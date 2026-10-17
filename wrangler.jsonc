@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "enshroudedbuilds",
+  "compatibility_date": "2026-10-13",
+  // Static site only: serve the generated files in ./public, no Worker script
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
+}
