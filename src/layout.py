@@ -7,7 +7,7 @@ SITE_NAME = "Enshrouded Builds"
 UPDATED = "2026-10-17"
 UPDATED_HUMAN = "October 17, 2026"
 # Google Analytics 4 measurement ID (e.g. "G-XXXXXXXXXX"); leave empty to disable tracking
-GA_ID = ""
+GA_ID = "G-ZFZ6Q4KKHS"
 
 NAV = [
     ("/builds/", "All Builds"),
