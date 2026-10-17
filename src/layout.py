@@ -6,6 +6,8 @@ SITE = "https://enshroudedbuilds.org"
 SITE_NAME = "Enshrouded Builds"
 UPDATED = "2026-10-17"
 UPDATED_HUMAN = "October 17, 2026"
+# Google Analytics 4 measurement ID (e.g. "G-XXXXXXXXXX"); leave empty to disable tracking
+GA_ID = ""
 
 NAV = [
     ("/builds/", "All Builds"),
@@ -192,6 +194,14 @@ def footer(builds):
 </footer>'''
 
 
+def analytics():
+    if not GA_ID:
+        return ""
+    return (f'<script async src="https://www.googletagmanager.com/gtag/js?id={GA_ID}"></script>\n'
+            "<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}"
+            f"gtag('js',new Date());gtag('config','{GA_ID}');</script>\n")
+
+
 def page(*, path, title, description, body, builds, active="", schemas=(), og_type="article", keywords=""):
     url = SITE + path
     graph = [{"@type": "WebSite", "@id": SITE + "/#website", "url": SITE + "/", "name": SITE_NAME,
@@ -225,7 +235,7 @@ def page(*, path, title, description, body, builds, active="", schemas=(), og_ty
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script>{THEME_BOOT}</script>
+{analytics()}<script>{THEME_BOOT}</script>
 <link rel="stylesheet" href="/assets/styles.css">
 <script type="application/ld+json">{ld}</script>
 </head>
