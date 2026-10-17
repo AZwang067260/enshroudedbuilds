@@ -1,0 +1,41 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="local-fonts.css">
+<style>
+*{margin:0;box-sizing:border-box}
+body{width:1200px;height:630px;overflow:hidden;font-family:Inter,sans-serif;color:#f5efe6;background:#09090d;position:relative}
+.bg{position:absolute;inset:0;background:
+ radial-gradient(55% 75% at 8% 100%, rgba(249,115,22,.42), transparent 70%),
+ radial-gradient(45% 65% at 100% 0%, rgba(139,92,246,.40), transparent 70%),
+ radial-gradient(35% 45% at 82% 62%, rgba(249,115,22,.22), transparent 70%)}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(70% 80% at 40% 50%,#000,transparent)}
+.mist{position:absolute;left:-10%;right:-10%;bottom:-60px;height:220px;background:radial-gradient(50% 60% at 30% 60%,rgba(167,139,250,.18),transparent 70%),radial-gradient(40% 50% at 75% 70%,rgba(167,139,250,.12),transparent 70%);filter:blur(10px)}
+.wrap{position:relative;height:100%;padding:56px 64px;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:12px;font-family:Cinzel,serif;font-weight:700;font-size:26px;letter-spacing:.06em}
+.brand b{color:#fb923c}
+.pill{display:inline-flex;align-items:center;gap:8px;margin-top:44px;padding:7px 14px;border-radius:999px;background:#f97316;color:#140a03;font-weight:700;font-size:18px;width:max-content}
+h1{font-family:Cinzel,serif;font-weight:700;font-size:76px;line-height:1.04;margin-top:22px;letter-spacing:.01em;max-width:780px}
+h1 span{background:linear-gradient(90deg,#fdba74,#f97316);-webkit-background-clip:text;color:transparent}
+p.sub{margin-top:20px;font-size:25px;color:#c9c3cf;max-width:700px;line-height:1.4}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto;max-width:760px}
+.chip{padding:8px 14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);border-radius:8px;font-size:17px;font-weight:600;color:#e9e4ee}
+.chip.s{border-color:rgba(249,115,22,.6);color:#fdba74}
+.url{position:absolute;right:64px;bottom:56px;font-size:22px;font-weight:600;color:#f5efe6}
+.url small{display:block;text-align:right;font-size:15px;color:#9a93a3;font-weight:500;margin-bottom:4px}
+.emblem{position:absolute;right:70px;top:92px;width:330px;height:330px;display:flex;align-items:center;justify-content:center}
+.ring{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(249,115,22,.35);box-shadow:0 0 80px rgba(249,115,22,.35),inset 0 0 60px rgba(139,92,246,.25)}
+.ring2{position:absolute;inset:34px;border-radius:50%;border:1px dashed rgba(196,181,253,.35)}
+.lv{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:#09090d;border:1px solid rgba(249,115,22,.5);padding:6px 16px;border-radius:8px;font-weight:700;font-size:18px;color:#fdba74;white-space:nowrap}
+</style></head><body>
+<div class="bg"></div><div class="grid"></div><div class="mist"></div>
+<div class="emblem"><div class="ring"></div><div class="ring2"></div>
+<svg width="170" height="170" viewBox="0 0 24 24" fill="none" stroke="url(#g)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 24px rgba(249,115,22,.8))"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fde68a"/><stop offset="1" stop-color="#f97316"/></linearGradient></defs><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+<div class="lv">LEVEL 50 · GEAR 55</div></div>
+<div class="wrap">
+ <div class="brand"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>ENSHROUDED<b>BUILDS</b></div>
+ <div class="pill">UPDATED FOR ENSHROUDED 1.0</div>
+ <h1>Best Enshrouded <span>Builds</span> for 1.0</h1>
+ <p class="sub">Skill tree paths, attributes, gear &amp; spells for every class.</p>
+ <div class="chips"><span class="chip s">Wizard</span><span class="chip s">Battlemage</span><span class="chip s">Barbarian</span><span class="chip">Tank</span><span class="chip">Warrior</span><span class="chip">Ranger</span><span class="chip">Assassin</span><span class="chip">Healer</span><span class="chip">Necromancer</span></div>
+</div>
+<div class="url"><small>Free build guides</small>enshroudedbuilds.org</div>
+</body></html>

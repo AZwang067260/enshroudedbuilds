@@ -1,0 +1,12 @@
+{
+  "name": "enshroudedbuilds",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "python3 src/build.py",
+    "serve": "npx --yes serve public"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.16"
+  },
+  "private": true
+}

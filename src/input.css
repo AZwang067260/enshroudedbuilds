@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {:root {
+  --background: 36 33% 97%; --foreground: 240 10% 8%;
+  --card: 0 0% 100%; --card-foreground: 240 10% 8%;
+  --primary: 22 92% 48%; --primary-foreground: 0 0% 100%;
+  --secondary: 30 20% 92%; --secondary-foreground: 240 10% 12%;
+  --muted: 30 18% 93%; --muted-foreground: 240 5% 38%;
+  --accent: 30 25% 90%; --accent-foreground: 240 10% 12%;
+  --border: 30 15% 85%; --input: 30 15% 85%; --ring: 22 92% 48%;
+  --shroud: 268 60% 50%; --destructive: 0 72% 50%;
+  --radius: 0.6rem;
+}
+.dark {
+  --background: 240 14% 5%; --foreground: 36 20% 94%;
+  --card: 240 12% 8%; --card-foreground: 36 20% 94%;
+  --primary: 24 95% 55%; --primary-foreground: 240 14% 6%;
+  --secondary: 240 8% 14%; --secondary-foreground: 36 20% 94%;
+  --muted: 240 8% 13%; --muted-foreground: 240 5% 66%;
+  --accent: 240 8% 16%; --accent-foreground: 36 20% 94%;
+  --border: 240 7% 18%; --input: 240 7% 18%; --ring: 24 95% 55%;
+  --shroud: 268 75% 68%; --destructive: 0 70% 55%;
+}
+* { border-color: hsl(var(--border)); }
+html { scroll-behavior: smooth; }
+body { background: hsl(var(--background)); color: hsl(var(--foreground)); -webkit-font-smoothing: antialiased; }
+.hero-glow { background:
+  radial-gradient(60% 60% at 20% 0%, hsl(var(--primary) / .18), transparent 70%),
+  radial-gradient(50% 60% at 90% 10%, hsl(var(--shroud) / .18), transparent 70%); }
+.prose-eb > p, .prose-eb > section > p { margin: 0 0 1rem; line-height: 1.75; color: hsl(var(--foreground) / .88); }
+.prose-eb h2 { font-size: 1.6rem; font-weight: 700; letter-spacing: -.02em; margin: 2.5rem 0 1rem; scroll-margin-top: 5rem; }
+.prose-eb h3 { font-size: 1.15rem; font-weight: 600; margin: 1.75rem 0 .6rem; scroll-margin-top: 5rem; }
+.prose-eb ul.dots { list-style: disc; padding-left: 1.25rem; margin: 0 0 1rem; }
+.prose-eb ul.dots li { margin: .35rem 0; line-height: 1.7; }
+.prose-eb a:not(.btn) { color: hsl(var(--primary)); text-underline-offset: 3px; }
+.prose-eb a:not(.btn):hover { text-decoration: underline; }
+details > summary { list-style: none; cursor: pointer; }
+details > summary::-webkit-details-marker { display: none; }
+details[open] .chev { transform: rotate(180deg); }
+.tab-btn[aria-selected="true"] { background: hsl(var(--background)); color: hsl(var(--foreground)); box-shadow: 0 1px 2px rgb(0 0 0 / .15); }
+}
