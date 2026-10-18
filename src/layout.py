@@ -4,8 +4,8 @@ from html import escape
 
 SITE = "https://enshroudedbuilds.org"
 SITE_NAME = "Enshrouded Builds"
-UPDATED = "2026-10-17"
-UPDATED_HUMAN = "October 17, 2026"
+UPDATED = "2026-10-18"
+UPDATED_HUMAN = "October 18, 2026"
 # Google Analytics 4 measurement ID (e.g. "G-XXXXXXXXXX"); leave empty to disable tracking
 GA_ID = "G-ZFZ6Q4KKHS"
 
@@ -60,7 +60,7 @@ def badge(text, variant="secondary"):
         "outline": "text-foreground",
         "shroud": "border-transparent bg-shroud/15 text-shroud",
     }
-    return (f'<span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold '
+    return (f'<span class="inline-flex shrink-0 items-center whitespace-nowrap rounded-md border px-2.5 py-0.5 text-xs font-semibold '
             f'{styles[variant]}">{e(text)}</span>')
 
 

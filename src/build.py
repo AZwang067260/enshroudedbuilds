@@ -45,6 +45,35 @@ def build_card(b):
 </a>'''
 
 
+HUBS = [
+    ("/enshrouded-1-0-builds/", "Enshrouded 1.0 Builds", "Everything Update 1.0 changed, plus the skill tree reset re-spec checklist."),
+    ("/tier-list/", "Builds Tier List (1.0)", "Every Enshrouded build ranked for the 1.0 full release."),
+    ("/skill-tree/", "Skill Tree Guide (1.0)", "All 12 archetypes, attributes, skill points and respecs."),
+    ("/builds/", "All Enshrouded Builds", "Compare every class build by role, stats and difficulty."),
+]
+
+
+def hub_links(exclude=""):
+    """Cards linking to the hub pages; the 1.0 builds page is highlighted as the main entry point."""
+    out = ""
+    for href, name, blurb in HUBS:
+        if href == exclude:
+            continue
+        accent = "border-primary/60 bg-primary/5" if href == "/enshrouded-1-0-builds/" else "bg-card"
+        out += (f'<a href="{href}" class="block rounded-lg border p-4 text-sm transition-colors hover:border-primary/60 {accent}">'
+                f'<span class="font-semibold">{e(name)} →</span><br><span class="text-muted-foreground">{e(blurb)}</span></a>')
+    return f'<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{out}</div>'
+
+
+def all_builds_grid(exclude=""):
+    """Compact links to every class build page."""
+    items = "".join(
+        f'<a href="/builds/{b["slug"]}/" class="flex items-center justify-between gap-2 rounded-lg border bg-card p-3 text-sm hover:border-primary/60">'
+        f'<span class="font-medium">Enshrouded {e(b["short"])} Build</span>{tier_badge(b["tier"])}</a>'
+        for b in sorted(BUILDS, key=lambda b: TIER_ORDER[b["tier"]]) if b["slug"] != exclude)
+    return f'<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{items}</div>'
+
+
 def section(id_, title, inner):
     return f'<section aria-labelledby="{id_}"><h2 id="{id_}">{title}</h2>{inner}</section>'
 
@@ -63,7 +92,7 @@ def build_page(b):
     path = f"/builds/{b['slug']}/"
     crumbs_html, crumbs_schema = breadcrumb([("/", "Home"), ("/builds/", "Enshrouded Builds"), (path, f"{b['short']} Build")])
     n = b["short"]
-    toc = [("overview", f"{n} build overview"), ("why-1-0", "What changed in 1.0"), ("attributes", "Attribute priority"),
+    toc = [("overview", f"{n} build overview"), ("why-1-0", "What changed in 1.0"), ("respec", "Re-spec after the 1.0 reset"), ("attributes", "Attribute priority"),
            ("skill-tree", "Skill tree path (1–50)"), ("key-skills", "Key skills"), ("gear", "Best gear")]
     if b["spells"]:
         toc.append(("spells", "Spells & arrows"))
@@ -95,8 +124,17 @@ def build_page(b):
         f'<a href="/builds/{s}/" class="rounded-lg border bg-card p-4 text-sm hover:border-primary/60"><span class="font-semibold">{e(BY_SLUG[s]["short"])} build</span><br><span class="text-muted-foreground">{e(t)}</span></a>'
         for s, t in b["hybrids"]) + "</div>"
 
-    others = [x for x in BUILDS if x["slug"] != b["slug"]][:3]
-    related = '<div class="grid gap-4 md:grid-cols-3">' + "".join(build_card(x) for x in others) + "</div>"
+    first_skills = ", ".join(f"<strong>{e(s)}</strong>" for s, _ in b["phases"][0][1][:3])
+    respec = (f'<h3 id="respec">How to re-spec the {n} after the 1.0 skill tree reset</h3><ol class="my-4 list-decimal space-y-2 pl-5">'
+              f'<li>Stay in your base and open the skill tree. Every point was refunded when you first loaded your save in Update 1.0.</li>'
+              f'<li>Take the opening nodes first: {first_skills}.</li>'
+              f'<li>Put attribute points into <strong>{e(b["primary"])}</strong>, following the priority table below.</li>'
+              f'<li>Follow the level 1–50 path in the <a href="#skill-tree">skill tree section</a> and stop where your current level runs out.</li>'
+              f'<li>Re-check your hotbar and weapon swap ({e(b["weapon"])}) before leaving base.</li></ol>'
+              f'<p>For the changes that affect every build, read our <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds guide</a> and its full re-spec checklist.</p>')
+    related = (f'<p class="mb-4 text-muted-foreground">Every other Enshrouded 1.0 class build, rebuilt after the October 15, 2026 skill tree reset:</p>'
+               + all_builds_grid(b["slug"])
+               + '<h3 class="mb-4 mt-10 text-lg font-semibold">Enshrouded 1.0 guides</h3>' + hub_links())
 
     body = f'''
 <div class="hero-glow border-b">
@@ -111,7 +149,7 @@ def build_page(b):
 <div class="container grid gap-10 py-10 lg:grid-cols-[1fr_280px]">
   <article class="prose-eb min-w-0">
     {section("overview", f"Enshrouded {n} build overview", paras(b["intro"]) + quick)}
-    {section("why-1-0", f"What changed for the {n} in Enshrouded 1.0", paras(b["why"]) + alert("1.0 skill tree reset", "Every character's skill tree was reset at the 1.0 launch on October 15, 2026, and all points were refunded. Re-spend your points before leaving your base. Your character level is kept."))}
+    {section("why-1-0", f"What changed for the {n} in Enshrouded 1.0", paras(b["why"]) + alert("Update 1.0 skill tree reset", 'Every character\'s skill tree was reset when Enshrouded Update 1.0 launched on October 15, 2026, and all points were refunded. Re-spend your points before leaving your base. Your character level is kept. See all <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds</a>.') + respec)}
     {section("attributes", f"{n} attribute priority", f"<p>Attribute points decide how your {n.lower()} build scales. Use this priority when you spend points on the skill tree:</p>" + table(["Attribute", "Priority", "Why"], [[f"<strong>{e(a)}</strong>", e(p), e(w)] for a, p, w in b["attributes"]]))}
     {section("skill-tree", f"Enshrouded {n} skill tree path (level 1–50)", f"<p>Below is the recommended {n.lower()} skill order for Enshrouded 1.0, split into early, mid and late game. Fill in attribute nodes as you path between these key skills. With the 1.0 level cap at 50 you have more points than in early access, so the late-game tab includes optional flex picks.</p>" + tabs(phase_tabs) + alert("Verify in-game", "Skill names and positions are taken from the 1.0 launch tree. Keen Games may adjust values in hotfixes, so always check the in-game tooltip before committing your points."))}
     {section("key-skills", f"Key {n} skills explained", key)}
@@ -262,8 +300,9 @@ def builds_hub():
 <div class="prose-eb mt-16 max-w-4xl">
 <h2>Choosing between Enshrouded builds</h2>
 <p>Because Enshrouded has no locked classes, every build here is a starting point, not a cage. Most players settle on one main archetype and borrow a few nodes from a neighboring one. A Warrior might take Tank armor scaling, a Wizard might add Battlemage wand sustain, and a Ranger might take Assassin crits. Each build page ends with a <em>Hybrid builds</em> section that shows which combinations work well.</p>
-<p>If you are coming back after the <a href="/enshrouded-1-0-builds/">1.0 update</a>, remember that your skill points were refunded. It is the best time to try something new, since you have to re-spend everything anyway.</p>
-</div></div>'''
+<p>If you are coming back after Update 1.0 (October 15, 2026), remember that your skill points were refunded. It is the best time to try something new, since you have to re-spend everything anyway. Our <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds guide</a> covers every change and the re-spec checklist.</p>
+</div>
+<section class="mt-12" aria-labelledby="guides"><h2 id="guides" class="mb-4 text-2xl font-bold">More Enshrouded 1.0 guides</h2>{hub_links(path)}</section></div>'''
     title = "All Enshrouded Builds for 1.0: Mage, Melee, Ranged & Support"
     desc = "Compare every Enshrouded build for 1.0. Wizard, Battlemage, Necromancer, Healer, Barbarian, Warrior, Tank, Ranger and Assassin, with tiers, main stats and difficulty."
     write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, active=path,
@@ -307,12 +346,13 @@ def one_point_oh():
     ]
     body = f'''
 <div class="hero-glow border-b"><div class="container py-12">{ch}
-<div class="flex flex-wrap gap-2">{badge("Released Oct 15, 2026", "primary")}{badge("PC & PS5", "outline")}</div>
-<h1 class="mt-4 text-3xl font-bold tracking-tight md:text-5xl">Enshrouded 1.0 Builds: Best Builds After the Skill Tree Reset</h1>
-<p class="mt-4 max-w-3xl text-lg text-muted-foreground">Everything that changed for builds in the Enshrouded 1.0 full release: the skill tree reset, the level 50 cap, new skills and spells, Eternal arrows, and the best builds to re-spec into.</p></div></div>
+<div class="flex flex-wrap gap-2">{badge("Update 1.0 · Released Oct 15, 2026", "primary")}{badge("PC & PS5", "outline")}{badge("Updated " + UPDATED_HUMAN, "outline")}</div>
+<h1 class="mt-4 text-3xl font-bold tracking-tight md:text-5xl">Enshrouded 1.0 Builds: Best Builds for Update 1.0 (October 15, 2026)</h1>
+<p class="mt-4 max-w-3xl text-lg text-muted-foreground">Enshrouded Update 1.0 launched on October 15, 2026 and reset every skill tree. Here are the best Enshrouded 1.0 builds for every class, what changed in the update, and how to re-spec your points.</p>
+<div class="mt-6 flex flex-wrap gap-3">{button("#best", "Best 1.0 builds")}{button("#checklist", "Re-spec checklist", "outline")}</div></div></div>
 <div class="container py-10"><article class="prose-eb mx-auto max-w-4xl">
 <h2 class="!mt-0" id="overview">Enshrouded 1.0 at a glance</h2>
-<p><strong>Enshrouded 1.0</strong> launched on <strong>October 15, 2026</strong> for PC and PlayStation 5, ending more than two and a half years of Early Access. For build-focused players this release changes everything: <strong>every skill tree was reset</strong>, the level cap went from 45 to 50, gear now goes up to level 55, and the game added eight new skills, nine new spells and upgradeable Eternal gear. Every older guide is now outdated, which is why demand for <strong>Enshrouded 1.0 builds</strong> is rising so fast.</p>
+<p><strong>Enshrouded Update 1.0</strong>, the full release, launched on <strong>October 15, 2026</strong> for PC and PlayStation 5, ending more than two and a half years of Early Access. For build-focused players this release changes everything: <strong>every skill tree was reset</strong>, the level cap went from 45 to 50, gear now goes up to level 55, and the game added eight new skills, nine new spells and upgradeable Eternal gear. Every older guide is now outdated, which is why demand for <strong>Enshrouded 1.0 builds</strong> is rising so fast.</p>
 {changes}
 <h2 id="checklist">1.0 re-spec checklist</h2>
 <p>Your points were refunded when you first loaded your save in 1.0. Follow this checklist before you go back into the Shroud:</p>
@@ -324,15 +364,17 @@ def one_point_oh():
 <h2 id="melee">1.0 changes for melee builds</h2>
 <p>Melee builds got fewer new skills but benefit from lower skill costs and buffs to existing nodes, plus the higher level and gear caps. Warriors no longer need to step around dagger nodes, Tanks get more value from top-tier heavy armor, and Barbarians reach their two-handed damage spikes earlier. See the <a href="/builds/warrior/">Warrior</a>, <a href="/builds/tank/">Tank</a> and <a href="/builds/barbarian/">Barbarian</a> guides.</p>
 <h2 id="best">Best Enshrouded 1.0 builds</h2>
-<div class="not-prose my-6 grid gap-5 sm:grid-cols-2">{"".join(build_card(BY_SLUG[s]) for s in ["wizard", "battlemage", "barbarian", "necromancer"])}</div>
+<p>Every class guide below was rewritten for Update 1.0, with a level 1–50 skill path and a re-spec section for the October 15 skill tree reset. Start with the S-tier builds if you want the strongest picks.</p>
+<div class="not-prose my-6 grid gap-5 sm:grid-cols-2">{"".join(build_card(b) for b in sorted(BUILDS, key=lambda b: TIER_ORDER[b["tier"]]))}</div>
+<p>Want the ranking at a glance? See the <a href="/tier-list/">Enshrouded builds tier list</a>, or learn how each archetype works in the <a href="/skill-tree/">skill tree guide</a>.</p>
 {alert("Hotfixes ahead", "Enshrouded 1.0 is only a few days old. Some numbers, such as the exact values for Puncture and Barrage and the total skill points at level 50, have not been officially confirmed yet. We will update these guides when Keen Games releases patch notes.")}
 <h2 id="faq">Enshrouded 1.0 FAQ</h2>
 {accordion(ONE_FAQ)}
 </article></div>'''
-    title = "Enshrouded 1.0 Builds: Best Builds After the Skill Tree Reset"
-    desc = "Enshrouded 1.0 builds guide: skill tree reset, level 50 cap, gear 55, new mage and archer skills, 9 new spells, Eternal arrows and the best builds to re-spec into."
+    title = "Enshrouded 1.0 Builds: Best Update 1.0 Builds (Oct 15, 2026)"
+    desc = "Best Enshrouded 1.0 builds for every class after Update 1.0 (Oct 15, 2026): skill tree reset, level 50 cap, gear 55, new skills and spells, and a re-spec checklist."
     write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, active=path,
-                     keywords="enshrouded 1.0 builds, enshrouded 1.0, enshrouded skill tree reset, enshrouded 1.0 best build, enshrouded full release",
+                     keywords="enshrouded 1.0 builds, enshrouded update 1.0, enshrouded 1.0, enshrouded skill tree reset, enshrouded 1.0 best build, enshrouded full release",
                      schemas=[article_schema(path, title, desc), cs, faq_schema(ONE_FAQ)]), "1.0")
 
 
@@ -365,13 +407,15 @@ def tier_list():
 <div class="container py-10"><div class="space-y-4">{rows}</div>
 <article class="prose-eb mx-auto mt-12 max-w-4xl">
 <h2 class="!mt-0">How we rank Enshrouded builds</h2>
-<p>Every build on this list can finish Enshrouded 1.0. The tiers measure how <em>efficient</em> and <em>forgiving</em> a build is at the new level 50 cap with gear up to level 55. We score four things: damage output, survivability, solo strength and ease of use. A-tier builds are not weak. Several of them, like the Tank and Healer, are more valuable than S-tier builds in a coordinated co-op group.</p>
+<p>Every build on this list can finish Enshrouded 1.0. For what Update 1.0 changed on October 15, 2026 and how to re-spec, read the <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds guide</a>. The tiers measure how <em>efficient</em> and <em>forgiving</em> a build is at the new level 50 cap with gear up to level 55. We score four things: damage output, survivability, solo strength and ease of use. A-tier builds are not weak. Several of them, like the Tank and Healer, are more valuable than S-tier builds in a coordinated co-op group.</p>
 <h2>S-tier Enshrouded builds</h2>
 <p>The <a href="/builds/wizard/">Wizard</a> keeps the top spot thanks to unmatched area damage and the new 1.0 spells. The <a href="/builds/battlemage/">Battlemage</a> is the best solo build: Unity and Arcane Deflection keep its mana nearly infinite and the shield covers mistakes. The <a href="/builds/barbarian/">Barbarian</a> brings the highest physical damage, using two-handed stuns as defense.</p>
 <h2>A-tier Enshrouded builds</h2>
 <p>The <a href="/builds/tank/">Tank</a> and <a href="/builds/healer/">Healer</a> rank lower only because they shine in groups. The <a href="/builds/warrior/">Warrior</a> is the best build for beginners. The <a href="/builds/ranger/">Ranger</a> improved a lot with Eternal arrows, and the <a href="/builds/assassin/">Assassin</a> benefits from daggers moving into its tree. The <a href="/builds/necromancer/">Necromancer</a> may rise to S-tier once 1.0 hotfixes settle the summon numbers.</p>
 <p>Tier lists change with patches. This list was last reviewed on {UPDATED_HUMAN}.</p>
-</article></div>'''
+</article>
+<section class="mx-auto mt-12 max-w-5xl" aria-labelledby="all-builds"><h2 id="all-builds" class="mb-4 text-2xl font-bold">Every Enshrouded 1.0 build guide</h2>{all_builds_grid()}
+<h3 class="mb-4 mt-10 text-lg font-semibold">More Enshrouded 1.0 guides</h3>{hub_links(path)}</section></div>'''
     title = "Enshrouded Builds Tier List (1.0): Best Builds Ranked"
     desc = "Enshrouded builds tier list for 1.0: S-tier Wizard, Battlemage and Barbarian, plus A-tier Tank, Warrior, Healer, Ranger, Assassin and Necromancer, with the reasons behind each pick."
     write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, active=path,
@@ -425,11 +469,13 @@ def skill_tree():
 <p>Most nodes on the path to big skills are attribute nodes, so knowing what each attribute does is the first step toward a good <strong>Enshrouded build</strong>.</p>
 {attrs}
 <h2>Planning a build in 1.0</h2>
-<p>With the level cap at 50, you have more points than in Early Access, but still not enough to fill everything. The best builds pick <strong>one main archetype</strong>, go deep for its key skills, and use a <strong>neighbouring archetype</strong> for support: Tank armor for a Warrior, Battlemage sustain for a Wizard, Assassin crits for a Ranger. Avoid spreading single points across the whole tree. Many weak nodes add up to much less than a few strong capstones.</p>
+<p>Update 1.0 (October 15, 2026) reset every skill tree, so everyone is re-spending points right now. The <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds guide</a> has the full re-spec checklist. With the level cap at 50, you have more points than in Early Access, but still not enough to fill everything. The best builds pick <strong>one main archetype</strong>, go deep for its key skills, and use a <strong>neighbouring archetype</strong> for support: Tank armor for a Warrior, Battlemage sustain for a Wizard, Assassin crits for a Ranger. Avoid spreading single points across the whole tree. Many weak nodes add up to much less than a few strong capstones.</p>
 <p>Utility archetypes like <strong>Athlete, Trickster, Beastmaster and Survivor</strong> are rarely a build's main focus, but one or two of their nodes can help a lot with movement, control or exploring the Shroud.</p>
 <h2>Skill tree FAQ</h2>
 {accordion(faq)}
-</article></div>'''
+</article>
+<section class="mx-auto mt-12 max-w-5xl" aria-labelledby="all-builds"><h2 id="all-builds" class="mb-4 text-2xl font-bold">Enshrouded 1.0 builds for every archetype</h2>{all_builds_grid()}
+<h3 class="mb-4 mt-10 text-lg font-semibold">More Enshrouded 1.0 guides</h3>{hub_links(path)}</section></div>'''
     title = "Enshrouded Skill Tree Guide (1.0): All 12 Archetypes Explained"
     desc = "Enshrouded skill tree guide for 1.0: all 12 archetypes (Warrior, Tank, Barbarian, Wizard, Battlemage, Healer, Ranger, Assassin and more), attributes, skill points and respec."
     write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, active=path,
