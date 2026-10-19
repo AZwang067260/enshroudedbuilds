@@ -12,6 +12,7 @@ GA_ID = "G-ZFZ6Q4KKHS"
 NAV = [
     ("/builds/", "All Builds"),
     ("/enshrouded-1-0-builds/", "1.0 Builds"),
+    ("/enshrouded-1-0-patch-notes/", "1.0 Patch Notes"),
     ("/tier-list/", "Tier List"),
     ("/skill-tree/", "Skill Tree Guide"),
 ]
@@ -182,6 +183,7 @@ def footer(builds):
     <div><p class="mb-3 text-sm font-semibold">Class Builds</p><ul class="space-y-2 text-sm text-muted-foreground">{blinks}</ul></div>
     <div><p class="mb-3 text-sm font-semibold">Guides</p><ul class="space-y-2 text-sm text-muted-foreground">
       <li><a href="/enshrouded-1-0-builds/" class="hover:text-foreground">Enshrouded 1.0 Builds</a></li>
+      <li><a href="/enshrouded-1-0-patch-notes/" class="hover:text-foreground">Enshrouded 1.0 Patch Notes</a></li>
       <li><a href="/tier-list/" class="hover:text-foreground">Builds Tier List</a></li>
       <li><a href="/skill-tree/" class="hover:text-foreground">Skill Tree Guide</a></li>
       <li><a href="/builds/" class="hover:text-foreground">All Builds</a></li>
