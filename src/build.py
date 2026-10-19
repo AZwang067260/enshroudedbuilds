@@ -389,7 +389,7 @@ def one_point_oh():
 <p>Every class guide below was rewritten for Update 1.0, with a level 1–50 skill path and a re-spec section for the October 15 skill tree reset. Start with the S-tier builds if you want the strongest picks.</p>
 <div class="not-prose my-6 grid gap-5 sm:grid-cols-2">{"".join(build_card(b) for b in sorted(BUILDS, key=lambda b: TIER_ORDER[b["tier"]]))}</div>
 <p>Want the ranking at a glance? See the <a href="/tier-list/">Enshrouded builds tier list</a>, or learn how each archetype works in the <a href="/skill-tree/">skill tree guide</a>.</p>
-{alert("Hotfixes ahead", "Enshrouded 1.0 is only a few days old. Some numbers, such as the exact values for Puncture and Barrage and the total skill points at level 50, have not been officially confirmed yet. We will update these guides when Keen Games releases patch notes.")}
+{alert("Hotfixes ahead", "Enshrouded 1.0 is only a few days old. Some numbers, such as the exact values for Puncture and Barrage, have not been officially confirmed yet. We will update these guides when Keen Games releases patch notes.")}
 <h2 id="faq">Enshrouded 1.0 FAQ</h2>
 {accordion(ONE_FAQ)}
 </article></div>'''
@@ -407,7 +407,7 @@ PATCH_FAQ = [
 ("What are the new skills in Enshrouded 1.0?", "Eight new skills: five for mages (Advanced Necromancy, Totem Mastery, Aerial Wand Attack, Wand Evasion Attack, Blast and Cast) and three for archers (Puncture, Barrage, Survival Instinct)."),
 ("What are the new spells in Enshrouded 1.0?", "Nine new spells: Mana Drain, Entangle, Pillar of Flames, Blizzard, Ball Lightning, Summon Fire Totem, Summon Ice Totem, Summon Shock Totem and Summon Hollow Skeleton."),
 ("Did Enshrouded 1.0 reset my skill tree?", "Yes. Every character's skill tree was reset and all skill points were refunded the first time you load your save in 1.0. Your level, items and base are kept."),
-("What is the new level cap in Enshrouded 1.0?", "The player level cap went up from 45 to 50, and gear now goes up to level 55."),
+("What is the new level cap in Enshrouded 1.0?", "The player level cap went up from 45 to 50, and gear now goes up to level 55. A level 50 character has 212 skill points in total."),
 ("Does Enshrouded 1.0 have crossplay?", "No, there is no crossplay at launch."),
 ]
 
@@ -441,6 +441,7 @@ def patch_notes():
         ["Skill tree", "Your old spend", "<strong>Full reset, all points refunded</strong>"],
         ["Level cap", "45", "<strong>50</strong>"],
         ["Gear level", "Lower cap", "<strong>Up to 55</strong>"],
+        ["Skill points", "-", "<strong>212 at level 50</strong> (2 per level + Shroud Roots)"],
         ["New skills", "-", "<strong>8</strong> (5 mage, 3 archer)"],
         ["New spells", "-", "<strong>9</strong> (4 of them summons)"],
         ["Eternal gear", "-", "<strong>22 tier-7 Eternal spells</strong> and <strong>Eternal Fire, Shock and Bone arrows</strong>"],
@@ -465,7 +466,7 @@ def patch_notes():
 <p>Not sure how to spend them? Our <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds guide</a> has a re-spec checklist, and every class guide has a level 1–50 skill order.</p>
 
 <h2 id="level-cap">Level cap 50 and gear level 55</h2>
-<p>The player level cap rose from <strong>45 to 50</strong>, which means more skill points for every build. Gear now goes up to <strong>level 55</strong>, so the top weapons and armor sets of Early Access are no longer the best in the game. Upgrading your main weapon to the new tier is the biggest damage increase after the update.</p>
+<p>The player level cap rose from <strong>45 to 50</strong>, which means more skill points for every build: <strong>212 in total at level 50</strong> (2 per level plus Shroud Roots), according to community planners built from the game files. Gear now goes up to <strong>level 55</strong>, so the top weapons and armor sets of Early Access are no longer the best in the game. Upgrading your main weapon to the new tier is the biggest damage increase after the update.</p>
 
 <h2 id="new-skills">New skills in Enshrouded 1.0</h2>
 <p>Update 1.0 adds <strong>eight new skills</strong>: five for mages and three for archers. Exact values for some skills, such as Puncture and Barrage, had not been published at launch, so check the in-game tooltip.</p>
@@ -560,7 +561,7 @@ def skill_tree():
         ["Mage", "<strong>Wizard</strong>", "Elemental spell and staff damage", '<a href="/builds/wizard/">Wizard</a>'],
         ["Mage", "<strong>Battlemage</strong>", "Wands + shields", '<a href="/builds/battlemage/">Battlemage</a>'],
         ["Mage", "<strong>Healer</strong>", "Healing and support", '<a href="/builds/healer/">Healer</a>'],
-        ["Mage", "<strong>Trickster</strong>", "Crowd control and debuffs", "Mage utility"],
+        ["Mage", "<strong>Trickster</strong>", "Spell charge speed (Quick Charge), mana regen (Mana Currents), utility", '<a href="/builds/necromancer/">Necromancer</a>'],
         ["Ranger", "<strong>Ranger</strong>", "Bows, extra arrows, weak points", '<a href="/builds/ranger/">Ranger</a>'],
         ["Ranger", "<strong>Assassin</strong>", "Crits, daggers (since 1.0), glider", '<a href="/builds/assassin/">Assassin</a>'],
         ["Ranger", "<strong>Beastmaster</strong>", "Hunting and survival utility", "Utility"],
@@ -576,9 +577,9 @@ def skill_tree():
     ])
     faq = [
         ("How many archetypes are in the Enshrouded skill tree?", "Twelve, in three combat areas: Warrior (Warrior, Tank, Barbarian, Athlete), Mage (Wizard, Battlemage, Healer, Trickster) and Ranger (Ranger, Assassin, Beastmaster, Survivor)."),
-        ("How do you get skill points in Enshrouded?", "Mainly by leveling up, which you do by gaining XP from combat, quests and exploration. The 1.0 level cap is 50."),
+        ("How do you get skill points in Enshrouded?", "You get 2 skill points per level up to the 1.0 cap of 50, plus extra points from destroying Shroud Roots."),
         ("Can you reset skills in Enshrouded?", "Yes, you can respec your skill points. Everyone also got a free reset with the 1.0 launch."),
-        ("How many skill points do you get at level 50?", "The exact 1.0 total has not been officially confirmed, and community sources disagree. We will update this answer when Keen Games publishes it."),
+        ("How many skill points do you get at level 50?", "212 in total at level 50, according to community planners built from the 1.0 game files. You get 2 points per level, and destroying Shroud Roots adds the rest."),
     ]
     body = f'''
 <div class="hero-glow border-b"><div class="container py-12">{ch}
@@ -587,6 +588,9 @@ def skill_tree():
 <div class="container py-10"><article class="prose-eb mx-auto max-w-4xl">
 <h2 class="!mt-0">How the Enshrouded skill tree works</h2>
 <p>The <strong>Enshrouded skill tree</strong> is one large connected web that every character shares. You start in the middle and unlock nodes outward with skill points earned from leveling. Some nodes are small attribute increases, others are passive bonuses, and a few are build-defining skills like Blink, Unity or Battle Heal. Nodes are grouped into archetypes, and your build is the shape your path makes through them.</p>
+<h2 id="structure-1-0">The 1.0 skill tree layout</h2>
+<p>In Update 1.0 the tree is organized as <strong>three main trees, Warrior, Ranger and Mage</strong>, branching out from a shared <strong>Core</strong> of general skills in the center. Community planners built from the game files count about <strong>243 nodes and 166 skills</strong>. Inside each main tree, the familiar archetype groups remain: Wizard, Battlemage, Healer and Trickster sit in the Mage tree, for example. That is why build guides, including ours, still name builds after archetypes.</p>
+<p>A level 50 character has <strong>212 skill points</strong> in total: you earn 2 points per level, and Shroud Roots add more on top. That is enough to max one main tree and reach well into a second, but not to take everything.</p>
 <h2>All 12 Enshrouded archetypes</h2>
 {arche}
 <h2>Attributes explained</h2>

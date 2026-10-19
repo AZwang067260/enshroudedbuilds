@@ -32,7 +32,8 @@ BUILDS = [
 ("Wizard (archetype node)", "Magic critical hit chance. Take it first."),
 ("Mage Apprentice", "Early magic damage boost that carries the opening levels."),
 ("Intelligence nodes", "Grab every one you path past."),
-("Wand Mastery", "Extra projectile chance on wands. Your early-game damage engine."),
+("Wand Specialization", "Unlocks your wand's special abilities, which trigger once your Focus bar is full."),
+("Wand Mastery", "Raises wand damage (3 ranks, about +5% each). Your early-game damage engine."),
 ("Blink", "Replaces the dodge roll with a short teleport. This is your defense."),
 ]),
 ("Levels 16–35", [
@@ -124,7 +125,9 @@ BUILDS = [
 "phases": [
 ("Levels 1–15", [
 ("Battlemage (archetype node)", "Entry to the wand/shield hybrid section."),
-("Wand Mastery", "Chance to fire extra projectiles. Huge early damage increase."),
+("Wand Specialization", "Unlocks your wand's special abilities, which trigger once your Focus bar is full."),
+("Wand Mastery", "Raises wand damage (3 ranks, about +5% each)."),
+("Arcane Proliferation", "Chance for wand attacks to fire double projectiles (the extra ones deal reduced damage)."),
 ("Sting", "Boosts your wand attacks. Pick it up as soon as it is reachable."),
 ("Intelligence + Constitution nodes", "Alternate them so you are not fragile."),
 ]),
@@ -132,7 +135,6 @@ BUILDS = [
 ("Unity", "Wand hits can restore mana. This is the reason the build never runs dry."),
 ("Arcane Deflection", "Parry → mana. Pairs with a shield."),
 ("Life Burst", "Sustain that lets you stay in fights longer."),
-("Arcane Proliferation", "Extra wand value along the Battlemage path."),
 ("Chain Hit (Wizard)", "Bouncing wand shots for clearing packs."),
 ]),
 ("Levels 36–50", [
@@ -144,7 +146,7 @@ BUILDS = [
 ]),
 ],
 "key_skills": [
-("Wand Mastery", "Chance for extra projectiles. The single biggest wand damage increase."),
+("Arcane Proliferation", "Wand attacks can fire double projectiles. Together with Wand Mastery's damage bonus it is the biggest early wand upgrade."),
 ("Unity", "Mana on wand hits. This turns the wand into a perpetual-motion weapon."),
 ("Arcane Deflection", "Rewards shield parries with mana and works well with a shield in the off-hand."),
 ("Wand Evasion Attack", "One of the new 1.0 skills: piercing, wider shots that clear lines of enemies."),
@@ -201,7 +203,7 @@ BUILDS = [
 ],
 "why": [
 "Summons did not exist as a real playstyle before 1.0. Because Advanced Necromancy and Totem Mastery increase your summon limits, the Necromancer can now hold whole fights by itself. Solo players who struggled with aggro now have built-in tanks.",
-"Since this is a brand-new archetype, exact summon numbers may still change with post-launch hotfixes. We will update this page when Keen Games publishes patch notes.",
+"The 1.0 summoner core is consistent across the community: Advanced Necromancy and Totem Mastery for more summons, the Necromancer skill for a bonus skull companion, and the Trickster nodes Quick Charge and Mana Currents to keep casting. Exact percentages may still change with hotfixes.",
 ],
 "attributes": [
 ("Intelligence", "Very high", "Magic scaling for your wand and spells."),
@@ -212,16 +214,19 @@ BUILDS = [
 "phases": [
 ("Levels 1–15", [
 ("Wizard / Battlemage entry nodes", "Get magic damage and crit online first."),
-("Wand Mastery", "Your personal damage while summons are on cooldown."),
+("Wand Mastery", "Raises wand damage: your personal damage while summons are on cooldown."),
 ("Intelligence + Spirit nodes", "Mana pool for summons."),
 ]),
 ("Levels 16–35", [
+("Advanced Necromancy (new)", "+1 Hollow skeleton per rank. Max it as soon as you have Summon Hollow Skeleton."),
+("Totem Mastery (new)", "+1 active totem per rank. Take it alongside your first totem spell."),
+("Necromancer", "Magic kills have a chance to summon a friendly skull companion (check the exact chance in-game)."),
+("Quick Charge", "Trickster node: shorter spell charge time, so summons and totems come out faster."),
+("Mana Currents", "Trickster node: higher base mana regeneration for constant recasting."),
 ("Unity", "Mana on wand hits keeps summons flowing."),
-("Totem Mastery (new)", "Raises your totem limit. Take it as soon as it is in reach."),
-("Constitution nodes", "Two or three for safety."),
 ]),
 ("Levels 36–50", [
-("Advanced Necromancy (new)", "Raises your skeleton limit. This is the build's capstone."),
+("Constitution nodes", "Two or three for safety."),
 ("Life Burst", "Extra sustain."),
 ("Chain Hit", "Better clearing between summon waves."),
 ("Remaining Spirit / Intelligence", "Spend the rest on mana and damage."),
@@ -230,10 +235,12 @@ BUILDS = [
 "key_skills": [
 ("Advanced Necromancy", "More Hollow skeletons at once. More bodies means more damage and more aggro soaked."),
 ("Totem Mastery", "More active totems. Mix Fire, Ice and Shock for damage plus slows."),
-("Unity", "Wand-based mana sustain so you can resummon all fight."),
+("Necromancer", "The original summon skill: magic kills can spawn a skull companion on top of your skeletons."),
+("Quick Charge &amp; Mana Currents", "Two Trickster nodes that every 1.0 summoner guide takes: faster spell charging and more mana regen."),
 ],
 "gear": [
 ("Main weapon", "<strong>Wand</strong> with Intelligence rolls", "Personal DPS and mana via Unity."),
+("Community picks", "<strong>Staff of Reeds</strong> + <strong>Candlelight Wand</strong>", "Recommended by several 1.0 summoner guides. Swap to higher-level gear as you find it."),
 ("Spells", "Summon Hollow Skeleton + 1–2 totem spells", "Upgrade Eternal versions when available."),
 ("Armor", "Light set with mana / Intelligence bonuses", "Mana is the bottleneck."),
 ("Accessories", "Max mana, mana regen, magic damage", "Sustain first."),
@@ -261,11 +268,12 @@ BUILDS = [
 ],
 "hybrids": [("wizard", "Wizard burst with summon support"), ("healer", "Summoner/Healer for co-op support"), ("battlemage", "Wand-heavy summoner")],
 "faqs": [
-("What is the best necromancer skill order in Enshrouded 1.0?", "Open with Wand Mastery and Intelligence/Spirit nodes (levels 1–15), take Unity and Totem Mastery in the mid game (16–35), then finish with Advanced Necromancy, Life Burst and Chain Hit (36–50). The full step-by-step table is in the skill order section above."),
+("What is the best necromancer skill order in Enshrouded 1.0?", "Open with Wand Mastery and Intelligence/Spirit nodes (levels 1–15). In the mid game (16–35) take Advanced Necromancy, Totem Mastery, Necromancer, Quick Charge, Mana Currents and Unity. Finish with Constitution, Life Burst and Chain Hit (36–50). The full step-by-step table is in the skill order section above."),
 ("Is the necromancer build the same as the summoner build?", "Yes. Players search for both names, but in Enshrouded 1.0 they mean the same build: a mage that fights with Summon Hollow Skeleton and the Fire, Ice and Shock totems, scaled by Advanced Necromancy and Totem Mastery."),
 ("Is there a Necromancer class in Enshrouded?", "There are no fixed classes, but Enshrouded 1.0 added Summon Hollow Skeleton, three elemental totem spells and the Advanced Necromancy and Totem Mastery skills. Together they make a real summoner build."),
 ("What does Advanced Necromancy do?", "It increases how many skeletons you can have summoned at the same time."),
 ("What does Totem Mastery do?", "It increases your active totem limit, so you can stack Fire, Ice and Shock totems together."),
+("What does the Necromancer skill do?", "Necromancer is a Mage-tree skill that gives magic kills a chance to summon a friendly skull companion. Community sources disagree on the exact chance, so check the in-game tooltip."),
 ("Is the summoner build good solo?", "Yes. Skeletons soak aggro, which helps solo players most of all."),
 ],
 },
