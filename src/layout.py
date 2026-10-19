@@ -4,8 +4,8 @@ from html import escape
 
 SITE = "https://enshroudedbuilds.org"
 SITE_NAME = "Enshrouded Builds"
-UPDATED = "2026-10-18"
-UPDATED_HUMAN = "October 18, 2026"
+UPDATED = "2026-10-19"
+UPDATED_HUMAN = "October 19, 2026"
 # Google Analytics 4 measurement ID (e.g. "G-XXXXXXXXXX"); leave empty to disable tracking
 GA_ID = "G-ZFZ6Q4KKHS"
 
