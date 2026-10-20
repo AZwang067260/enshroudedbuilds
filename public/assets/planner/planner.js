@@ -188,7 +188,13 @@
   $('#tr-fit').addEventListener('click', fit);
 
   // ---------- controls, presets, sharing
-  function loadPreset(b) { sel = {}; var p = D.presets[b] || {}; for (var id in p) sel[id] = p[id]; lv.value = D.levelCap; document.querySelectorAll('[data-biome]').forEach(function (c) { c.checked = true; }); }
+  var STAGE = { 1: [15, 2], 2: [35, 4] };
+  function loadPreset(b, stage) {
+    var st = STAGE[stage], p = D.presets[st ? b + ':' + stage : b] || {};
+    sel = {}; for (var id in p) sel[id] = p[id];
+    lv.value = st ? st[0] : D.levelCap;
+    document.querySelectorAll('[data-biome]').forEach(function (c, i) { c.checked = !st || i < st[1]; });
+  }
   pre.addEventListener('change', function () { var v = pre.value; if (v) loadPreset(v); pre.value = v; render(); });
   [lv, fl].forEach(function (x) { x.addEventListener('input', render); });
   document.querySelectorAll('[data-biome]').forEach(function (c) { c.addEventListener('change', render); });
@@ -208,7 +214,7 @@
   });
   (function fromHash() {
     var h = {}; location.hash.slice(1).split('&').forEach(function (kv) { var a = kv.split('='); if (a[0]) h[a[0]] = decodeURIComponent(a[1] || ''); });
-    if (h.b && D.presets[h.b]) { loadPreset(h.b); pre.value = h.b; }
+    if (h.b && D.presets[h.b]) { loadPreset(h.b, +h.s || 0); pre.value = h.b; }
     if (h.l) lv.value = h.l; if (h.f) fl.value = h.f;
     if (h.e !== undefined) document.querySelectorAll('[data-biome]').forEach(function (c, i) { c.checked = !!(+h.e & (1 << i)); });
     if (h.t !== undefined) {

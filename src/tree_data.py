@@ -117,7 +117,65 @@ def build_preset(build, budget=212):
     for name in FILL[build]:
         ids = nodes_named(name)
         want(name, max_rank(ids[0]) if ids and not name.endswith(" node") else 11)
+    # spend what is left on the cheapest reachable skills of the build's own area
+    area = {"wizard": "Mage", "battlemage": "Mage", "necromancer": "Mage", "healer": "Mage", "warrior": "Warrior",
+            "tank": "Warrior", "barbarian": "Warrior", "ranger": "Ranger", "assassin": "Ranger"}[build]
+    while True:
+        options = []
+        for nid, n in NODES.items():
+            o = OUR.get(our_name(n["type"]))
+            if not o or o[0] != area or sel.get(nid, 0) >= max_rank(nid):
+                continue
+            extra = cost(nid) if nid in sel else sum(cost(p) for p in cheapest_path(set(sel), nid))
+            options.append((extra, nid))
+        options = [o for o in options if spent() + o[0] <= budget]
+        if not options:
+            break
+        _, nid = min(options)
+        if nid in sel:
+            sel[nid] += 1
+        else:
+            take(nid, 1)
     return sel, spent()
+
+
+def stage_budget(level, biome_count):
+    return PROGRESSION["leveling"]["skillPointsPerLevel"] * (level - 1) + sum(
+        PROGRESSION["biomes"][k]["points"] for k, _ in BIOMES[:biome_count])
+
+
+# (label, point budget, biomes explored) for the three build stages; biomes follow their level ranges
+STAGES = [("Levels 1–15", stage_budget(15, 2), 2), ("Levels 16–35", stage_budget(35, 4), 4), ("Levels 36–50", stage_budget(50, 7), 7)]
+
+
+def type_of(name):
+    for key in RAW["types"]:
+        if our_name(key) == name:
+            return key
+    return None
+
+
+def game_text(name, rank=None):
+    """In-game description of a skill at the given rank (max rank by default), tags stripped."""
+    key = type_of(name)
+    if not key:
+        return ""
+    t = RAW["types"][key]
+    rank = rank or t.get("maxLevel", 1)
+    def sub(m):
+        k = m.group(1)
+        if k in t.get("gameLevelValues", {}):
+            return str(t["gameLevelValues"][k][rank - 1])
+        return str(t.get("gameValues", {}).get(k, m.group(0)))
+    import re
+    lines = [re.sub(r"\{\{(\w+)\}\}", sub, re.sub(r"<[^>]+>", "", d)) for d in t.get("description", [])]
+    return lines[0] if lines else ""
+
+
+def skill_cost(name):
+    key = type_of(name)
+    t = RAW["types"][key]
+    return t["cost"], t.get("maxLevel", 1)
 
 
 def client_data(area_colors):
@@ -137,7 +195,11 @@ def client_data(area_colors):
             a = n["baseAnchor"]
             row += [round(a["x"], 2), round(a["y"], 2)]
         nodes.append(row)
-    presets = {b: build_preset(b)[0] for b in PRESETS}
+    presets = {}
+    for b in PRESETS:
+        presets[b] = build_preset(b)[0]
+        for i, (_, budget, _) in enumerate(STAGES[:-1], 1):
+            presets[f"{b}:{i}"] = build_preset(b, budget)[0]
     return {"build": BUILD_ID, "types": types, "nodes": nodes, "edges": RAW["edges"], "presets": presets, "colors": area_colors,
             "biomes": [[k, label, PROGRESSION["biomes"][k]["points"]] for k, label in BIOMES],
             "flameCap": PROGRESSION["flame"]["flameLevelCap"], "levelCap": PROGRESSION["leveling"]["playerLevelCap"]}

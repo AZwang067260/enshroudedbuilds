@@ -8,6 +8,8 @@ import subprocess
 from art import ART, alt_text, build_svg
 from content_builds import BUILDS
 from planner import PLANNER_FAQ, client_payload, planner_page, skills_table
+from skills_data import PRESETS
+from tree_data import BUILD_ID, OUR, STAGES, build_preset, game_text, skill_cost, type_of
 from layout import (GAME_VERSION, SITE, UPDATED, UPDATED_HUMAN, accordion, alert, badge, breadcrumb, button, card, e,
                     faq_schema, page, table)
 
@@ -156,9 +158,45 @@ def build_page(b):
             f'uses {e(b["weapon"][0].lower() + b["weapon"][1:])} and follows this skill order to level 50: {" → ".join(e(k) for k in key_order[:7])}. '
             f'Rated {b["tier"]}-tier after the Update 1.0 skill tree reset (October 15, 2026).')
 
-    key = '<div class="my-5 grid gap-4 sm:grid-cols-2">' + "".join(
-        card(f'<div class="p-5"><h3 class="!m-0 text-base font-semibold">{e(k)}</h3><p class="mt-2 text-sm text-muted-foreground leading-relaxed">{e(v)}</p></div>')
-        for k, v in b["key_skills"]) + "</div>"
+    # core skills: the build's preset skills (no attribute nodes), with in-game values and our notes
+    notes = {}
+    for k, v in b["key_skills"]:
+        for part in re.split(r"\s*(?:&amp;|&)\s*", k):
+            notes.setdefault(part.strip(), v)
+    for _, skills in b["phases"]:
+        for sk, why in skills:
+            notes.setdefault(re.sub(r"\s*\(.*?\)", "", sk).strip(), why)
+    core = [nm for nm in PRESETS[b["slug"]] if not nm.endswith(" node") and nm != "Double Jump" and type_of(nm)]
+    core.sort(key=lambda nm: (0 if any(nm in k for k, _ in b["key_skills"]) else 1))
+    core_rows = []
+    for nm in core:
+        c, ranks = skill_cost(nm)
+        cost_txt = f"{c} pt" if ranks == 1 else f"{c} pt × {ranks}"
+        o = OUR.get(nm)
+        core_rows.append([f'<strong>{e(nm)}</strong><br><span class="text-xs text-muted-foreground">{e(o[1] if o else "")}</span>',
+                          cost_txt, e(game_text(nm)), e(notes.get(nm, ""))])
+    key = (f'<p>The skills this build depends on, with the in-game text at max rank from the 1.0 game files (build {BUILD_ID}) and why each one matters for the {n.lower()}:</p>'
+           + table(["Skill", "Cost", "In-game effect (max rank)", f"Why it matters for the {n}"], core_rows))
+
+    # level stages: planner presets that follow real paths through the tree
+    stage_cards = ""
+    for i, (label, budget, biomes) in enumerate(STAGES, 1):
+        spent_i = build_preset(b["slug"], budget)[1]
+        link = f'/skill-planner/#b={b["slug"]}' + (f"&s={i}" if i < len(STAGES) else "")
+        stage_cards += (f'<a href="{link}" class="block rounded-lg border bg-card p-4 text-sm hover:border-primary/60">'
+                        f'<span class="font-semibold">{label}</span><br><span class="text-muted-foreground">{spent_i} / {budget} points'
+                        f' ({biomes} of 7 biomes explored)</span><br><span class="font-medium text-primary">Open this stage in the planner →</span></a>')
+    stages = (f'<h3 id="stages">{n} build by level: points per stage</h3><p>Your budget grows with your level and the biomes you explore: 2 points per level plus the Shroud Roots and Elixir Wells of each finished biome. '
+              f'Each card opens a planner preset for that stage that follows real paths through the 1.0 skill tree.</p>'
+              f'<div class="my-5 grid gap-3 sm:grid-cols-3">{stage_cards}</div>')
+
+    full_spent = build_preset(b["slug"])[1]
+    quick_answer = (f'<div class="not-prose mb-8 rounded-lg border border-primary/40 bg-primary/5 p-5" id="quick-answer"><p class="text-xs font-semibold uppercase tracking-wide text-primary">Quick answer</p>'
+             f'<p class="mt-2 leading-relaxed"><strong>{e(n)}: {b["tier"]}-tier</strong>, {e(b["difficulty"].lower())} difficulty, best for {e(b["best_for"].lower())}. '
+             f'It scales with <strong>{e(b["primary"].replace(", ", " and "))}</strong> and uses {e(b["weapon"][0].lower() + b["weapon"][1:])}. '
+             f'The level 50 planner preset spends <strong>{full_spent} of 212 points</strong>. '
+             f'Core skills: {", ".join(e(x) for x in core[:5])}{f" (+{len(core) - 5} more)" if len(core) > 5 else ""}. '
+             f'Main weakness: {e(b["cons"][0][0].lower() + b["cons"][0][1:])}.</p></div>')
 
     pros = card('<div class="p-5"><h3 class="!mt-0 text-base font-semibold text-emerald-500">Pros</h3>' + ul([e(p) for p in b["pros"]]) + "</div>")
     cons = card('<div class="p-5"><h3 class="!mt-0 text-base font-semibold text-destructive">Cons</h3>' + ul([e(c) for c in b["cons"]]) + "</div>")
@@ -184,7 +222,7 @@ def build_page(b):
   <div class="container grid items-center gap-8 py-10 md:py-14 lg:grid-cols-[1fr_420px]">
     <div>
     {crumbs_html}
-    <div class="flex flex-wrap gap-2">{tier_badge(b["tier"])}{badge("Enshrouded 1.0", "outline")}{badge(b["role"])}{badge("Updated " + UPDATED_HUMAN, "outline")}</div>
+    <div class="flex flex-wrap gap-2">{tier_badge(b["tier"])}{badge("Enshrouded 1.0", "outline")}{badge(b["role"])}{badge("Updated " + UPDATED_HUMAN, "outline")}{badge("Checked against 1.0.0.2 · build " + BUILD_ID, "outline")}</div>
     <h1 class="mt-4 max-w-4xl text-3xl font-bold tracking-tight md:text-5xl">Enshrouded 1.0 {e(b["name"])} Build</h1>
     <p class="mt-4 max-w-3xl text-lg text-muted-foreground">{e(b["tagline"])}</p>
     <p class="mt-3 max-w-3xl leading-relaxed text-foreground/85">{lead}</p>
@@ -195,10 +233,11 @@ def build_page(b):
 </div>
 <div class="container grid gap-10 py-10 lg:grid-cols-[1fr_280px]">
   <article class="prose-eb min-w-0">
+    {quick_answer}
     {section("overview", f"Enshrouded {n} build overview", paras(b["intro"]) + quick)}
     {section("why-1-0", f"What changed for the {n} in Enshrouded 1.0", paras(b["why"]) + alert("Update 1.0 skill tree reset", 'Every character\'s skill tree was reset when Enshrouded Update 1.0 launched on October 15, 2026, and all points were refunded. Re-spend your points before leaving your base. Your character level is kept. See all <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds</a>.') + respec)}
     {section("attributes", f"{n} attribute priority", f"<p>Attribute points decide how your {n.lower()} build scales. Use this priority when you spend points on the skill tree:</p>" + table(["Attribute", "Priority", "Why"], [[f"<strong>{e(a)}</strong>", e(p), e(w)] for a, p, w in b["attributes"]]))}
-    {section("skill-order", f"Enshrouded 1.0 {n} Skills &amp; Skill Order (Level 1–50)", f"<p>This is the full {n.lower()} skill order for Enshrouded 1.0, from level 1 to the new level 50 cap. Take the skills from top to bottom and fill in attribute nodes as you path between them. Each row lists the level range where that skill fits.</p>" + order_table + alert("Verify in-game", "Skill names and positions are taken from the 1.0 launch tree. Keen Games may adjust values in hotfixes, so always check the in-game tooltip before committing your points."))}
+    {section("skill-order", f"Enshrouded 1.0 {n} Skills &amp; Skill Order (Level 1–50)", f"<p>This is the full {n.lower()} skill order for Enshrouded 1.0, from level 1 to the new level 50 cap. Take the skills from top to bottom and fill in attribute nodes as you path between them. Each row lists the level range where that skill fits.</p>" + order_table + stages + alert("Hotfixes", "Skill names, costs and values were checked against the 1.0 game files (hotfix 1.0.0.2). Keen Games may still adjust values in later hotfixes, so check the in-game tooltip before committing your points."))}
     {section("key-skills", f"Key {n} skills explained", key)}
     {section("gear", f"Best {n} gear: weapons, armor, accessories and food", f"<p>Gear matters as much as skills in Enshrouded. With the 1.0 gear cap raised to 55, always upgrade your main weapon first. Here is the {n.lower()} loadout to aim for:</p>" + table(["Slot", "Recommended", "Why"], [[f"<strong>{e(s)}</strong>", p, e(w)] for s, p, w in b["gear"]]))}
     {section("spells", "Best spells & arrows for this build", table(["Spell / arrow", "Use"], [[f"<strong>{e(s)}</strong>", e(u)] for s, u in b["spells"]])) if b["spells"] else ""}
