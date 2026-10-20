@@ -1,9 +1,8 @@
 """Enshrouded 1.0 skill list used by the skill planner and the skills table.
 
-Each skill: (name, ranks, cost per rank, effect at max rank, flags). Flags: "new" = added in 1.0,
-"disputed" = sources disagree on the value. Values come from community planners built from the
-1.0 game files (build 1267041), cross-checked where a second 1.0 source exists. Keen Games does not
-publish these numbers, so the in-game tooltip always wins.
+Each skill: (name, ranks, cost per rank, effect at max rank, flags). Flags: "new" = added in 1.0.
+Ranks, costs and effect values were checked against the in-game skill text of the 1.0 game export
+(build 1267041, see src/vendor/enshrouded-skill-tree). The in-game tooltip always wins.
 """
 
 # area -> [(group, [skills])]
@@ -16,7 +15,7 @@ TREE = [
             ("Airborne Architect", 1, 3, "Fly freely in first person while building inside your base.", "new"),
             ("Snap", 1, 2, "Merciless Attacks restore 20% mana.", ""),
             ("Power Parry", 3, 1, "+30% parry power.", ""),
-            ("Opportunity", 3, 1, "Bigger Merciless Attack multiplier.", "disputed"),
+            ("Opportunity", 3, 1, "+120% Merciless Attack damage multiplier.", ""),
             ("Saviour", 3, 1, "Revive allies 3 s faster (default 6 s).", ""),
             ("Inner Fires", 3, 1, "+3 min time in the Shroud.", ""),
             ("Giant Slayer Hook", 1, 3, "Grapple onto large enemies in combat.", ""),
@@ -28,8 +27,8 @@ TREE = [
             ("Lumberjack", 3, 1, "+30% damage to wood.", ""),
             ("Mason", 3, 1, "+30% damage to stone.", ""),
             ("Prospector", 3, 1, "+30% damage to metal.", ""),
-            ("Well Rested", 3, 1, "Longer Rested buff.", "disputed"),
-            ("Fisherman's Resolve", 3, 1, "More fishing endurance.", "disputed"),
+            ("Well Rested", 3, 1, "+6 min base Rested duration.", ""),
+            ("Fisherman's Resolve", 3, 1, "+15 fishing endurance.", ""),
         ]),
     ]),
     ("Mage", [
@@ -43,8 +42,8 @@ TREE = [
             ("Dark Arts", 3, 2, "+30% Shroud damage.", ""),
             ("Frost", 3, 2, "Melee attackers are slowed for 9 s.", ""),
             ("Bone to Ash", 3, 1, "+15% damage against Hollow enemies.", ""),
-            ("Chain Hit", 1, 3, "Hits jump to a second enemy within 15 m (5 shock per Intelligence).", ""),
-            ("Mass Destruction", 1, 3, "2 shock per Intelligence to every enemy within 15 m of the target.", ""),
+            ("Chain Hit", 1, 3, "Magic crits strike a second enemy within 15 m (5 shock per Intelligence).", ""),
+            ("Mass Destruction", 1, 3, "Magic crits deal 2 shock per Intelligence to every enemy within 15 m of the target.", ""),
             ("Radiant Aura", 3, 1, "Nearby Fell enemies take fire damage every second (scales with Intelligence).", ""),
             ("Fire Resistance", 3, 1, "+15% fire resistance.", ""),
             ("Ice Resistance", 3, 1, "+15% ice resistance.", ""),
@@ -54,14 +53,14 @@ TREE = [
         ]),
         ("Healer", [
             ("Spirit node", 11, 1, "+1 Spirit each (+20 max mana per point).", "attr:spi"),
-            ("Healer", 3, 1, "+45% healing from spells and Water Aura.", "disputed"),
+            ("Healer", 3, 1, "+45% healing from spells and Water Aura.", ""),
             ("Water Aura", 3, 1, "Heals you and allies within 15 m (1 health per 2 Intelligence).", ""),
             ("Waters of Life", 1, 2, "Doubles Water Aura healing.", ""),
-            ("Healing Revive", 3, 1, "Revived allies get 24% health (default 10%).", ""),
-            ("Life Essences", 3, 1, "Max health +9 per point of Intelligence.", "disputed"),
+            ("Healing Revive", 3, 1, "Revived allies get up to 24% more health (default 10%).", ""),
+            ("Life Essences", 3, 1, "Max health +9 per point of Intelligence.", ""),
             ("Necromancer", 3, 1, "Magic-weapon kills have a 15% chance to summon a skull.", ""),
             ("Righteous Fire", 3, 2, "60% of your healing also burns nearby Fell enemies.", ""),
-            ("Shared Misery", 3, 2, "Spreads debuff damage to nearby enemies.", "disputed"),
+            ("Shared Misery", 3, 2, "Taking Shroud damage gives players within 15 m +15% Shroud resistance for 30 s.", ""),
             ("Shroud Mitigation", 3, 1, "Magic hits can restore Shroud time for you and allies.", ""),
             ("Shroud Resistance", 3, 1, "+15% Shroud resistance.", ""),
             ("Blink", 1, 4, "Your dodge becomes a short teleport (20 stamina).", ""),
@@ -71,7 +70,7 @@ TREE = [
         ("Battlemage", [
             ("Wand Mastery", 3, 1, "+15% wand damage.", ""),
             ("Wand Specialization", 1, 3, "Unlocks wand special abilities (Focus).", ""),
-            ("Unity", 3, 1, "Wand hits have a 30% chance to restore 6% max mana.", "disputed"),
+            ("Unity", 3, 1, "Wand hits have a 30% chance to restore 6% max mana.", ""),
             ("Sting", 1, 3, "+20% damage from repeated wand hits.", ""),
             ("Eternal Spark", 3, 1, "Wand hits have a 45% chance to restore 1 durability.", ""),
             ("Arcane Deflection", 3, 1, "Parrying restores 30 mana.", ""),
@@ -80,8 +79,8 @@ TREE = [
             ("Evasion Attack", 1, 4, "Melee dash during an evade for +50% weapon damage.", ""),
             ("Life Burst", 1, 4, "Magic-weapon kills heal nearby players (scales with Intelligence).", ""),
             ("Exalted", 1, 5, "+1 Intelligence per 2 Flame levels.", "flame:int"),
-            ("Aerial Wand Attack", 1, 3, "Mid-air shot that explodes on impact for +50% weapon damage.", "new"),
-            ("Wand Evasion Attack", 1, 4, "Dodging fires a piercing wand disc.", "new"),
+            ("Aerial Wand Attack", 1, 3, "Mid-air shot that explodes for +50% weapon damage (25 stamina).", "new"),
+            ("Wand Evasion Attack", 1, 4, "Dodging fires a piercing wand disc for +50% weapon damage (50 mana).", "new"),
         ]),
         ("Trickster", [
             ("Arcane Concentration", 1, 5, "+1 Spirit per 2 Flame levels.", "flame:spi"),
@@ -90,7 +89,7 @@ TREE = [
             ("Mana Currents", 3, 1, "+15 base mana regeneration.", ""),
             ("Spellslinger", 3, 1, "+15% staff damage.", ""),
             ("Terror", 3, 2, "Spell crits have a 60% chance to stun for 2 s.", ""),
-            ("Bloodletting", 3, 2, "Spell crits can drop resource orbs.", "disputed"),
+            ("Bloodletting", 3, 2, "Spell crits have a 60% chance to drop two resource orbs.", ""),
             ("Counterstrike", 3, 1, "24% chance to reflect 60% of damage taken as fire.", ""),
             ("Blood Magic", 1, 4, "Below 20% mana, converts health into mana (2 min cooldown).", ""),
             ("Begone!", 1, 3, "Mana-powered stun punch replaces unarmed attacks.", ""),
@@ -119,7 +118,7 @@ TREE = [
             ("Slasher", 3, 2, "+30% melee cutting damage.", ""),
             ("Swift Blades", 1, 4, "+15% one-handed attack speed.", ""),
             ("One-Handed Specialization", 1, 3, "Unlocks one-handed special abilities.", ""),
-            ("Battle Heal", 3, 2, "Melee crits heal a share of your max health.", "disputed"),
+            ("Battle Heal", 3, 2, "Melee crits heal 3% of your max health.", ""),
             ("Bash", 3, 2, "Parries bash the enemy for blunt damage (scales with Strength).", ""),
             ("Breach", 1, 3, "Overpowered enemies take +100% melee physical damage for 3 s.", ""),
             ("Heavy Handed", 3, 1, "Fill a blocking enemy's stun bar 30% faster.", ""),
@@ -128,7 +127,7 @@ TREE = [
         ("Barbarian", [
             ("Barbarian", 1, 5, "+1 Strength per 2 Flame levels.", "flame:str"),
             ("Barbarian's Path", 3, 1, "+15% damage with two-handed axes, clubs and hammers.", ""),
-            ("Titan Edge", 3, 1, "+15% greatsword damage.", "disputed"),
+            ("Titan Edge", 3, 1, "+15% greatsword damage.", ""),
             ("Brute", 3, 2, "+30% melee blunt damage.", ""),
             ("Heavy Hitter", 1, 4, "+10% two-handed attack speed.", ""),
             ("Blood Rage", 3, 2, "A melee kill within 15 m gives +15% melee damage for 10 s.", ""),
@@ -159,7 +158,7 @@ TREE = [
             ("Puncture", 3, 2, "+30% ranged piercing damage.", "new"),
             ("Barrage", 3, 1, "Bow hits have a 45% chance to restore 1 durability.", "new"),
             ("Skill Shot", 3, 1, "+60% weak-point damage.", ""),
-            ("Fatal Precision", 3, 1, "More crit chance and crit damage.", "disputed"),
+            ("Fatal Precision", 3, 1, "+3% crit chance and +15% crit damage.", ""),
             ("Bow Specialization", 1, 3, "Unlocks bow special abilities.", ""),
             ("Blessed Arrows", 3, 1, "Bow crits restore up to 24 mana.", ""),
             ("Counter Battery", 3, 1, "+24% damage against ranged enemies.", ""),
@@ -171,7 +170,7 @@ TREE = [
             ("Eagle's Bane", 3, 1, "+30% damage against flying enemies.", ""),
             ("Vitality Surge", 3, 1, "Bow, dagger and throwable crits restore 9 stamina.", ""),
             ("Cutthroat", 3, 1, "+300% Sneak Attack damage.", ""),
-            ("Silent Stride", 3, 1, "Move faster while sneaking.", "disputed"),
+            ("Silent Stride", 3, 1, "+60% movement speed while sneaking.", ""),
         ]),
         ("Assassin", [
             ("Graceful Stride", 1, 5, "+1 Dexterity per 2 Flame levels.", "flame:dex"),
@@ -202,7 +201,7 @@ TREE = [
             ("Bee Sting", 1, 3, "Aiming a bow in mid-air slows your fall.", ""),
             ("Eagle Eye", 1, 3, "Much greater bow zoom.", ""),
             ("Bounty Bonanza", 1, 2, "+5 XP for the group when a Skillshot kills a Fell enemy.", ""),
-            ("Endurance of the Flame", 1, 5, "+1 Endurance per 2 Flame levels.", "flame:end disputed"),
+            ("Endurance of the Flame", 1, 5, "+1 Endurance per 2 Flame levels.", "flame:end"),
         ]),
         ("Survivor", [
             ("Endurance node", 8, 1, "+1 Endurance each (+10 max stamina per point).", "attr:end"),

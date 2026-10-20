@@ -114,8 +114,8 @@ def sources(extra=()):
     return (f'<section aria-labelledby="sources" class="mt-12 rounded-lg border bg-card p-5 text-sm">'
             f'<h2 id="sources" class="!mt-0 !text-lg">Sources &amp; how we checked this guide</h2>'
             f'<p>Facts on this page were last checked on <strong>{UPDATED_HUMAN}</strong> against Enshrouded <strong>{GAME_VERSION}</strong>. '
-            f'Patch facts come from Keen Games\' official posts. Skill values that Keen has not published (ranks, percentages, point costs) come from community planners '
-            f'built from the 1.0 game files ({planners}) and are cross-checked against at least one other 1.0 source. Values the sources disagree on are marked as such. '
+            f'Patch facts come from Keen Games\' official posts. Skill ranks, point costs and percentages were checked against the in-game skill text exported from the 1.0 game files '
+            f'(build 1267041), and against community planners ({planners}). Item names were checked against the official Enshrouded Wiki. '
             f'Read our <a href="/about/#methodology">methodology</a>.</p><ul class="dots">{links}</ul></section>')
 
 
@@ -483,10 +483,10 @@ def patch_notes():
     path = "/enshrouded-1-0-patch-notes/"
     ch, cs = breadcrumb([("/", "Home"), (path, "Enshrouded 1.0 Patch Notes")])
     skills = table(["New skill", "Tree", "What it does", "Best for"], [
-        ["<strong>Advanced Necromancy</strong>", "Mage", "+1 Hollow skeleton cap per rank (3 ranks), up from a cap of one.", '<a href="/builds/necromancer/">Necromancer</a>'],
+        ["<strong>Advanced Necromancy</strong>", "Mage", "+1 summoned Hollow ally per rank (3 ranks).", '<a href="/builds/necromancer/">Necromancer</a>'],
         ["<strong>Totem Mastery</strong>", "Mage", "+1 active totem per rank (3 ranks).", '<a href="/builds/necromancer/">Necromancer</a>'],
-        ["<strong>Aerial Wand Attack</strong>", "Mage", "Hold attack in mid-air: the shot explodes on impact for +50% weapon damage.", '<a href="/builds/battlemage/">Battlemage</a>'],
-        ["<strong>Wand Evasion Attack</strong>", "Mage", "Dodging fires a piercing wand disc (costs 20 stamina).", '<a href="/builds/battlemage/">Battlemage</a>'],
+        ["<strong>Aerial Wand Attack</strong>", "Mage", "Hold the use-item key during a jump: the shot deals +50% weapon damage in a small blast (25 stamina).", '<a href="/builds/battlemage/">Battlemage</a>'],
+        ["<strong>Wand Evasion Attack</strong>", "Mage", "Dodging fires a piercing wand disc for +50% weapon damage (costs 50 mana).", '<a href="/builds/battlemage/">Battlemage</a>'],
         ["<strong>Blast and Cast</strong>", "Mage", "After a wand critical hit, your next staff attack within 10 seconds deals 50% more base damage.", '<a href="/builds/wizard/">Wizard</a>'],
         ["<strong>Puncture</strong>", "Archer", "Increases ranged piercing damage (exact value not in the official notes).", '<a href="/builds/ranger/">Ranger</a>'],
         ["<strong>Barrage</strong>", "Archer", "Bow hits have a chance to restore 1 durability.", '<a href="/builds/ranger/">Ranger</a>'],
@@ -541,7 +541,7 @@ def patch_notes():
 <p>The player level cap rose from <strong>45 to 50</strong>, which means more skill points for every build: <strong>212 in total at level 50</strong> according to community planners built from the game files: <strong>98</strong> from levels (2 per level after level 1), <strong>60</strong> from Shroud Roots (1 each) and <strong>54</strong> from Elixir Wells (3 each). You only reach 212 if you explore every biome. Gear now goes up to <strong>level 55</strong>, so the top weapons and armor sets of Early Access are no longer the best in the game. Upgrading your main weapon to the new tier is the biggest damage increase after the update.</p>
 
 <h2 id="new-skills">New skills in Enshrouded 1.0</h2>
-<p>Update 1.0 adds <strong>eight new combat skills</strong>: five for mages and three for archers (a ninth new skill, Airborne Architect, is a building skill). Keen's official post left some values as placeholders, such as Puncture's damage bonus, so check the in-game tooltip for those.</p>
+<p>Update 1.0 adds <strong>eight new combat skills</strong>: five for mages and three for archers (a ninth new skill, Airborne Architect, is a building skill). Values below were checked against the in-game skill text in the 1.0 game files.</p>
 {skills}
 
 <h2 id="new-spells">New spells in Enshrouded 1.0</h2>
@@ -720,7 +720,7 @@ def about():
 <p>Enshrouded 1.0 launched on October 15, 2026 and reset every skill tree, so many guides online still show Early Access numbers. This is how every guide on this site is put together:</p>
 <ul class="dots">
 <li><strong>Official facts first.</strong> Release dates, new skills, new spells, the level cap and hotfix changes are taken from Keen Games' official 1.0 posts and the Steam patch notes.</li>
-<li><strong>Skill values are cross-checked.</strong> Keen does not publish every rank, percentage and point cost. For those we use community planners built from the 1.0 game files and only state a number when a second 1.0 source agrees. If sources disagree, the guide says so.</li>
+<li><strong>Skill values are checked against the game text.</strong> Keen does not publish every rank, percentage and point cost in its patch notes, so we compare every number in our guides with the in-game skill text exported from the 1.0 game files (Steam build 1267041). Gear and item names are checked against the official Enshrouded Wiki; anything we cannot confirm there is labeled as a community pick.</li>
 <li><strong>Competitor and community guides are compared</strong> before a build is changed, so our tiers and skill orders reflect where the community agrees and explain where we differ.</li>
 <li><strong>Every page shows the review date</strong> and the game version it was checked against (currently {GAME_VERSION}), and lists its sources at the bottom.</li>
 <li><strong>Corrections are welcome.</strong> If a tooltip in your game shows a different value, tell us and we will re-check it.</li>
