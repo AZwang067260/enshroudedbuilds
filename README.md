@@ -7,7 +7,10 @@ A static Enshrouded Builds site: plain HTML + Tailwind CSS (compiled) + shadcn/u
 ```
 src/layout.py           Shared <head> (SEO meta, OG, JSON-LD), header, footer and UI components
 src/content_builds.py   Data and copy for each class build (edit build content here)
-src/build.py            Generator: home, builds hub, 9 class pages, 1.0 page, tier list, skill tree page, sitemap and robots
+src/build.py            Generator: home, builds hub, 9 class pages, 1.0 pages, tier list, skill tree, skill planner, sitemap and robots
+src/skills_data.py      1.0 skill list (ranks, costs, effects) and build presets for the skill planner
+src/planner.py          The /skill-planner/ page (static skill list + JS point planner)
+src/art.py              Original SVG build illustrations (no game assets); per-build share images in public/og/
 src/input.css           Tailwind entry file + shadcn theme variables (light/dark)
 tailwind.config.js      Tailwind config (shadcn color tokens)
 public/                 Generated output. Deploy this directory.

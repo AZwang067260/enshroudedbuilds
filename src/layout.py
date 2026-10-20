@@ -4,8 +4,10 @@ from html import escape
 
 SITE = "https://enshroudedbuilds.org"
 SITE_NAME = "Enshrouded Builds"
-UPDATED = "2026-10-19"
-UPDATED_HUMAN = "October 19, 2026"
+UPDATED = "2026-10-20"
+UPDATED_HUMAN = "October 20, 2026"
+# game version the facts were last checked against
+GAME_VERSION = "1.0.0.2 (Steam build 1269579)"
 # Google Analytics 4 measurement ID (e.g. "G-XXXXXXXXXX"); leave empty to disable tracking
 GA_ID = "G-ZFZ6Q4KKHS"
 
@@ -14,7 +16,8 @@ NAV = [
     ("/enshrouded-1-0-builds/", "1.0 Builds"),
     ("/enshrouded-1-0-patch-notes/", "1.0 Patch Notes"),
     ("/tier-list/", "Tier List"),
-    ("/skill-tree/", "Skill Tree Guide"),
+    ("/skill-tree/", "Skill Tree"),
+    ("/skill-planner/", "Skill Planner"),
 ]
 
 JS = """
@@ -186,6 +189,7 @@ def footer(builds):
       <li><a href="/enshrouded-1-0-patch-notes/" class="hover:text-foreground">Enshrouded 1.0 Patch Notes</a></li>
       <li><a href="/tier-list/" class="hover:text-foreground">Builds Tier List</a></li>
       <li><a href="/skill-tree/" class="hover:text-foreground">Skill Tree Guide</a></li>
+      <li><a href="/skill-planner/" class="hover:text-foreground">Skill Planner</a></li>
       <li><a href="/builds/" class="hover:text-foreground">All Builds</a></li>
       <li><a href="/about/" class="hover:text-foreground">About &amp; Disclaimer</a></li>
     </ul></div>
@@ -204,7 +208,7 @@ def analytics():
             f"gtag('js',new Date());gtag('config','{GA_ID}');</script>\n")
 
 
-def page(*, path, title, description, body, builds, active="", schemas=(), og_type="article", keywords=""):
+def page(*, path, title, description, body, builds, active="", schemas=(), og_type="article", keywords="", og_image="/og-image.png", og_alt="Best Enshrouded Builds for 1.0 - EnshroudedBuilds.org"):
     url = SITE + path
     graph = [{"@type": "WebSite", "@id": SITE + "/#website", "url": SITE + "/", "name": SITE_NAME,
               "inLanguage": "en"}] + list(schemas)
@@ -224,11 +228,11 @@ def page(*, path, title, description, body, builds, active="", schemas=(), og_ty
 <meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(description)}">
 <meta property="og:url" content="{url}">
-<meta property="og:image" content="{SITE}/og-image.png">
+<meta property="og:image" content="{SITE}{og_image}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Best Enshrouded Builds for 1.0 - EnshroudedBuilds.org">
-<meta name="twitter:image" content="{SITE}/og-image.png">
+<meta property="og:image:alt" content="{e(og_alt)}">
+<meta name="twitter:image" content="{SITE}{og_image}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{e(title)}">
 <meta name="twitter:description" content="{e(description)}">
