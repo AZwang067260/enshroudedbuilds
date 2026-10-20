@@ -7,7 +7,7 @@ import subprocess
 
 from art import ART, alt_text, build_svg
 from content_builds import BUILDS
-from planner import PLANNER_FAQ, client_payload, planner_page
+from planner import PLANNER_FAQ, client_payload, planner_page, skills_table
 from layout import (GAME_VERSION, SITE, UPDATED, UPDATED_HUMAN, accordion, alert, badge, breadcrumb, button, card, e,
                     faq_schema, page, table)
 
@@ -58,7 +58,7 @@ HUBS = [
     ("/enshrouded-1-0-builds/", "Enshrouded 1.0 Builds", "Everything Update 1.0 changed, plus the skill tree reset re-spec checklist."),
     ("/enshrouded-1-0-patch-notes/", "Enshrouded 1.0 Patch Notes", "Every new skill, spell and change in Update 1.0."),
     ("/tier-list/", "Builds Tier List (1.0)", "Every Enshrouded build ranked for the 1.0 full release."),
-    ("/skill-planner/", "Skill Planner (1.0)", "Plan all 178 skills against your 212-point budget and share the build."),
+    ("/skill-planner/", "Skill Planner (1.0)", "Plan your build on the real 1.0 skill tree (231 nodes) with a 212-point budget."),
     ("/skill-tree/", "Skill Tree Guide (1.0)", "All 12 archetypes, attributes, skill points and respecs."),
     ("/builds/", "All Enshrouded Builds", "Compare every class build by role, stats and difficulty."),
 ]
@@ -104,18 +104,16 @@ OFFICIAL = [
     ("https://steamdb.info/patchnotes/25988036/", "SteamDB: hotfix 1.0.0.2 patch notes"),
     ("https://enshrouded.wiki.gg/wiki/1.0_Update", "Enshrouded Wiki: 1.0 Update"),
 ]
-PLANNERS = [("https://pindrop.gg/enshrouded/skill-tree", "PinDrop skill tree"), ("https://enshrouded.tools/skill-tree", "enshrouded.tools")]
 
 
 def sources(extra=()):
     """Sources block shown at the end of guide pages: official notes first, then community data used for numbers."""
     links = "".join(f'<li><a href="{u}" rel="noopener" target="_blank">{e(t)}</a></li>' for u, t in OFFICIAL + list(extra))
-    planners = ", ".join(f'<a href="{u}" rel="nofollow noopener" target="_blank">{e(t)}</a>' for u, t in PLANNERS)
     return (f'<section aria-labelledby="sources" class="mt-12 rounded-lg border bg-card p-5 text-sm">'
             f'<h2 id="sources" class="!mt-0 !text-lg">Sources &amp; how we checked this guide</h2>'
             f'<p>Facts on this page were last checked on <strong>{UPDATED_HUMAN}</strong> against Enshrouded <strong>{GAME_VERSION}</strong>. '
             f'Patch facts come from Keen Games\' official posts. Skill ranks, point costs and percentages were checked against the in-game skill text exported from the 1.0 game files '
-            f'(build 1267041), and against community planners ({planners}). Item names were checked against the official Enshrouded Wiki. '
+            f'(build 1267041) and cross-checked with two independent community sources. Item names were checked against the official Enshrouded Wiki. '
             f'Read our <a href="/about/#methodology">methodology</a>.</p><ul class="dots">{links}</ul></section>')
 
 
@@ -261,8 +259,8 @@ def home():
   <div class="container py-16 md:py-24">
     <div class="flex flex-wrap gap-2">{badge("Updated for Enshrouded 1.0", "primary")}{badge(UPDATED_HUMAN, "outline")}</div>
     <h1 class="mt-5 max-w-4xl font-display text-4xl font-bold leading-tight tracking-tight md:text-6xl">Enshrouded Builds: Best Class Builds for 1.0</h1>
-    <p class="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">Every Enshrouded build, rebuilt for the 1.0 full release. Each class guide covers the skill tree path to level 50, attribute priorities, the best weapons, armor and spells, and how to play the build solo or in co-op.</p>
-    <div class="mt-8 flex flex-wrap gap-3">{button("/builds/", "Browse all builds")}{button("/enshrouded-1-0-builds/", "What changed in 1.0", "outline")}</div>
+    <p class="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">Every Enshrouded build, rebuilt for the 1.0 full release. Each class guide covers the skill tree path to level 50, attribute priorities, the best weapons, armor and spells, and how to play the build solo or in co-op. Then plan your own build on the real 1.0 skill tree with our free <a href="/skill-planner/" class="text-primary hover:underline">Enshrouded skill planner</a>.</p>
+    <div class="mt-8 flex flex-wrap gap-3">{button("/builds/", "Browse all builds")}{button("/skill-planner/", "Open the skill planner", "outline")}{button("/enshrouded-1-0-builds/", "What changed in 1.0", "outline")}</div>
     <div class="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">{stats}</div>
   </div>
 </section>
@@ -316,8 +314,8 @@ def home():
 </div></aside>
 </div>
 '''
-    title = "Enshrouded Builds 1.0: Best Class Builds, Skills & Gear"
-    desc = "The best Enshrouded 1.0 builds for every class: Wizard, Battlemage, Necromancer, Barbarian, Tank and more, with skill order to level 50, gear and tips."
+    title = "Enshrouded Builds 1.0: Best Builds & Skill Planner"
+    desc = "The best Enshrouded 1.0 builds for every class with skill order to level 50 and gear, plus a free skill planner with the real 1.0 skill tree."
     write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, og_type="website",
                      keywords="enshrouded builds, enshrouded 1.0 builds, best enshrouded builds, enshrouded class builds, enshrouded skill tree",
                      schemas=[{"@type": "WebPage", "name": title, "url": SITE + "/", "description": desc, "dateModified": UPDATED},
@@ -343,8 +341,8 @@ def skill_planner():
     shutil.copy(os.path.join(ROOT, "src", "planner.js"), os.path.join(assets, "planner.js"))
     shutil.copy(os.path.join(ROOT, "src", "vendor", "enshrouded-skill-tree", "LICENSE"), os.path.join(assets, "LICENSE.txt"))
     body += '<script src="/assets/planner/tree-data.js" defer></script><script src="/assets/planner/planner.js" defer></script>'
-    title = "Enshrouded Skill Planner (1.0): Free Skill Tree Calculator"
-    desc = "Free Enshrouded 1.0 skill planner with the real skill tree: 231 nodes and links from the game files, 212-point budget, attributes and shareable builds."
+    title = "Enshrouded Skill Planner (1.0): Skill Tree Calculator"
+    desc = "Free Enshrouded skill planner and skill tree calculator for 1.0: the real tree from the game files, a 212-point budget, attributes and shareable builds."
     app = {"@type": "WebApplication", "name": "Enshrouded 1.0 Skill Planner", "url": SITE + path, "applicationCategory": "GameApplication",
            "operatingSystem": "Any (web browser)", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": desc,
            "about": {"@type": "VideoGame", "name": "Enshrouded"}, "license": "https://www.gnu.org/licenses/gpl-3.0.html"}
@@ -695,14 +693,28 @@ def skill_tree():
 <h2>Planning a build in 1.0</h2>
 <p>Update 1.0 (October 15, 2026) reset every skill tree, so everyone is re-spending points right now. The <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds guide</a> has the full re-spec checklist. With the level cap at 50, you have more points than in Early Access, but still not enough to fill everything. The best builds pick <strong>one main archetype</strong>, go deep for its key skills, and use a <strong>neighbouring archetype</strong> for support: Tank armor for a Warrior, Battlemage sustain for a Wizard, Assassin crits for a Ranger. Avoid spreading single points across the whole tree. Many weak nodes add up to much less than a few strong capstones.</p>
 <p>Utility archetypes like <strong>Athlete, Trickster, Beastmaster and Survivor</strong> are rarely a build's main focus, but one or two of their nodes can help a lot with movement, control or exploring the Shroud.</p>
+<h2 id="skill-points">Enshrouded skill points: how many you get</h2>
+<p>You earn <strong>2 skill points per level</strong> after level 1, so 98 by the level 50 cap. Exploration adds the rest: <strong>1 point for each Shroud Root</strong> you destroy and <strong>3 points for each Elixir Well</strong> you cleanse, 114 points across the seven biomes. A fully explored level 50 character has <strong>212 skill points</strong>, while the whole tree (231 nodes, 178 different skills) costs 675. The <a href="/skill-planner/">Enshrouded skill planner</a> calculates your budget for any level and set of explored biomes.</p>
+<h2 id="respec">How to respec in Enshrouded 1.0</h2>
+<p>Every existing character got one <strong>free skill tree reset</strong> when loading a save in Update 1.0, with all points refunded. After that:</p>
+<ul class="dots">
+<li><strong>Full respec:</strong> use the <strong>Flame Altar</strong>. Since a 2024 update the cost has been 1 Rune per skill point you had spent; this has not been re-confirmed for 1.0 yet, so check the altar before you commit.</li>
+<li><strong>Single nodes:</strong> you can unlearn a skill in the tree only if nothing you still own depends on it, so refund from the end of a chain.</li>
+<li><strong>Plan first:</strong> build the new layout in the <a href="/skill-planner/">skill planner</a> so you only pay for one respec.</li>
+</ul>
 <h2>Skill tree FAQ</h2>
 {accordion(faq)}
+<h2 id="all-skills">All 178 Enshrouded 1.0 skills</h2>
+<p>Every skill in the 1.0 tree with its ranks, point cost and effect at max rank, checked against the in-game skill text. Use <em>Open in planner</em> to see where a skill sits in the tree.</p>
+</article>
+<div class="mx-auto max-w-5xl">{skills_table()}</div>
+<article class="prose-eb mx-auto max-w-4xl">
 {sources()}
 </article>
 <section class="mx-auto mt-12 max-w-5xl" aria-labelledby="all-builds"><h2 id="all-builds" class="mb-4 text-2xl font-bold">Enshrouded 1.0 builds for every archetype</h2>{all_builds_grid()}
 <h3 class="mb-4 mt-10 text-lg font-semibold">More Enshrouded 1.0 guides</h3>{hub_links(path)}</section></div>'''
-    title = "Enshrouded 1.0 Skill Tree Guide: All 12 Archetypes"
-    desc = "Enshrouded 1.0 skill tree guide: all 12 archetypes from Warrior to Wizard, the six attributes, skill points, respecs and the Update 1.0 reset."
+    title = "Enshrouded 1.0 Skill Tree: All Skills, Points & Respec"
+    desc = "Enshrouded 1.0 skill tree guide: all 178 skills with costs and effects, the 12 archetypes, attributes, skill points at level 50 and how to respec."
     write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, active=path,
                      keywords="enshrouded skill tree, enshrouded archetypes, enshrouded attributes, enshrouded respec, enshrouded 1.0 skill tree",
                      schemas=[article_schema(path, title, desc), cs, faq_schema(faq)]), "0.8")

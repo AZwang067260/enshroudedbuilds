@@ -10,6 +10,7 @@ AREA_COLORS = {"Mage": "#60a5fa", "Warrior": "#f87171", "Ranger": "#4ade80", "Co
 PLANNER_FAQ = [
     ("How many skill points do you get in Enshrouded 1.0?", "212 at level 50 if you explore everything: 2 points for every level from 2 to 50 (98), plus 114 from exploration, 1 for each Shroud Root and 3 for each Elixir Well, spread over the seven biomes."),
     ("How many points does it take to fill the whole skill tree?", "675 points. A level 50 character can afford roughly a third of the tree, so every build has to choose."),
+    ("Is there an Enshrouded skill calculator or build planner?", "Yes, this page. The Enshrouded skill planner works as a skill calculator and build planner in one: it adds up the points your build costs, compares them with your budget for your level and explored biomes, and shows the attributes you end up with."),
     ("Does this planner follow the real skill tree connections?", "Yes. The tree uses the node positions and links exported from the Enshrouded 1.0 game files: 231 nodes and 291 links. You can only learn a skill that connects to one you already have, starting from the entry nodes around the center, exactly like in the game. Refunding a skill also refunds anything that would lose its connection."),
     ("Is this the same skill tree as the game?", f"Yes. The data comes from the 1.0 game files (Steam build {BUILD_ID}), including the in-game skill text you see in the details panel. Keen Games can still change values in hotfixes, so the in-game tooltip always wins."),
     ("Can I share my build?", "Yes. Every change updates the page address. Use Copy build link and send it to a friend: the link opens the planner with your exact build, level, flame level and explored biomes."),
@@ -55,27 +56,6 @@ def planner_page(builds_lookup):
     field = "h-9 w-full rounded-md border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     small_btn = "inline-flex h-9 w-9 items-center justify-center rounded-md border bg-background/90 text-lg font-semibold hover:bg-accent"
 
-    # crawlable list of every skill, each with a link that focuses it in the tree
-    sections = ""
-    for area, groups in TREE:
-        sections += f'<h3 id="{area.lower()}" class="mb-3 mt-8 text-xl font-bold">{e(area)} skills</h3>'
-        for group, sks in groups:
-            rows = ""
-            for name, ranks, cost, effect, flags in sks:
-                tags = (badge("New in 1.0", "primary") if "new" in flags else "") + (badge("Disputed", "outline") if "disputed" in flags else "")
-                cost_txt = f"{cost} pt" if ranks == 1 else f"{cost} pt × {ranks}"
-                find = (f'<a href="#planner" data-find="{keys[name]}" class="whitespace-nowrap text-xs font-medium text-primary hover:underline">Find in tree</a>'
-                        if name in keys else "")
-                rows += (f'<tr class="border-t align-top"><td class="px-3 py-2"><div class="flex flex-wrap items-center gap-1.5 font-medium">{e(name)}{tags}</div>'
-                         f'<div class="mt-0.5 text-xs text-muted-foreground md:hidden">{e(effect)}</div></td>'
-                         f'<td class="hidden px-3 py-2 text-sm text-muted-foreground md:table-cell">{e(effect)}</td>'
-                         f'<td class="whitespace-nowrap px-3 py-2 text-sm">{cost_txt}</td><td class="px-3 py-2 text-right">{find}</td></tr>')
-            sections += (f'<section class="mb-5 overflow-hidden rounded-lg border bg-card">'
-                         f'<div class="border-b bg-muted/50 px-3 py-2"><h4 class="text-base font-semibold">{e(group)}'
-                         f'<span class="ml-2 text-xs font-normal text-muted-foreground">{e(area)} · {len(sks)} skills</span></h4></div>'
-                         f'<div class="overflow-x-auto"><table class="w-full text-left"><thead class="sr-only"><tr><th>Skill</th><th>Effect at max rank</th><th>Cost</th><th>Tree</th></tr></thead>'
-                         f'<tbody>{rows}</tbody></table></div></section>')
-
     options = "".join(f'<option value="{s}">{e(n)} build</option>' for s, n in BUILD_NAMES)
     biomes = "".join(f'<label class="flex items-center justify-between gap-2 py-0.5"><span class="flex items-center gap-2"><input type="checkbox" checked data-biome="{k}" data-points="{PROGRESSION["biomes"][k]["points"]}" class="h-4 w-4 accent-[hsl(var(--primary))]">{e(label)}</span><span class="text-muted-foreground">+{PROGRESSION["biomes"][k]["points"]}</span></label>' for k, label in BIOMES)
     legend = "".join(f'<span class="inline-flex items-center gap-1.5"><i class="inline-block h-2.5 w-2.5 rounded-full" style="background:{c}"></i>{a}</span>' for a, c in AREA_COLORS.items())
@@ -102,12 +82,12 @@ def planner_page(builds_lookup):
     guide_links = " · ".join(f'<a href="/builds/{s}/">{e(builds_lookup[s]["short"])}</a>' for s, _ in BUILD_NAMES)
     body = f'''<style>{STYLE}</style>
 <div class="hero-glow border-b"><div class="container py-8 md:py-10">{{crumbs}}
-<div class="flex flex-wrap gap-2">{badge("Free tool", "primary")}{badge("Enshrouded 1.0", "outline")}{badge("231 nodes · 291 links · 178 skills", "outline")}{badge("Game build " + BUILD_ID, "outline")}</div>
-<h1 class="mt-4 max-w-4xl text-3xl font-bold tracking-tight md:text-5xl">Enshrouded 1.0 Skill Planner</h1>
-<p class="mt-3 max-w-3xl text-lg text-muted-foreground">The full Enshrouded 1.0 skill tree with the real node links from the game files. Start from an entry node, follow the connections, keep an eye on your 212 points and share the build with one link.</p>
+<div class="flex flex-wrap gap-2">{badge("Free tool", "primary")}{badge("Enshrouded 1.0", "outline")}{badge("231 nodes · 178 skills · 212 points", "outline")}{badge("Game build " + BUILD_ID, "outline")}</div>
+<h1 class="mt-4 max-w-4xl text-3xl font-bold tracking-tight md:text-5xl">Enshrouded Skill Planner (1.0)</h1>
+<p class="mt-3 max-w-3xl text-lg text-muted-foreground">This free <strong>Enshrouded skill planner</strong> shows the real 1.0 skill tree, with every node and link taken from the game files. Plan your build point by point, check your 212-point budget and share it with one link.</p>
 </div></div>
-<section id="planner" class="container scroll-mt-16 py-6" aria-label="Skill tree planner">
-  <noscript><p class="mb-4 rounded-md border p-3 text-sm">The interactive tree needs JavaScript. The full skill list further down works without it.</p></noscript>
+<section id="planner" class="container scroll-mt-16 py-6" aria-label="Enshrouded skill tree planner">
+  <noscript><p class="mb-4 rounded-md border p-3 text-sm">The skill planner needs JavaScript. The <a href="/skill-tree/#all-skills">full skill list</a> works without it.</p></noscript>
   <div class="grid gap-6 lg:grid-cols-[1fr_330px]" data-pl-js hidden>
     <div class="min-w-0">
       <div class="relative overflow-hidden rounded-xl border bg-card shadow-sm">
@@ -125,24 +105,24 @@ def planner_page(builds_lookup):
   </div>
 </section>
 <div class="container"><article class="prose-eb mx-auto max-w-4xl">
+<h2 id="about-planner">Enshrouded skill tree planner for the 1.0 release</h2>
+<p>Enshrouded 1.0 reset every character's skill tree, so most players are re-planning their build right now. This <strong>Enshrouded skill tree planner</strong> lets you do that before you spend a single point in the game. It draws the full 1.0 tree, with 231 nodes covering 178 different skills, at the positions and with the links the game uses. Like in Enshrouded itself, you can only learn a skill that connects to one you already have.</p>
+<p>Use the skill planner to test a new build, compare two paths to the same capstone, or check how many points a hybrid really costs. When you like the result, copy the build link and share it with your group.</p>
 <h2 id="how-to-use">How to use the Enshrouded skill planner</h2>
 <ol class="my-4 list-decimal space-y-2 pl-5">
 <li><strong>Load a build or start empty.</strong> Each preset is the level 50 version of one of our guides, following real paths through the tree: {guide_links}.</li>
-<li><strong>Start at the center.</strong> Glowing nodes are the ones you can learn now. Every skill has to connect to one you already have, starting from an entry node next to the center ring.</li>
+<li><strong>Start at the center.</strong> Glowing nodes are the ones you can learn now, starting from the entry nodes next to the center ring.</li>
 <li><strong>Click to add a rank, right-click to refund.</strong> On phones, tap once to see a skill and tap again to add it; use the − button in the details panel to refund. Refunding a skill also refunds anything that would lose its connection.</li>
-<li><strong>Set your progress.</strong> Your budget is 2 points per level after level 1 plus the points of every biome you have explored (Shroud Roots give 1 point, Elixir Wells give 3).</li>
+<li><strong>Set your level, Flame level and explored biomes.</strong> The planner adjusts your point budget and attributes to match.</li>
 <li><strong>Share it.</strong> The address updates with every click, so Copy build link always shares your current plan.</li>
 </ol>
-<h2 id="points">Enshrouded 1.0 skill points and tree layout</h2>
-<p>The 1.0 skill tree has <strong>231 nodes</strong> joined by <strong>291 links</strong>, with <strong>178 different skills</strong> spread over the Core and three class areas: Mage (Wizard, Healer, Battlemage, Trickster), Warrior (Tank, Warrior, Barbarian, Athlete) and Ranger (Ranger, Assassin, Beastmaster, Survivor). Filling every node costs <strong>675 points</strong>, but a fully explored level 50 character has <strong>212</strong>: 98 from levels and 114 from exploring the seven biomes. Every build has to commit to one area and borrow only the best skills from its neighbours. Read the <a href="/skill-tree/">skill tree guide</a> for how the areas fit together.</p>
-<h2 id="all-skills">All 178 Enshrouded 1.0 skills</h2>
-<p>Every skill in the 1.0 tree with its ranks, point cost and effect at max rank. Use <em>Find in tree</em> to jump to a skill in the planner.</p>
-</article>
-<div class="mx-auto max-w-5xl">{sections}</div>
-<article class="prose-eb mx-auto max-w-4xl">
+<h2 id="skill-points">Enshrouded build calculator: skill points at every level</h2>
+<p>The planner works as a <strong>skill point calculator</strong> too. You earn 2 skill points per level after level 1 (98 at level 50), 1 point for every Shroud Root and 3 for every Elixir Well. Exploration adds 114 points across the seven biomes, for <strong>212 skill points at level 50</strong> on a fully explored character. Filling the whole tree would cost 675 points, so every Enshrouded build has to commit to one area and borrow only the best skills from its neighbours. Untick the biomes you have not finished yet to see your real budget today.</p>
+<h2 id="respec">Respec your build after the 1.0 reset</h2>
+<p>Every existing character got a free skill tree reset when loading a save in 1.0. After that, you respec at the Flame Altar. Plan the new build in the skill planner first so you only respec once. The <a href="/skill-tree/#respec">skill tree guide</a> explains respec costs and rules, and lists every skill with its effect.</p>
 {{faq}}
 <h2 id="credits">Data and license</h2>
-<p>The tree layout, links, costs and in-game skill text come from the open-source <a href="https://www.enshrouded-skill-tree.com/" rel="noopener" target="_blank">Enshrouded Skill Planner</a> project (<a href="https://github.com/rossicler/enshrouded-skill-tree" rel="noopener" target="_blank">rossicler/enshrouded-skill-tree</a>), exported from the Enshrouded 1.0 game files and licensed under the GNU GPL v3.0. Our planner code and the data files it loads are released under the same license, and their source is <a href="https://github.com/AZwang067260/enshroudedbuilds" rel="noopener" target="_blank">available on GitHub</a>. Skill effects in the table above are our own summaries. Enshrouded and its game text are property of Keen Games GmbH.</p>
+<p>The tree layout, links, costs and in-game skill text come from the open-source <a href="https://www.enshrouded-skill-tree.com/" rel="noopener" target="_blank">Enshrouded Skill Planner</a> project (<a href="https://github.com/rossicler/enshrouded-skill-tree" rel="noopener" target="_blank">rossicler/enshrouded-skill-tree</a>), exported from the Enshrouded 1.0 game files and licensed under the GNU GPL v3.0. Our planner code and the data files it loads are released under the same license, and their source is <a href="https://github.com/AZwang067260/enshroudedbuilds" rel="noopener" target="_blank">available on GitHub</a>. Enshrouded and its game text are property of Keen Games GmbH.</p>
 {{sources}}
 </article></div>'''
     return body
@@ -152,3 +132,29 @@ def client_payload():
     from tree_data import client_data
     return "/*! SPDX-License-Identifier: GPL-3.0-or-later. Data: rossicler/enshrouded-skill-tree, Enshrouded 1.0 game files. */\nwindow.EB_TREE=" + json.dumps(
         client_data(AREA_COLORS), separators=(",", ":"), ensure_ascii=False) + ";\n"
+
+
+def skills_table():
+    """Crawlable list of every 1.0 skill (shown on /skill-tree/), each linking to the skill in the planner."""
+    keys = type_key_by_name()
+    sections = ""
+    for area, groups in TREE:
+        sections += f'<h3 id="skills-{area.lower()}" class="mb-3 mt-8 text-xl font-bold">{e(area)} skills</h3>'
+        for group, sks in groups:
+            rows = ""
+            for name, ranks, cost, effect, flags in sks:
+                tags = (badge("New in 1.0", "primary") if "new" in flags else "") + (badge("Disputed", "outline") if "disputed" in flags else "")
+                cost_txt = f"{cost} pt" if ranks == 1 else f"{cost} pt × {ranks}"
+                find = (f'<a href="/skill-planner/#n={keys[name]}" class="whitespace-nowrap text-xs font-medium text-primary hover:underline">Open in planner</a>'
+                        if name in keys else "")
+                rows += (f'<tr class="border-t align-top"><td class="px-3 py-2"><div class="flex flex-wrap items-center gap-1.5 font-medium">{e(name)}{tags}</div>'
+                         f'<div class="mt-0.5 text-xs text-muted-foreground md:hidden">{e(effect)}</div></td>'
+                         f'<td class="hidden px-3 py-2 text-sm text-muted-foreground md:table-cell">{e(effect)}</td>'
+                         f'<td class="whitespace-nowrap px-3 py-2 text-sm">{cost_txt}</td><td class="px-3 py-2 text-right">{find}</td></tr>')
+            sections += (f'<section class="mb-5 overflow-hidden rounded-lg border bg-card">'
+                         f'<div class="border-b bg-muted/50 px-3 py-2"><h4 class="text-base font-semibold">{e(group)}'
+                         f'<span class="ml-2 text-xs font-normal text-muted-foreground">{e(area)} · {len(sks)} skills</span></h4></div>'
+                         f'<div class="overflow-x-auto"><table class="w-full text-left"><thead class="sr-only"><tr><th>Skill</th><th>Effect at max rank</th><th>Cost</th><th>Tree</th></tr></thead>'
+                         f'<tbody>{rows}</tbody></table></div></section>')
+
+    return sections

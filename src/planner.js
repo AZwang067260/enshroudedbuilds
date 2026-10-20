@@ -7,7 +7,7 @@
   var D = window.EB_TREE; if (!D) return;
   var NS = 'http://www.w3.org/2000/svg';
   var $ = function (s) { return document.querySelector(s); };
-  var T = D.types, N = {}, ORDER = [], ADJ = {}, sel = {}, focus = null, query = '';
+  var T = D.types, N = {}, ORDER = [], ADJ = {}, sel = {}, focus = null, query = '', zoomTo = null;
   var FLAME = { THICK_SKIN: 'CONS', BARBARIAN: 'STR', EXALTED: 'INT', ARCANE_CONCENTRATION: 'SPIRIT', GRACEFUL_STRIDE: 'DEX', ENDURANCE_OF_THE_FLAME: 'ENDURANCE' };
   var B36 = '0123456789abcdefghijklmnopqrstuvwxyz';
   D.nodes.forEach(function (r) {
@@ -216,7 +216,8 @@
       for (var i = 0; i < h.t.length && i < ORDER.length; i++) { var r = B36.indexOf(h.t[i]); if (r > 0) sel[ORDER[i]] = Math.min(r, type(ORDER[i]).m); }
       var ok = reachable(null); Object.keys(sel).forEach(function (id) { if (!ok[id]) delete sel[id]; });
     }
+    if (h.n) { var nid = ORDER.filter(function (x) { return N[x].t === h.n; })[0]; if (nid) { focus = nid; zoomTo = nid; } }
   })();
   document.querySelectorAll('[data-pl-js]').forEach(function (x) { x.hidden = false; });
-  fit(); render();
+  fit(); if (zoomTo) { vt.k = 2.5; vt.x = -N[zoomTo].x * vt.k; vt.y = -N[zoomTo].y * vt.k; apply(); } render();
 })();
