@@ -4,6 +4,7 @@ from html import escape
 
 SITE = "https://enshroudedbuilds.org"
 SITE_NAME = "Enshrouded Builds"
+CONTACT_EMAIL = "contact@enshroudedbuilds.org"
 UPDATED = "2026-10-20"
 UPDATED_HUMAN = "October 20, 2026"
 # game version the facts were last checked against
@@ -191,11 +192,17 @@ def footer(builds):
       <li><a href="/skill-tree/" class="hover:text-foreground">Skill Tree Guide</a></li>
       <li><a href="/skill-planner/" class="hover:text-foreground">Skill Planner</a></li>
       <li><a href="/builds/" class="hover:text-foreground">All Builds</a></li>
-      <li><a href="/about/" class="hover:text-foreground">About &amp; Disclaimer</a></li>
+      <li><a href="/blog/" class="hover:text-foreground">Blog</a></li>
     </ul></div>
   </div>
-  <div class="border-t"><div class="container py-6 text-xs text-muted-foreground">
-    Enshrouded is a trademark of Keen Games GmbH. This is an unofficial fan site and is not affiliated with or endorsed by Keen Games.
+  <div class="border-t"><div class="container flex flex-col gap-3 py-6 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
+    <p>Enshrouded is a trademark of Keen Games GmbH. This is an unofficial fan site and is not affiliated with or endorsed by Keen Games.</p>
+    <nav aria-label="Legal" class="flex flex-wrap gap-x-4 gap-y-1">
+      <a href="/about/" class="hover:text-foreground">About &amp; Disclaimer</a>
+      <a href="/privacy-policy/" class="hover:text-foreground">Privacy Policy</a>
+      <a href="/terms/" class="hover:text-foreground">Terms of Service</a>
+      <a href="/contact/" class="hover:text-foreground">Contact</a>
+    </nav>
   </div></div>
 </footer>'''
 

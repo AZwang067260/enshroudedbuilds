@@ -1,4 +1,5 @@
 """Static site generator for enshroudedbuilds.org. Run: python3 src/build.py  -> writes ./public"""
+import datetime
 import json
 import os
 import re
@@ -6,11 +7,12 @@ import shutil
 import subprocess
 
 from art import ART, alt_text, build_svg
+from blog import POSTS
 from content_builds import BUILDS
 from planner import PLANNER_FAQ, client_payload, planner_page, skills_table
 from skills_data import PRESETS
 from tree_data import BUILD_ID, OUR, STAGES, build_preset, game_text, skill_cost, type_of
-from layout import (GAME_VERSION, SITE, UPDATED, UPDATED_HUMAN, accordion, alert, badge, breadcrumb, button, card, e,
+from layout import (CONTACT_EMAIL, GAME_VERSION, SITE, UPDATED, UPDATED_HUMAN, accordion, alert, badge, breadcrumb, button, card, e,
                     faq_schema, page, table)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,13 +22,13 @@ TIER_ORDER = {"S": 0, "A": 1, "B": 2}
 PAGES = []  # (path, priority) for the sitemap
 
 
-def write(path, html, priority="0.8"):
+def write(path, html, priority="0.8", lastmod=UPDATED):
     target = os.path.join(OUT, path.strip("/"), "index.html") if path.endswith("/") else os.path.join(OUT, path.strip("/"))
     os.makedirs(os.path.dirname(target), exist_ok=True)
     with open(target, "w", encoding="utf-8") as f:
         f.write(html)
     if path != "/404.html":
-        PAGES.append((path, priority))
+        PAGES.append((path, priority, lastmod))
 
 
 def article_schema(path, headline, desc, image="/og-image.png"):
@@ -492,7 +494,7 @@ def one_point_oh():
 <p>Every class guide below was rewritten for Update 1.0, with a level 1–50 skill path and a re-spec section for the October 15 skill tree reset. Start with the S-tier builds if you want the strongest picks.</p>
 <div class="not-prose my-6 grid gap-5 sm:grid-cols-2">{"".join(build_card(b) for b in sorted(BUILDS, key=lambda b: TIER_ORDER[b["tier"]]))}</div>
 <p>Want the ranking at a glance? See the <a href="/tier-list/">Enshrouded builds tier list</a>, or learn how each archetype works in the <a href="/skill-tree/">skill tree guide</a>.</p>
-{alert("Hotfixes ahead", "Enshrouded 1.0 is only a few days old. Some numbers, such as the exact values for Puncture and Barrage, have not been officially confirmed yet. We will update these guides when Keen Games releases patch notes.")}
+{alert("Hotfixes ahead", "Enshrouded 1.0 is only a few days old. Keen Games' notes don't list exact skill values, so ours come from the in-game skill text (see <a href='/blog/enshrouded-1-0-new-skills/'>every new skill's ranks and costs</a>). We will update these guides when balance patches arrive.")}
 <h2 id="faq">Enshrouded 1.0 FAQ</h2>
 {accordion(ONE_FAQ)}
 {sources()}
@@ -525,9 +527,9 @@ def patch_notes():
         ["<strong>Aerial Wand Attack</strong>", "Mage", "Hold the use-item key during a jump: the shot deals +50% weapon damage in a small blast (25 stamina).", '<a href="/builds/battlemage/">Battlemage</a>'],
         ["<strong>Wand Evasion Attack</strong>", "Mage", "Dodging fires a piercing wand disc for +50% weapon damage (costs 50 mana).", '<a href="/builds/battlemage/">Battlemage</a>'],
         ["<strong>Blast and Cast</strong>", "Mage", "After a wand critical hit, your next staff attack within 10 seconds deals 50% more base damage.", '<a href="/builds/wizard/">Wizard</a>'],
-        ["<strong>Puncture</strong>", "Archer", "Increases ranged piercing damage (exact value not in the official notes).", '<a href="/builds/ranger/">Ranger</a>'],
-        ["<strong>Barrage</strong>", "Archer", "Bow hits have a chance to restore 1 durability.", '<a href="/builds/ranger/">Ranger</a>'],
-        ["<strong>Survival Instinct</strong>", "Archer", "Killing Shroud enemies with a bow or dagger adds Shroud time.", '<a href="/builds/assassin/">Assassin</a>, <a href="/builds/ranger/">Ranger</a>'],
+        ["<strong>Puncture</strong>", "Archer", "+10% ranged piercing damage per rank (30% at rank 3).", '<a href="/builds/ranger/">Ranger</a>'],
+        ["<strong>Barrage</strong>", "Archer", "Bow hits have a 15% chance per rank to restore 1 durability (45% at rank 3).", '<a href="/builds/ranger/">Ranger</a>'],
+        ["<strong>Survival Instinct</strong>", "Archer", "Killing Shroud enemies with a bow or dagger restores 3 seconds of Shroud time per rank (9 s at rank 3).", '<a href="/builds/assassin/">Assassin</a>, <a href="/builds/ranger/">Ranger</a>'],
     ])
     spells = table(["New spell", "Type", "Use"], [
         ["<strong>Pillar of Flames</strong>", "Fire damage", "Area damage on groups"],
@@ -786,6 +788,162 @@ def about():
                      body=body, builds=BUILDS, schemas=[cs], og_type="website"), "0.3")
 
 
+# ============================================================ PRIVACY / TERMS / CONTACT
+
+POLICY_DATE, POLICY_DATE_HUMAN = "2026-10-20", "October 20, 2026"
+MAIL = f'<a href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a>'
+
+
+def simple_page(path, name, h1, title, desc, inner, priority="0.3"):
+    ch, cs = breadcrumb([("/", "Home"), (path, name)])
+    body = f'''<div class="container py-12"><article class="prose-eb mx-auto max-w-3xl">{ch}
+<h1 class="text-3xl font-bold md:text-4xl">{h1}</h1>
+{inner}
+</article></div>'''
+    write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, schemas=[cs], og_type="website"),
+          priority, POLICY_DATE)
+
+
+def privacy():
+    inner = f'''<p class="text-sm text-muted-foreground">Effective date: {POLICY_DATE_HUMAN}</p>
+<p>This Privacy Policy explains what information EnshroudedBuilds.org ("we", "us", "this site") collects when you visit, how it is used, and the choices you have. This site is an independent fan guide to Enshrouded. You can read every page without an account, and we do not ask you to submit any personal information.</p>
+<h2 id="information-we-collect">Information we collect</h2>
+<p>We do not run user accounts, comment sections, newsletters or contact forms, so we do not collect your name, address or payment details. The information that is collected comes from the services below:</p>
+<ul class="dots">
+<li><strong>Analytics.</strong> We use Google Analytics 4 to understand which guides are read and how visitors find us. Google Analytics uses cookies and similar technologies to collect information such as pages viewed, time on page, referring site, approximate location (country or city), device type and browser. Google Analytics 4 does not log or store full IP addresses. We use these reports in aggregate only.</li>
+<li><strong>Hosting and security.</strong> The site is served by Cloudflare. Like any web server, Cloudflare processes your IP address, browser user agent and the pages you request in order to deliver the site, protect it from attacks and keep short-lived logs. See the <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener" target="_blank">Cloudflare Privacy Policy</a>.</li>
+<li><strong>Fonts.</strong> Our fonts are loaded from Google Fonts, which receives your IP address and browser details when the font files are downloaded.</li>
+<li><strong>Email.</strong> If you email us, we receive your email address and whatever you write. We use it only to reply to you.</li>
+</ul>
+<h2 id="advertising">Advertising and cookies</h2>
+<p>We use or plan to use <strong>Google AdSense</strong> to show ads that help pay for the site. When ads are shown:</p>
+<ul class="dots">
+<li>Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this website or other websites.</li>
+<li>Google's use of advertising cookies enables it and its partners to serve ads to you based on your visit to this site and/or other sites on the Internet.</li>
+<li>You may opt out of personalized advertising by visiting Google's <a href="https://adssettings.google.com/" rel="noopener" target="_blank">Ads Settings</a>. You can also opt out of some third-party vendors' use of cookies for personalized advertising at <a href="https://www.aboutads.info/choices/" rel="noopener" target="_blank">www.aboutads.info</a>.</li>
+<li>If you are in the European Economic Area, the United Kingdom or Switzerland, you will be asked for consent before personalized ads or advertising cookies are used, through a consent message provided by Google. You can change your choice at any time from that message.</li>
+</ul>
+<p>Learn more in <a href="https://policies.google.com/technologies/partner-sites" rel="noopener" target="_blank">How Google uses information from sites or apps that use its services</a> and in the <a href="https://policies.google.com/privacy" rel="noopener" target="_blank">Google Privacy Policy</a>.</p>
+<h2 id="local-storage">Information stored in your browser</h2>
+<p>This site saves one setting in your browser's local storage: whether you chose the light or dark theme. It never leaves your device. The <a href="/skill-planner/">skill planner</a> keeps your build in the page address (the part after #), which is not sent to our server. Nothing is saved unless you copy or bookmark that link.</p>
+<h2 id="your-choices">Your choices</h2>
+<ul class="dots">
+<li>You can block or delete cookies in your browser settings. The guides work without cookies.</li>
+<li>You can stop Google Analytics from collecting data with the <a href="https://tools.google.com/dlpage/gaoptout" rel="noopener" target="_blank">Google Analytics opt-out browser add-on</a>.</li>
+<li>You can turn off personalized ads in Google's <a href="https://adssettings.google.com/" rel="noopener" target="_blank">Ads Settings</a>.</li>
+</ul>
+<h2 id="your-rights">Your privacy rights</h2>
+<p>Depending on where you live (for example under the GDPR in the EU and UK, or the CCPA/CPRA in California), you may have the right to access, correct or delete personal information about you, to object to or restrict its processing, and to opt out of the "sale" or "sharing" of personal information for targeted advertising. We do not sell personal information. Because we do not hold accounts or profiles, most data about your visit is held by Google and Cloudflare, and you can manage it through the links above. For any request, email us at {MAIL}.</p>
+<h2 id="retention">Data retention</h2>
+<p>Google Analytics data is kept for 14 months and then deleted automatically. Emails are kept only as long as needed to answer them.</p>
+<h2 id="children">Children's privacy</h2>
+<p>This site is a general-audience game guide and is not directed at children under 13. We do not knowingly collect personal information from children. If you believe a child has sent us personal information, contact us and we will delete it.</p>
+<h2 id="third-party-links">Links to other sites</h2>
+<p>Our guides link to other websites, such as Keen Games' official news, the Enshrouded Wiki and Steam. Their privacy practices are their own, so please read their policies.</p>
+<h2 id="changes">Changes to this policy</h2>
+<p>If we change this policy, we will update the effective date at the top of this page.</p>
+<h2 id="contact">Contact</h2>
+<p>Questions about this policy? Email {MAIL} or see our <a href="/contact/">contact page</a>.</p>'''
+    simple_page("/privacy-policy/", "Privacy Policy", "Privacy Policy", "Privacy Policy | Enshrouded Builds",
+                "How EnshroudedBuilds.org handles your data: Google Analytics, Google AdSense advertising cookies, Cloudflare hosting and your privacy choices.",
+                inner)
+
+
+def terms():
+    inner = f'''<p class="text-sm text-muted-foreground">Effective date: {POLICY_DATE_HUMAN}</p>
+<p>These Terms of Service ("Terms") apply to your use of EnshroudedBuilds.org (the "site"). By using the site you agree to these Terms. If you do not agree, please do not use the site.</p>
+<h2 id="about-the-site">About the site</h2>
+<p>EnshroudedBuilds.org is an independent, unofficial fan site with build guides, a skill tree guide and a skill planner for the game Enshrouded. It is not affiliated with, endorsed by or sponsored by Keen Games GmbH. Enshrouded and all related names, logos and artwork are trademarks of Keen Games GmbH and are used here only to identify the game.</p>
+<h2 id="use-of-content">Use of our content</h2>
+<p>You may read, share links to, and print our guides for personal, non-commercial use. You may quote short passages if you credit EnshroudedBuilds.org and link to the original page. You may not copy whole guides or large parts of them to another website, app or video description, or present them as your own work.</p>
+<p>The <a href="/skill-planner/">skill planner</a> code and its skill tree data are licensed under the GNU General Public License v3.0 or later. That license, not these Terms, governs your use of that code and data. See the <a href="/assets/planner/LICENSE.txt">license notice</a> and the <a href="/about/#skill-planner">About page</a> for credits.</p>
+<h2 id="accuracy">Accuracy of information</h2>
+<p>We check our guides against the in-game skill text and official patch notes (see our <a href="/about/#methodology">methodology</a>), but Enshrouded is updated regularly, and values, tiers and recommendations can change with any patch. All content is provided for general information and entertainment, "as is" and without warranty of any kind. If you find a mistake, please <a href="/contact/">tell us</a>.</p>
+<h2 id="acceptable-use">Acceptable use</h2>
+<p>Do not use the site in a way that harms it or other visitors. That includes attempting to gain unauthorized access, overloading the site with automated requests, scraping it at a rate that degrades service, or using it to distribute malware.</p>
+<h2 id="third-parties">Advertising and third-party links</h2>
+<p>The site may show ads served by Google AdSense and links to other websites. We are not responsible for the content, products or privacy practices of advertisers or linked sites. How ads use cookies is explained in our <a href="/privacy-policy/">Privacy Policy</a>.</p>
+<h2 id="liability">Limitation of liability</h2>
+<p>To the fullest extent permitted by law, EnshroudedBuilds.org and its authors are not liable for any indirect, incidental or consequential damages arising from your use of the site, including lost game progress or decisions you make based on our guides.</p>
+<h2 id="changes">Changes to these terms</h2>
+<p>We may update these Terms from time to time. The effective date at the top shows when they last changed. Continuing to use the site after a change means you accept the new Terms.</p>
+<h2 id="contact">Contact</h2>
+<p>Questions about these Terms? Email {MAIL}.</p>'''
+    simple_page("/terms/", "Terms of Service", "Terms of Service", "Terms of Service | Enshrouded Builds",
+                "Terms of Service for EnshroudedBuilds.org, an unofficial Enshrouded fan guide: use of our content, accuracy, advertising and liability.",
+                inner)
+
+
+def contact():
+    inner = f'''<p>EnshroudedBuilds.org is run by a small team of Enshrouded players. The best way to reach us is by email:</p>
+<p class="not-prose my-6"><a href="mailto:{CONTACT_EMAIL}" class="inline-flex items-center gap-2 rounded-lg border bg-card px-5 py-4 text-lg font-semibold hover:bg-accent">{CONTACT_EMAIL}</a></p>
+<p>We read every message and usually reply within a few days.</p>
+<h2 id="what-to-send">What to write to us about</h2>
+<ul class="dots">
+<li><strong>Corrections.</strong> If a skill value, cost or item in a guide doesn't match your game, tell us the page and, if you can, attach a screenshot of the tooltip. We re-check it against the game data and fix it.</li>
+<li><strong>Build suggestions.</strong> Found a strong setup we don't cover? Send the skills, gear and why it works.</li>
+<li><strong>Privacy requests.</strong> Questions about the data described in our <a href="/privacy-policy/">Privacy Policy</a>.</li>
+<li><strong>Partnerships and other questions.</strong> Anything else about the site.</li>
+</ul>
+<h2 id="game-support">Game support</h2>
+<p>We are a fan site and can't help with game bugs, crashes, purchases or your Keen Games account. For those, contact Keen Games through the official Enshrouded support channels.</p>'''
+    simple_page("/contact/", "Contact", "Contact Enshrouded Builds", "Contact | Enshrouded Builds",
+                "Contact EnshroudedBuilds.org by email for guide corrections, build suggestions, privacy requests and other questions.",
+                inner)
+
+
+# ============================================================ BLOG
+
+def published_posts():
+    today = datetime.date.today().isoformat()
+    return sorted((p for p in POSTS if p["date"] <= today), key=lambda p: p["date"], reverse=True)
+
+
+def human_date(iso):
+    d = datetime.date.fromisoformat(iso)
+    return f"{d.strftime('%B')} {d.day}, {d.year}"
+
+
+def blog():
+    posts = published_posts()
+    path = "/blog/"
+    ch, cs = breadcrumb([("/", "Home"), (path, "Blog")])
+    items = "".join(f'''<li>{card(f"""<a href="/blog/{p["slug"]}/" class="block p-5 hover:bg-accent/40">
+<p class="text-xs text-muted-foreground"><time datetime="{p["date"]}">{human_date(p["date"])}</time></p>
+<h2 class="mt-1 text-lg font-semibold">{e(p["h1"])}</h2>
+<p class="mt-2 text-sm text-muted-foreground">{e(p["summary"])}</p></a>""")}</li>''' for p in posts)
+    body = f'''<div class="container py-12"><div class="mx-auto max-w-3xl">{ch}
+<h1 class="text-3xl font-bold md:text-4xl">Enshrouded Blog: 1.0 Skill Changes, Builds and Patches</h1>
+<p class="mt-4 text-lg text-muted-foreground">Notes on Enshrouded 1.0: what changed in the skill tree, how each class compares before and after the update, and what every patch means for your build. Values are checked against the 1.0 game files.</p>
+<ul class="mt-8 space-y-4">{items}</ul></div></div>'''
+    schema = {"@type": "Blog", "name": "Enshrouded Builds Blog", "url": SITE + path, "inLanguage": "en",
+              "blogPost": [{"@type": "BlogPosting", "headline": p["h1"], "url": f"{SITE}/blog/{p['slug']}/", "datePublished": p["date"]} for p in posts]}
+    write(path, page(path=path, title="Enshrouded Blog: 1.0 Skill Changes & Patch Notes",
+                     description="Enshrouded 1.0 blog: skill tree changes, class before-and-after comparisons and patch analysis, checked against the game files.",
+                     body=body, builds=BUILDS, schemas=[schema, cs], og_type="website"), "0.6", posts[0]["date"] if posts else UPDATED)
+    for p in posts:
+        blog_post(p)
+
+
+def blog_post(p):
+    path = f"/blog/{p['slug']}/"
+    ch, cs = breadcrumb([("/", "Home"), ("/blog/", "Blog"), (path, p["h1"])])
+    body = f'''<div class="container py-12"><article class="prose-eb mx-auto max-w-3xl">{ch}
+<div class="flex flex-wrap gap-2">{badge("Enshrouded 1.0", "primary")}{badge("Checked against build " + BUILD_ID, "outline")}</div>
+<h1 class="mt-4 text-3xl font-bold md:text-4xl">{e(p["h1"])}</h1>
+<p class="text-sm text-muted-foreground">Published <time datetime="{p["date"]}">{human_date(p["date"])}</time> by the Enshrouded Builds team</p>
+{p["body"]()}
+{sources()}
+</article></div>'''
+    schema = {"@type": "BlogPosting", "headline": p["title"], "description": p["description"], "inLanguage": "en",
+              "image": SITE + "/og-image.png", "datePublished": p["date"], "dateModified": p["date"], "mainEntityOfPage": SITE + path,
+              "author": {"@type": "Organization", "name": "Enshrouded Builds", "url": SITE + "/"},
+              "publisher": {"@type": "Organization", "name": "Enshrouded Builds", "url": SITE + "/"}, "citation": citations(),
+              "about": {"@type": "VideoGame", "name": "Enshrouded", "author": {"@type": "Organization", "name": "Keen Games"}}}
+    write(path, page(path=path, title=p["title"], description=p["description"], body=body, builds=BUILDS,
+                     schemas=[schema, cs]), "0.6", p["date"])
+
+
 def not_found():
     body = f'''<div class="container py-24 text-center"><p class="text-6xl font-bold text-primary">404</p>
 <h1 class="mt-4 text-2xl font-bold">Lost in the Shroud</h1><p class="mt-2 text-muted-foreground">This page doesn't exist. Try one of our Enshrouded builds instead.</p>
@@ -795,7 +953,7 @@ def not_found():
 
 
 def seo_files():
-    urls = "".join(f"<url><loc>{SITE}{p}</loc><lastmod>{UPDATED}</lastmod><priority>{pr}</priority></url>\n" for p, pr in PAGES)
+    urls = "".join(f"<url><loc>{SITE}{p}</loc><lastmod>{lm}</lastmod><priority>{pr}</priority></url>\n" for p, pr, lm in PAGES)
     with open(os.path.join(OUT, "sitemap.xml"), "w") as f:
         f.write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n')
     with open(os.path.join(OUT, "robots.txt"), "w") as f:
@@ -850,6 +1008,10 @@ if __name__ == "__main__":
     skill_planner()
     skill_tree()
     about()
+    privacy()
+    terms()
+    contact()
+    blog()
     not_found()
     seo_files()
     subprocess.run(["npx", "tailwindcss", "-c", "tailwind.config.js", "-i", "src/input.css",
