@@ -7,7 +7,7 @@ import subprocess
 
 from art import ART, alt_text, build_svg
 from content_builds import BUILDS
-from planner import PLANNER_FAQ, planner_page
+from planner import PLANNER_FAQ, client_payload, planner_page
 from layout import (GAME_VERSION, SITE, UPDATED, UPDATED_HUMAN, accordion, alert, badge, breadcrumb, button, card, e,
                     faq_schema, page, table)
 
@@ -332,16 +332,22 @@ def home():
 def skill_planner():
     path = "/skill-planner/"
     ch, cs = breadcrumb([("/", "Home"), ("/skill-tree/", "Skill Tree Guide"), (path, "Skill Planner")])
-    body, data, js = planner_page(BY_SLUG)
+    body = planner_page(BY_SLUG)
     body = (body.replace("{crumbs}", ch).replace("{faq}", '<h2 id="faq">Skill planner FAQ</h2>' + accordion(PLANNER_FAQ))
-            .replace("{sources}", sources()))
-    body += '<div class="h-14 lg:hidden" aria-hidden="true"></div>'
-    body += f'<script>window.EB_PLANNER={json.dumps(data, separators=(",", ":"))};</script><script>{js}</script>'
+            .replace("{sources}", sources([("https://github.com/rossicler/enshrouded-skill-tree", "rossicler/enshrouded-skill-tree: tree data from the 1.0 game files (GPL-3.0)")])))
+    # planner data and code are GPL-3.0-or-later (see src/vendor/enshrouded-skill-tree)
+    assets = os.path.join(OUT, "assets", "planner")
+    os.makedirs(assets, exist_ok=True)
+    with open(os.path.join(assets, "tree-data.js"), "w", encoding="utf-8") as f:
+        f.write(client_payload())
+    shutil.copy(os.path.join(ROOT, "src", "planner.js"), os.path.join(assets, "planner.js"))
+    shutil.copy(os.path.join(ROOT, "src", "vendor", "enshrouded-skill-tree", "LICENSE"), os.path.join(assets, "LICENSE.txt"))
+    body += '<script src="/assets/planner/tree-data.js" defer></script><script src="/assets/planner/planner.js" defer></script>'
     title = "Enshrouded Skill Planner (1.0): Free Skill Tree Calculator"
-    desc = "Free Enshrouded 1.0 skill planner: all 178 skills and 231 nodes with ranks and point costs, a 212-point budget, attribute totals and shareable build links."
+    desc = "Free Enshrouded 1.0 skill planner with the real skill tree: 231 nodes and links from the game files, 212-point budget, attributes and shareable builds."
     app = {"@type": "WebApplication", "name": "Enshrouded 1.0 Skill Planner", "url": SITE + path, "applicationCategory": "GameApplication",
            "operatingSystem": "Any (web browser)", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": desc,
-           "about": {"@type": "VideoGame", "name": "Enshrouded"}}
+           "about": {"@type": "VideoGame", "name": "Enshrouded"}, "license": "https://www.gnu.org/licenses/gpl-3.0.html"}
     write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, active=path,
                      keywords="enshrouded skill planner, enshrouded skill tree planner, enshrouded skill calculator, enshrouded build planner, enshrouded 1.0 skill tree",
                      schemas=[app, cs, faq_schema(PLANNER_FAQ)]), "0.9")
@@ -720,7 +726,7 @@ def about():
 <li><strong>Corrections are welcome.</strong> If a tooltip in your game shows a different value, tell us and we will re-check it.</li>
 </ul>
 <h2 id="skill-planner">The skill planner</h2>
-<p>Our <a href="/skill-planner/">Enshrouded skill planner</a> uses the same skill data as the guides. It counts the points you can earn from levels, Shroud Roots and Elixir Wells and checks your plan against that budget.</p>
+<p>Our <a href="/skill-planner/">Enshrouded skill planner</a> draws the real 1.0 skill tree, with the node positions and links exported from the game files by the open-source <a href="https://github.com/rossicler/enshrouded-skill-tree" rel="noopener" target="_blank">rossicler/enshrouded-skill-tree</a> project (GPL-3.0). We checked that export against our own skill table: all 178 skills match on ranks and point costs. The planner code and its data are released under the GPL-3.0 as well.</p>
 <h2>Disclaimer</h2>
 <p>Enshrouded and all related names and artwork are trademarks of Keen Games GmbH. This site is not affiliated with or endorsed by Keen Games.</p>
 </article></div>'''

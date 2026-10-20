@@ -265,13 +265,13 @@ PRESETS = {
 
 # Extra picks used to fill each preset up to the level 50 budget, in priority order
 FILL = {
-    "wizard": ["Constitution node", "Spirit node", "Mana Currents", "Iceman", "Thunder", "Fire Resistance", "Shock Resistance", "Ice Resistance",
+    "wizard": ["Spirit node", "Mana Currents", "Iceman", "Thunder", "Fire Resistance", "Shock Resistance", "Ice Resistance",
                "Emergency Blink", "Terror", "Counterstrike", "Bone to Ash", "Arcane Concentration", "Dark Arts", "Frost", "Bloodletting", "Shroud Resistance"],
-    "battlemage": ["Constitution node", "Spirit node", "Eternal Spark", "Blink Attack", "Mana Currents", "Quick Charge", "Thunder", "Arsonist",
+    "battlemage": ["Spirit node", "Eternal Spark", "Blink Attack", "Mana Currents", "Quick Charge", "Thunder", "Arsonist",
                    "Fire Resistance", "Shock Resistance", "Ice Resistance", "Emergency Blink", "Heavy Plates", "Shiny Plates", "Bone to Ash", "Radiant Aura", "Shroud Resistance"],
-    "necromancer": ["Constitution node", "Arsonist", "Iceman", "Thunder", "Mass Destruction", "Exalted", "Emergency Blink", "Healer", "Water Aura",
+    "necromancer": ["Arsonist", "Iceman", "Thunder", "Mass Destruction", "Exalted", "Emergency Blink", "Healer", "Water Aura",
                     "Fire Resistance", "Shock Resistance", "Ice Resistance", "Radiant Aura", "Shroud Resistance", "Shroud Mitigation", "Spellslinger"],
-    "healer": ["Constitution node", "Intelligence node", "Shroud Mitigation", "Mana Currents", "Quick Charge", "Necromancer", "Emergency Blink", "Arcane Concentration",
+    "healer": ["Intelligence node", "Shroud Mitigation", "Mana Currents", "Quick Charge", "Necromancer", "Emergency Blink", "Arcane Concentration",
                "Shroud Resistance", "Fire Resistance", "Ice Resistance", "Shock Resistance", "Earth Aura", "Arsonist", "Exalted", "Advanced Necromancy"],
     "warrior": ["Constitution node", "Endurance node", "Breach", "Heavy Handed", "Shockwave", "Shiny Plates", "Tower", "Warden", "Athlete", "Thick Skin",
                 "Brute", "Opportunity", "Snap", "Finesse", "Upwards Slash Attack", "Crash Down Attack", "Steadfast", "Earth Aura"],
