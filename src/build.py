@@ -11,7 +11,7 @@ from blog import POSTS
 from content_builds import BUILDS
 from planner import PLANNER_FAQ, client_payload, planner_page, skills_table
 from skills_data import PRESETS
-from tree_data import BUILD_ID, OUR, STAGES, build_preset, game_text, skill_cost, type_of
+from tree_data import BIOMES, BUILD_ID, OUR, STAGES, build_preset, game_text, skill_cost, type_of
 from layout import (CONTACT_EMAIL, GAME_VERSION, SITE, UPDATED, UPDATED_HUMAN, accordion, alert, badge, breadcrumb, button, card, e,
                     faq_schema, page, table)
 
@@ -238,7 +238,7 @@ def build_page(b):
     {quick_answer}
     {section("overview", f"Enshrouded {n} build overview", paras(b["intro"]) + quick)}
     {section("why-1-0", f"What changed for the {n} in Enshrouded 1.0", paras(b["why"]) + alert("Update 1.0 skill tree reset", 'Every character\'s skill tree was reset when Enshrouded Update 1.0 launched on October 15, 2026, and all points were refunded. Re-spend your points before leaving your base. Your character level is kept. See all <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds</a>.') + respec)}
-    {section("attributes", f"{n} attribute priority", f"<p>Attribute points decide how your {n.lower()} build scales. Use this priority when you spend points on the skill tree:</p>" + table(["Attribute", "Priority", "Why"], [[f"<strong>{e(a)}</strong>", e(p), e(w)] for a, p, w in b["attributes"]]))}
+    {section("attributes", f"{n} attribute priority", f"<p>Attribute points decide how your {n.lower()} build scales. Use this priority when you spend points on the skill tree. What each of the six attributes does is explained in our <a href=\"/skill-tree/\">Enshrouded skill tree guide</a>.</p>" + table(["Attribute", "Priority", "Why"], [[f"<strong>{e(a)}</strong>", e(p), e(w)] for a, p, w in b["attributes"]]))}
     {section("skill-order", f"Enshrouded 1.0 {n} Skills &amp; Skill Order (Level 1–50)", f"<p>This is the full {n.lower()} skill order for Enshrouded 1.0, from level 1 to the new level 50 cap. Take the skills from top to bottom and fill in attribute nodes as you path between them. Each row lists the level range where that skill fits.</p>" + order_table + stages + alert("Hotfixes", "Skill names, costs and values were checked against the 1.0 game files (hotfix 1.0.0.2). Keen Games may still adjust values in later hotfixes, so check the in-game tooltip before committing your points."))}
     {section("key-skills", f"Key {n} skills explained", key)}
     {section("gear", f"Best {n} gear: weapons, armor, accessories and food", f"<p>Gear matters as much as skills in Enshrouded. With the 1.0 gear cap raised to 55, always upgrade your main weapon first. Here is the {n.lower()} loadout to aim for:</p>" + table(["Slot", "Recommended", "Why"], [[f"<strong>{e(s)}</strong>", p, e(w)] for s, p, w in b["gear"]]))}
@@ -437,6 +437,46 @@ ONE_FAQ = [
 ]
 
 
+# what 1.0 changed for each build, from Keen Games' 1.0 changelog and combat post
+CLASS_10 = {
+    "wizard": "The 1.0 spell pass is aimed at you: Pillar of Flames, Blizzard and Ball Lightning add area damage, every spell now has an upgradeable Eternal version, and <strong>Blast and Cast</strong> gives your next staff attack 50% more base damage after a wand crit.",
+    "battlemage": "Wands now have a piercing <strong>heavy attack</strong> from the start, plus two new active skills, <strong>Wand Evasion Attack</strong> and <strong>Aerial Wand Attack</strong>. Anvils in enemy camps now also repair your ward or shield.",
+    "necromancer": "A real build for the first time: four summon spells (three totems and Hollow Skeletons) plus <strong>Advanced Necromancy</strong> and <strong>Totem Mastery</strong> to keep more of them out. Companions from Gems of Necromancy now lose health out of combat, so the spells carry the build.",
+    "healer": "Every healing spell now has an Eternal version you can upgrade at the crafting survivors, so you no longer run out of charges in long fights. The new Ice Totem gives a support player a way to slow enemies chasing the group.",
+    "warrior": "The dagger skills left the Warrior area, so the path to one-handed and shield skills is cleaner. Heavy melee attacks now hit several enemies, and stamina now recovers while you block.",
+    "tank": "Stamina now recovers while blocking, blocking follows your camera direction for faster reactions, and anvils in enemy camps repair shields. Heavy melee attacks also hit several enemies, which helps a slow tank clear packs.",
+    "barbarian": "Heavy melee attacks now hit several enemies standing close together, which is a direct buff to two-handed play, and the attack range of two-handed axes was fixed.",
+    "ranger": "Three new archer skills (<strong>Puncture</strong>, <strong>Barrage</strong>, <strong>Survival Instinct</strong>) and upgradeable Eternal Ember and Voltaic arrows that use mana instead of ammo. Arrow costs and effects were rebalanced too.",
+    "assassin": "All dagger skills moved into the Assassin group, so the whole build now lives in the Ranger area. Revelwood and Nomad Highlands got craftable dagger armor sets, and dagger sets now upgrade melee crit chance instead of sneak attack damage.",
+}
+
+
+def class_summaries():
+    out = []
+    for b in sorted(BUILDS, key=lambda b: TIER_ORDER[b["tier"]]):
+        core = [k for k in PRESETS[b["slug"]] if not k.endswith(" node")][:4]
+        spent = build_preset(b["slug"])[1]
+        out.append(f'''<h3 id="{b["slug"]}-1-0">{e(b["short"])} in 1.0 ({b["tier"]}-tier, {e(b["difficulty"])})</h3>
+<p>{CLASS_10[b["slug"]]}</p>
+<p><strong>Plays as:</strong> {e(b["role"])}, {e(b["weapon"])}. <strong>Attributes:</strong> {e(b["primary"])}. <strong>Core skills:</strong> {", ".join(e(c) for c in core)}. Our level 50 preset spends {spent} of 212 points. <a href="/builds/{b["slug"]}/">Read the full {e(b["short"])} build →</a></p>''')
+    return "\n".join(out)
+
+
+def leveling_route():
+    biome_names = [label for _, label in BIOMES]
+    tips = [
+        "Take your weapon's specialization and the first damage nodes of your main archetype, plus two or three Constitution nodes. Clear every Shroud Root and Elixir Well in Springlands and Revelwood: they are worth more than half of your points at this stage.",
+        "Buy the build-defining skills (the ones in each guide's core skills table) and max their ranks. Add the utility you actually use, such as Double Jump or Inner Fires, and keep clearing Roots and Wells as you reach new biomes.",
+        "Finish capstones and max ranks, then reach into one neighbouring archetype for defense or sustain. Flame nodes such as Thick Skin or Exalted get stronger with every Flame level, so they are good late picks.",
+    ]
+    rows = []
+    for (label, budget, nb), tip in zip(STAGES, tips):
+        level = int(label.split("–")[1])
+        levels = 2 * (level - 1)
+        rows.append([f"<strong>{label}</strong>", f"{budget} ({levels} from levels, {budget - levels} from {', '.join(biome_names[:nb]) if nb < 7 else 'all 7 biomes'})", tip])
+    return table(["Stage", "Skill points by the end", "What to spend them on"], rows)
+
+
 def one_point_oh():
     path = "/enshrouded-1-0-builds/"
     ch, cs = breadcrumb([("/", "Home"), (path, "Enshrouded 1.0 Builds")])
@@ -494,6 +534,23 @@ def one_point_oh():
 <p>Every class guide below was rewritten for Update 1.0, with a level 1–50 skill path and a re-spec section for the October 15 skill tree reset. Start with the S-tier builds if you want the strongest picks.</p>
 <div class="not-prose my-6 grid gap-5 sm:grid-cols-2">{"".join(build_card(b) for b in sorted(BUILDS, key=lambda b: TIER_ORDER[b["tier"]]))}</div>
 <p>Want the ranking at a glance? See the <a href="/tier-list/">Enshrouded builds tier list</a>, or learn how each archetype works in the <a href="/skill-tree/">skill tree guide</a>.</p>
+<h2 id="by-class">Every Enshrouded 1.0 build by class: what changed</h2>
+<p>A short summary of each build after the update: what 1.0 changed for it, the attributes and core skills it uses, and how many points our planner preset spends. Each one links to the full guide with the level 1–50 skill order and gear.</p>
+{class_summaries()}
+<h2 id="leveling">Enshrouded 1.0 leveling route: level 1 to 50</h2>
+<p>Every build follows the same three stages. Skill points come from levels (2 per level after level 1) and from exploration (1 per Shroud Root, 3 per Elixir Well), so the budget below assumes you clear the biomes that match your level. Each class guide has a stage card for every row that opens the matching preset in the <a href="/skill-planner/">skill planner</a>.</p>
+{leveling_route()}
+<p>The exact skill order for your class is in its guide, and the reasons behind these budgets are in <a href="/blog/enshrouded-1-0-skill-tree-changes/">what changed in the 1.0 skill tree</a>.</p>
+<h2 id="mistakes">Common Enshrouded 1.0 build mistakes</h2>
+<ul class="dots">
+<li><strong>Leaving the base with refunded points.</strong> The 1.0 reset gave every point back. A character with an empty tree is much weaker than the one you remember.</li>
+<li><strong>Rebuying your Early Access build point for point.</strong> Many skills changed cost, effect or position in 1.0, and the dagger skills moved to the Assassin group. Plan the new tree from scratch.</li>
+<li><strong>Spreading points over the whole tree.</strong> A full tree costs 675 points and you get 212. Commit to one main archetype and one neighbour.</li>
+<li><strong>Skipping Shroud Roots and Elixir Wells.</strong> They give 114 of your 212 points. Grinding levels alone leaves you far behind.</li>
+<li><strong>Stacking Shroud time bonuses.</strong> 1.0 reduced how well Shroud time extensions stack. Hourglass capsules are now common and also drop from large Fell enemies, so pick those up instead.</li>
+<li><strong>Leaving Eternal spells and arrows at their base level.</strong> They can now be upgraded at the crafting survivors, like weapons.</li>
+<li><strong>Not upgrading your weapon.</strong> Gear now goes to level 55, and weapon level is still the biggest damage increase in the game.</li>
+</ul>
 {alert("Hotfixes ahead", "Enshrouded 1.0 is only a few days old. Keen Games' notes don't list exact skill values, so ours come from the in-game skill text (see <a href='/blog/enshrouded-1-0-new-skills/'>every new skill's ranks and costs</a>). We will update these guides when balance patches arrive.")}
 <h2 id="faq">Enshrouded 1.0 FAQ</h2>
 {accordion(ONE_FAQ)}
