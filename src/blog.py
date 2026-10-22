@@ -2,7 +2,8 @@
 the first week and one per week after that. Values in posts are generated from the 1.0 game export, not typed by hand."""
 from layout import e, table
 from skills_data import PRESETS
-from tree_data import BIOMES, BUILD_ID, NODES, OUR, PROGRESSION, cost, game_text, max_rank, our_name, skill_cost
+from tree_data import (BIOMES, BUILD_ID, NODES, OUR, PROGRESSION, STAGES, build_preset, cheapest_path, cost, game_text, max_rank,
+                       nodes_named, our_name, skill_cost)
 
 NEW_SKILLS = ["Blast and Cast", "Aerial Wand Attack", "Wand Evasion Attack", "Advanced Necromancy", "Totem Mastery",
               "Puncture", "Barrage", "Survival Instinct"]
@@ -154,6 +155,79 @@ def tree_changes_post():
 '''
 
 
+def _max_from_scratch(name):
+    """Points to reach a skill from an empty tree by the cheapest path, then max its ranks."""
+    path = cheapest_path(set(), nodes_named(name)[0])
+    c, ranks = skill_cost(name)
+    return sum(cost(n) for n in path) + c * (ranks - 1), len(path) - 1
+
+
+def _stage_has(build, names):
+    """First stage label whose planner preset already has every skill in `names` at max rank."""
+    for label, budget, _ in STAGES:
+        sel = build_preset(build, budget)[0]
+        got = {}
+        for nid, r in sel.items():
+            n = our_name(NODES[nid]["type"])
+            got[n] = max(got.get(n, 0), r)
+        if all(got.get(n, 0) >= skill_cost(n)[1] for n in names):
+            return label, budget
+    return None, None
+
+
+def necromancer_post():
+    from content_builds import BUILDS
+    NECRO_TIER = next(b["tier"] for b in BUILDS if b["slug"] == "necromancer")
+    summon = ["Advanced Necromancy", "Totem Mastery"]
+    an_pts, an_steps = _max_from_scratch("Advanced Necromancy")
+    tm_pts, tm_steps = _max_from_scratch("Totem Mastery")
+    stage, stage_budget = _stage_has("necromancer", summon + ["Necromancer"])
+    skills = table(["Skill", "Area / group", "Cost", "Rank 1", "Max rank"], [
+        [f"<strong>{n}</strong>", f"{OUR[n][0]} / {OUR[n][1]}", _ranks(n), e(game_text(n, 1)), e(game_text(n))]
+        for n in ["Necromancer"] + summon])
+    compare = table(["", "Before 1.0", "In 1.0"], [
+        ["Where minions come from", "Kills only: the Necromancer skill and the Gem of Lesser Necromancy raise allies from enemies you kill", "Summon spells you cast on demand, plus the old kill-based sources"],
+        ["Control", "Random: you can't choose when a minion appears", "Full: you cast skeletons and place totems before or during a fight"],
+        ["Skills that raise the cap", "None", f"Advanced Necromancy and Totem Mastery, +3 each at max rank ({_total(summon)} points together)"],
+        ["Limits", "Few", "Gem of Lesser Necromancy has a spawn limit, gem companions decay out of combat, and a global cap replaces your oldest creature"],
+        ["Viable as a main build?", "No, a bonus on top of a mage build", f'Yes: our <a href="/builds/necromancer/">Necromancer build</a> is {NECRO_TIER}-tier'],
+    ])
+    core = [k for k in PRESETS["necromancer"] if not k.endswith(" node")]
+    return f'''
+<p>Before Update 1.0, "necromancer" in Enshrouded meant a mage who sometimes got a free skeleton after a kill. In 1.0 it's a build you can play from start to finish: you cast your minions, you place your totems, and two new skills raise how many you keep out. This post compares the two versions and shows how to skill the new one, with values from the 1.0 game files (build {BUILD_ID}) and quotes from Keen Games' 1.0 changelog.</p>
+<p><strong>Short version:</strong> 1.0 added spells that summon Hollow skeletons and three elemental totems, plus <strong>Advanced Necromancy</strong> and <strong>Totem Mastery</strong>, which each add up to 3 more summons for {_total(summon)} points together. It also put limits on the old gem-raised minions. The result is a summoner you control, not one you hope for.</p>
+<h2 id="before">Before 1.0: minions were a lucky bonus</h2>
+<p>Early Access had two ways to get undead allies, and both depended on kills:</p>
+<ul class="dots">
+<li><strong>The Necromancer skill</strong> (Mage area, Healer group): {e(game_text("Necromancer", 1))[:-1].lower()} at rank 1, rising to 15% at rank 3. It's still in the tree in 1.0.</li>
+<li><strong>Gem of Lesser Necromancy</strong>, a weapon gem: according to the Enshrouded Wiki, killing an enemy while you have no allied unarmored Hollow gives a chance to spawn one. It drops from the Hollow Reaper in the Nomad Highlands Hollow Halls.</li>
+</ul>
+<p>Neither gave you control. You couldn't call a minion before a boss, and a bad run of kills meant no minions at all. That's why Early Access mage builds generally treated summons as a bonus on top of a Wizard or Healer, not as a build.</p>
+<h2 id="after">What 1.0 added for summoners</h2>
+<p>The changelog's own summary: "Players can now actively summon skeletons to fight alongside them. They work for free, never complain, and only occasionally get in the way." Among the nine new spell types are a Hollow skeleton summon and Fire, Ice and Shock totems, and every spell now has an Eternal version that doesn't use charges. Keen Games says this, "combined with new 'Necromancy' weapon gems and support skills, allows players to create an impressive amount of undead minions."</p>
+<p>The support skills are two new nodes in the Mage area's Wizard group. Here they are next to the old Necromancer skill:</p>
+{skills}
+<p>Note what they do: they don't add damage. They raise the number of Hollow allies from spells and the number of totems you can have out at once. More bodies on the field means more damage and more targets for enemies that aren't you.</p>
+<h2 id="limits">The new limits: summoning isn't unlimited</h2>
+<p>1.0 didn't just add minions, it also capped them. From the changelog:</p>
+<ul class="dots">
+<li><strong>A global creature cap.</strong> "Some of the new spells made it necessary to implement a new feature that counts the currently active creatures spawned by players and enforces a maximum. When players cast more creatures than the allowed maximum, the oldest creature gets replaced."</li>
+<li><strong>Gem of Lesser Necromancy</strong> "now has a limit for the resurrected companions it can spawn", which Keen calls necessary because of the new spells and Gems of Necromancy.</li>
+<li><strong>Companions from Gems of Necromancy</strong> "start to lose health after a while when out of combat", so you can't carry a gem army from fight to fight.</li>
+<li>On the plus side, "the attacks of skeleton companions are no longer interrupted by enemy attacks."</li>
+</ul>
+<p>In practice: recast before each big fight instead of trying to keep an army alive, and don't overcast. The newest summon pushes out the oldest one.</p>
+<h2 id="compare">Necromancer before vs after 1.0</h2>
+{compare}
+<h2 id="how-to-skill">How to skill a Necromancer in 1.0</h2>
+<p>The summon skills are cheap to reach. Starting from an empty tree, maxing Advanced Necromancy costs <strong>{an_pts} points</strong> by the cheapest path ({an_steps} nodes on the way), and Totem Mastery <strong>{tm_pts} points</strong>. Our planner preset already has both of them and the Necromancer skill at max rank by the end of the <strong>{stage.lower()}</strong> stage, within its {stage_budget}-point budget.</p>
+<p>The full core of our preset: {", ".join(e(c) for c in core)}. The Trickster nodes Quick Charge and Mana Currents matter more than they look. Summoning is mana-hungry, and shorter charge times get your skeletons and totems out faster at the start of a fight.</p>
+<p>Open the <a href="/skill-planner/#b=necromancer&amp;s=1">level 1–15 Necromancer preset</a> in the planner to see the path, or the <a href="/skill-planner/#b=necromancer">full level 50 build</a>. The <a href="/builds/necromancer/">Necromancer build guide</a> has the complete skill order, spells and gear.</p>
+<h2 id="should-you-switch">Should you switch to Necromancer?</h2>
+<p>If you liked a Wizard or Healer before 1.0 but found solo fights hard because everything ran at you, yes. Minions and totems give you the frontline a mage never had. Expect to manage your mana, and expect your summons to sometimes pull an extra pack. If you want the highest single-target burst, the <a href="/builds/wizard/">Wizard</a> still does more. For the full picture of what changed in the tree, read <a href="/blog/enshrouded-1-0-skill-tree-changes/">what changed in the 1.0 skill tree</a> and our breakdown of <a href="/blog/enshrouded-1-0-new-skills/">all eight new 1.0 skills</a>.</p>
+'''
+
+
 # slug, publish date, title (<=60), description (<=155), H1, body function
 POSTS = [
     {"slug": "enshrouded-1-0-new-skills", "date": "2026-10-20",
@@ -168,4 +242,10 @@ POSTS = [
      "h1": "What Changed in the Enshrouded 1.0 Skill Tree",
      "summary": "The reset, level 50, 18 new Shroud Roots and 212 skill points, the dagger move, re-priced skills and the Shroud time nerf, with numbers from the game files.",
      "body": tree_changes_post},
+    {"slug": "enshrouded-necromancer-before-after-1-0", "date": "2026-10-22",
+     "title": "Enshrouded Necromancer Before vs After 1.0: What Changed",
+     "description": "How the Enshrouded Necromancer changed in 1.0: summon spells, Advanced Necromancy and Totem Mastery, the new creature cap, and how to skill it now.",
+     "h1": "Enshrouded Necromancer: Before and After Update 1.0",
+     "summary": "From lucky skeletons on kills to a summoner you control: the new summon spells and skills, the 1.0 creature cap, and how to skill a Necromancer now.",
+     "body": necromancer_post},
 ]
