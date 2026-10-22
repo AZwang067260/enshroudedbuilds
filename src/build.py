@@ -362,7 +362,7 @@ def home():
   {card('<div class="p-5"><p class="font-semibold">Top 3 builds right now</p><ol class="mt-3 list-decimal space-y-1 pl-5 text-sm"><li><a class="hover:text-primary" href="/builds/wizard/">Wizard</a></li><li><a class="hover:text-primary" href="/builds/battlemage/">Battlemage</a></li><li><a class="hover:text-primary" href="/builds/barbarian/">Barbarian</a></li></ol></div>')}
 </div></aside>
 </div>
-<p class="container pb-2 text-center text-xs text-muted-foreground">Featured on <a href="https://twelve.tools" rel="nofollow noopener" target="_blank" class="hover:text-foreground">twelve.tools</a></p>
+<p class="container pb-2 text-center text-xs text-muted-foreground">Featured on <a href="https://twelve.tools" rel="nofollow noopener" target="_blank" class="hover:text-foreground">twelve.tools</a> · <a href="https://neeed.directory" rel="nofollow noopener" target="_blank" class="hover:text-foreground">neeed</a></p>
 '''
     title = "Enshrouded Builds 1.0: Best Builds & Skill Planner"
     desc = "The best Enshrouded 1.0 builds for every class with skill order to level 50 and gear, plus a free skill planner with the real 1.0 skill tree."
