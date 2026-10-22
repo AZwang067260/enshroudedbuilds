@@ -168,7 +168,7 @@ def game_text(name, rank=None):
             return str(t["gameLevelValues"][k][rank - 1])
         return str(t.get("gameValues", {}).get(k, m.group(0)))
     import re
-    lines = [re.sub(r"\{\{(\w+)\}\}", sub, re.sub(r"<[^>]+>", "", d)) for d in t.get("description", [])]
+    lines = [re.sub(r"\.(?=[A-Z])", ". ", re.sub(r"\{\{(\w+)\}\}", sub, re.sub(r"<[^>]+>", "", d))) for d in t.get("description", [])]
     return lines[0] if lines else ""
 
 

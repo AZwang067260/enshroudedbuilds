@@ -10,7 +10,8 @@ from art import ART, alt_text, build_svg
 from blog import POSTS
 from content_builds import BUILDS
 from planner import PLANNER_FAQ, client_payload, planner_page, skills_table
-from skills_data import PRESETS
+from skills_data import PRESETS, TREE
+from tree_data import ADJ as NODE_ADJ, NODES as NODES_ALL, cost as node_cost, max_rank as node_max, our_name
 from tree_data import BIOMES, BUILD_ID, OUR, STAGES, build_preset, game_text, skill_cost, type_of
 from layout import (CONTACT_EMAIL, GAME_VERSION, SITE, UPDATED, UPDATED_HUMAN, accordion, alert, badge, breadcrumb, button, card, e,
                     faq_schema, page, table)
@@ -47,15 +48,20 @@ def art_src(b):
     return f"/assets/img/builds/{b['slug']}.svg"
 
 
-def build_card(b):
+def build_card(b, detail=False):
     return f'''<a href="/builds/{b["slug"]}/" class="group block overflow-hidden rounded-lg border bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-md">
   <img src="{art_src(b)}" alt="{e(alt_text(b["slug"], b["short"]))}" width="1200" height="630" loading="lazy" decoding="async" class="aspect-[40/21] w-full border-b object-cover">
   <div class="p-5"><div class="mb-3 flex items-center justify-between gap-2">{tier_badge(b["tier"])}<span class="text-xs text-muted-foreground">{e(b["difficulty"])}</span></div>
   <h3 class="text-lg font-semibold group-hover:text-primary">Enshrouded {e(b["short"])} Build</h3>
   <p class="mt-1 text-sm text-muted-foreground">{e(b["role"])} · {e(b["weapon"])}</p>
-  <p class="mt-3 text-sm leading-relaxed text-foreground/80">{e(b["tagline"])}</p>
+  <p class="mt-3 text-sm leading-relaxed text-foreground/80">{e(b["tagline"])}</p>{card_detail(b) if detail else ""}
   <p class="mt-4 text-sm font-medium text-primary">Read the {e(b["short"])} build →</p></div>
 </a>'''
+
+
+def card_detail(b):
+    return (f'<p class="mt-3 text-xs leading-relaxed text-muted-foreground"><strong class="text-foreground">Core skills:</strong> {", ".join(e(c) for c in core_skills(b))}<br>'
+            f'<strong class="text-foreground">Skill tree area:</strong> {build_area(b)}</p>')
 
 
 HUBS = [
@@ -64,6 +70,7 @@ HUBS = [
     ("/tier-list/", "Builds Tier List (1.0)", "Every Enshrouded build ranked for the 1.0 full release."),
     ("/skill-planner/", "Skill Planner (1.0)", "Plan your build on the real 1.0 skill tree (231 nodes) with a 212-point budget."),
     ("/skill-tree/", "Skill Tree Guide (1.0)", "All 12 archetypes, attributes, skill points and respecs."),
+    ("/respec/", "How to Respec (1.0)", "Reset your skill tree at a Flame Altar: cost per stage and how to plan it."),
     ("/builds/", "All Enshrouded Builds", "Compare every class build by role, stats and difficulty."),
 ]
 
@@ -142,7 +149,7 @@ def build_page(b):
     quick = table(["Stat", "Value"], [
         ["Tier (1.0)", tier_badge(b["tier"])], ["Role", e(b["role"])], ["Difficulty", e(b["difficulty"])],
         ["Best for", e(b["best_for"])], ["Weapon", e(b["weapon"])], ["Armor", e(b["armor"])],
-        ["Main attributes", e(b["primary"])], ["Skill tree", e(b["tree"])], ["Max level", "50 (gear up to 55)"]])
+        ["Main attributes", e(b["primary"])], ["Skill tree", e(b["tree"]) + " · " + area_link(b)], ["Max level", "50 (gear up to 55)"]])
 
     order_rows, step = [], 0
     for label, skills in b["phases"]:
@@ -394,6 +401,36 @@ def skill_planner():
 
 # ============================================================ BUILDS HUB
 
+
+def core_skills(b, n=4):
+    """The first n non-attribute skills of a build's preset, in guide order."""
+    return [k for k in PRESETS[b["slug"]] if not k.endswith(" node")][:n]
+
+
+def build_area(b):
+    return next(a for a, slugs in AREA_BUILDS.items() if b["slug"] in slugs)
+
+
+def area_link(b):
+    a = build_area(b)
+    return f'<a href="{area_slug(a)}">{a} skill tree</a>'
+
+
+AKA = {"wizard": "fire mage, staff mage, caster", "battlemage": "wand mage, wand and shield build, spellblade",
+       "necromancer": "summoner, necro, minion build, totem build", "healer": "support mage, healing build, co-op support",
+       "warrior": "sword and shield, one-handed build, sword and board", "tank": "shield tank, aggro build, frontline",
+       "barbarian": "two-handed build, 2H build, greatsword build", "ranger": "bow build, archer, crit bow",
+       "assassin": "dagger build, rogue, stealth build"}
+
+BUILDS_FAQ = [
+    ("What is the easiest Enshrouded build for beginners?", "The <a href=\"/builds/necromancer/\">Necromancer</a>, <a href=\"/builds/warrior/\">Warrior</a> and <a href=\"/builds/tank/\">Tank</a> are rated Easy: summons or a shield cover your mistakes. Of the S-tier builds, the Necromancer is the most forgiving."),
+    ("Do old Enshrouded builds still work in 1.0?", "Not as they were. 1.0 reset every skill tree, changed the cost, effect or position of many skills and moved the dagger skills to the Assassin group. Every guide here was rebuilt on the 1.0 tree."),
+    ("Can you mix two builds in Enshrouded?", "Yes. There are no locked classes, so most builds take one main archetype and a few nodes from a neighbour, for example Tank armor for a Warrior. Each guide has a Hybrid builds section."),
+    ("How many skill points does a build have at level 50?", "212 if you clear every Shroud Root and Elixir Well: 98 from levels and 114 from exploration. Our presets spend 208 to 212 of them."),
+    ("Can I change these builds?", "Yes. Every guide links to its preset in the <a href=\"/skill-planner/\">skill planner</a>, where you can add or remove skills and share your version with one link."),
+]
+
+
 def builds_hub():
     path = "/builds/"
     ch, cs = breadcrumb([("/", "Home"), (path, "Enshrouded Builds")])
@@ -402,28 +439,34 @@ def builds_hub():
               ("Ranged & crit builds", ["ranger", "assassin"])]
     out = ""
     for g, slugs in groups:
-        out += f'<h2 class="mb-5 mt-12 text-2xl font-bold">{g}</h2><div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">' + "".join(build_card(BY_SLUG[s]) for s in slugs) + "</div>"
-    compare = table(["Build", "Tier", "Role", "Main stats", "Difficulty", "Best for"], [
+        out += f'<h2 class="mb-5 mt-12 text-2xl font-bold">{g}</h2><div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">' + "".join(build_card(BY_SLUG[s], detail=True) for s in slugs) + "</div>"
+    compare = table(["Build", "Tier", "Role", "Main stats", "Difficulty", "Best for", "Skill tree area"], [
         [f'<a class="font-medium text-primary hover:underline" href="/builds/{b["slug"]}/">{e(b["short"])}</a>', tier_badge(b["tier"]), e(b["role"]),
-         e(b["primary"]), e(b["difficulty"]), e(b["best_for"])] for b in sorted(BUILDS, key=lambda b: TIER_ORDER[b["tier"]])])
+         e(b["primary"]), e(b["difficulty"]), e(b["best_for"]), area_link(b)] for b in sorted(BUILDS, key=lambda b: TIER_ORDER[b["tier"]])])
+    aka = "".join(f'<li><a href="/builds/{b["slug"]}/"><strong>{e(b["short"])}</strong></a>: {e(AKA[b["slug"]])}</li>' for b in BUILDS)
     body = f'''
 <div class="hero-glow border-b"><div class="container py-12">{ch}
 <h1 class="text-3xl font-bold tracking-tight md:text-5xl">All Enshrouded 1.0 Builds</h1>
 <p class="mt-4 max-w-3xl text-lg text-muted-foreground">Every Enshrouded class build in one place: mage, melee, ranged and support. All guides have been rewritten after the 1.0 skill tree reset, with skill paths to the new level 50 cap.</p></div></div>
 <div class="container py-10">
-<div class="prose-eb max-w-4xl"><h2 class="!mt-0">Enshrouded builds compared</h2><p>This table compares every <strong>Enshrouded build</strong> by role, main attributes and difficulty. Choose by playstyle first, then open the full guide for the skill order and gear.</p>{compare}</div>
+<div class="prose-eb max-w-4xl"><h2 class="!mt-0">Enshrouded builds compared</h2><p>This table compares every <strong>Enshrouded build</strong> by role, main attributes and difficulty. The last column links to the part of the skill tree where the build spends most of its points. Choose by playstyle first, then open the full guide for the skill order and gear.</p>{compare}</div>
 {out}
 <div class="prose-eb mt-16 max-w-4xl">
 <h2>Choosing between Enshrouded builds</h2>
 <p>Because Enshrouded has no locked classes, every build here is a starting point, not a cage. Most players settle on one main archetype and borrow a few nodes from a neighboring one. A Warrior might take Tank armor scaling, a Wizard might add Battlemage wand sustain, and a Ranger might take Assassin crits. Each build page ends with a <em>Hybrid builds</em> section that shows which combinations work well.</p>
 <p>If you are coming back after Update 1.0 (October 15, 2026), remember that your skill points were refunded. It is the best time to try something new, since you have to re-spend everything anyway. Our <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds guide</a> covers every change and the re-spec checklist.</p>
+<h2 id="also-known-as">What players call these builds</h2>
+<p>Players use different names for the same playstyles. If you search for one of these, this is the guide you want:</p>
+<ul class="dots">{aka}</ul>
+<h2 id="faq">Enshrouded builds FAQ</h2>
+{accordion(BUILDS_FAQ)}
 </div>
 <section class="mt-12" aria-labelledby="guides"><h2 id="guides" class="mb-4 text-2xl font-bold">More Enshrouded 1.0 guides</h2>{hub_links(path)}</section></div>'''
     title = "All Enshrouded 1.0 Builds: Mage, Melee, Ranged & Support"
     desc = "Compare every Enshrouded 1.0 build: Wizard, Battlemage, Necromancer, Healer, Barbarian, Warrior, Tank, Ranger and Assassin by tier, stats and difficulty."
     write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, active=path,
                      keywords="enshrouded builds, enshrouded class builds, all enshrouded builds, enshrouded 1.0 builds",
-                     schemas=[cs, {"@type": "CollectionPage", "name": title, "url": SITE + path, "description": desc}]), "0.9")
+                     schemas=[cs, {"@type": "CollectionPage", "name": title, "url": SITE + path, "description": desc}, faq_schema(BUILDS_FAQ)]), "0.9")
 
 
 # ============================================================ 1.0 PAGE
@@ -770,7 +813,7 @@ def skill_tree():
     faq = [
         ("How many archetypes are in the Enshrouded skill tree?", "Twelve, in three combat areas: Warrior (Warrior, Tank, Barbarian, Athlete), Mage (Wizard, Battlemage, Healer, Trickster) and Ranger (Ranger, Assassin, Beastmaster, Survivor)."),
         ("How do you get skill points in Enshrouded?", "Three ways: 2 points per level up to the 1.0 cap of 50, 1 point for each Shroud Root you destroy, and 3 points for each Elixir Well you cleanse."),
-        ("Can you reset skills in Enshrouded?", "Yes. Respec at a Flame Altar; the cost has been 1 Rune per skill point you spent since a 2024 update (not yet re-confirmed for 1.0). In the tree you can also unlearn single nodes from the end of a chain. Everyone also got one free reset when loading a save in 1.0."),
+        ("Can you reset skills in Enshrouded?", "Yes. Respec at a Flame Altar: according to the Enshrouded Wiki it resets your skill tree for 1 Rune per skill point you have spent. Everyone also got one free reset when loading a save in 1.0."),
         ("How many skill points do you get at level 50?", "212 in total if you explore everything: 98 from levels 2–50, 60 from Shroud Roots and 54 from 18 Elixir Wells, according to community planners built from the 1.0 game files."),
     ]
     body = f'''
@@ -782,6 +825,7 @@ def skill_tree():
 <p>The <strong>Enshrouded skill tree</strong> is one large connected web that every character shares. You start in the middle and unlock nodes outward with skill points earned from leveling. Some nodes are small attribute increases, others are passive bonuses, and a few are build-defining skills like Blink, Unity or Battle Heal. Nodes are grouped into archetypes, and your build is the shape your path makes through them.</p>
 <h2 id="structure-1-0">The 1.0 skill tree layout</h2>
 <p>In Update 1.0 the tree is organized as <strong>three main trees, Warrior, Ranger and Mage</strong>, branching out from a shared <strong>Core</strong> of general skills in the center. Community planners built from the 1.0 game files count <strong>231 nodes</strong> (243 if you include the 12 free "Spark" starting nodes) and <strong>178 distinct skills</strong>. The Core alone holds 19 skills that any build can take, such as Merciless Attack. Inside each main tree, the familiar archetype groups remain: Wizard, Battlemage, Healer and Trickster sit in the Mage tree, for example. That is why build guides, including ours, still name builds after archetypes.</p>
+<p>Each area has its own guide with its key skills, starting nodes and every skill by group: the <a href="/skill-tree/mage/">Mage skill tree</a>, <a href="/skill-tree/warrior/">Warrior skill tree</a>, <a href="/skill-tree/ranger/">Ranger skill tree</a> and <a href="/skill-tree/core/">Core skills</a>.</p>
 <p>A fully explored level 50 character has <strong>212 skill points</strong>: 98 from levels, 60 from Shroud Roots and 54 from Elixir Wells. Filling the whole tree would cost roughly 675 points, so you can afford about a third of it: enough to max one main tree and reach into a second. Try it in the <a href="/skill-planner/">skill planner</a>.</p>
 <h2>All 12 Enshrouded archetypes</h2>
 {arche}
@@ -796,8 +840,7 @@ def skill_tree():
 <h2 id="respec">How to respec in Enshrouded 1.0</h2>
 <p>Every existing character got one <strong>free skill tree reset</strong> when loading a save in Update 1.0, with all points refunded. After that:</p>
 <ul class="dots">
-<li><strong>Full respec:</strong> use the <strong>Flame Altar</strong>. Since a 2024 update the cost has been 1 Rune per skill point you had spent; this has not been re-confirmed for 1.0 yet, so check the altar before you commit.</li>
-<li><strong>Single nodes:</strong> you can unlearn a skill in the tree only if nothing you still own depends on it, so refund from the end of a chain.</li>
+<li><strong>Full respec:</strong> use a <strong>Flame Altar</strong>. According to the Enshrouded Wiki it resets your skill tree for 1 Rune per skill point you have spent. Our <a href="/respec/">respec guide</a> has the cost at each stage of the game.</li>
 <li><strong>Plan first:</strong> build the new layout in the <a href="/skill-planner/">skill planner</a> so you only pay for one respec.</li>
 </ul>
 <h2>Skill tree FAQ</h2>
@@ -816,6 +859,239 @@ def skill_tree():
     write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, active=path,
                      keywords="enshrouded skill tree, enshrouded archetypes, enshrouded attributes, enshrouded respec, enshrouded 1.0 skill tree",
                      schemas=[article_schema(path, title, desc), cs, faq_schema(faq)]), "0.8")
+
+
+# ============================================================ AREA SKILL TREE PAGES
+
+AREA_BUILDS = {"Mage": ["wizard", "battlemage", "necromancer", "healer"], "Warrior": ["barbarian", "warrior", "tank"],
+               "Ranger": ["ranger", "assassin"], "Core": []}
+AREA_FOCUS = {"Mage": "Mage Apprentice", "Warrior": "The Warrior's Path", "Ranger": "Marksman", "Core": "Merciless Attack"}
+AREA_INTRO = {
+    "Mage": "The Mage area holds everything for staves, wands and spells: elemental damage and spell crits in the Wizard group, wand and shield play in Battlemage, healing and support in Healer, and spell charge speed and mana regeneration in Trickster. 1.0 added five of its eight new combat skills here, including the summoner skills.",
+    "Warrior": "The Warrior area is the melee half of the tree: one-handed weapons and sustain in the Warrior group, heavy armor, blocking and aggro in Tank, two-handed weapons in Barbarian, and stamina and movement in Athlete. 1.0 moved the dagger skills out of this area, so the paths are cleaner for sword, axe and hammer users.",
+    "Ranger": "The Ranger area covers bows, daggers and survival: bow damage and weak points in the Ranger group, crits, daggers and gliding in Assassin, hunting utility in Beastmaster and exploration perks in Survivor. In 1.0 it gained three new archer skills and all of the dagger skills.",
+    "Core": "The Core sits in the middle of the tree and holds the general skills any build can take: Merciless Attack and its upgrades, Double Jump, grappling hooks, Shroud time, and tool and gathering skills. Most of them are cheap, and several are starting nodes you can learn without a neighbour.",
+}
+AREA_GROUP_FOCUS = {
+    "Wizard": "Elemental spell and staff damage, spell crits, summon limits", "Healer": "Healing, auras and support",
+    "Battlemage": "Wands, wards and shields, wand attacks", "Trickster": "Spell charge speed, mana regeneration, utility",
+    "Tank": "Heavy armor, blocking and aggro", "Warrior": "One-handed weapons and sustain", "Barbarian": "Two-handed weapons and stuns",
+    "Athlete": "Stamina and movement", "Ranger": "Bows, extra arrows and weak points", "Assassin": "Crits, daggers and gliding",
+    "Beastmaster": "Hunting and creature-specific damage", "Survivor": "Exploration and survival utility", "Core": "General skills for every build",
+}
+
+
+def area_slug(area):
+    return f"/skill-tree/{area.lower()}/"
+
+
+def area_numbers(area):
+    """Nodes, distinct skills and the points to max every node in an area, from the export."""
+    nodes = points = 0
+    names = set()
+    for nid, n in NODES_ALL.items():
+        name = our_name(n["type"])
+        o = OUR.get(name)
+        if (o[0] if o else "Core") != area:
+            continue
+        nodes += 1
+        points += node_cost(nid) * node_max(nid)
+        names.add(name)
+    return nodes, len(names), points
+
+
+def area_key_skills(area):
+    """Core skills of our presets that sit in this area, most shared first: (name, [build slugs])."""
+    users = {}
+    for b, picks in PRESETS.items():
+        for name in picks:
+            o = OUR.get(name)
+            if o and o[0] == area and not name.endswith(" node"):
+                users.setdefault(name, []).append(b)
+    return sorted(users.items(), key=lambda kv: (-len(kv[1]), list(OUR).index(kv[0])))
+
+
+def area_starts(area):
+    """Starting nodes (learnable without a neighbour) in this area and what each one leads to."""
+    out = []
+    for nid, n in NODES_ALL.items():
+        name = our_name(n["type"])
+        o = OUR.get(name)
+        if n.get("base") and (o[0] if o else "Core") == area:
+            out.append((name, sorted(our_name(NODES_ALL[x]["type"]) for x in NODE_ADJ[nid])))
+    return sorted(out)
+
+
+def _cost_txt(name):
+    c, r = skill_cost(name)
+    return f"{c} pt" if r == 1 else f"{c} pt × {r}"
+
+
+def area_page(area):
+    path = area_slug(area)
+    ch, cs = breadcrumb([("/", "Home"), ("/skill-tree/", "Skill Tree"), (path, f"{area} Skill Tree")])
+    nodes, skills, points = area_numbers(area)
+    groups = dict(TREE)[area]
+    budget = STAGES[-1][1]
+    focus = type_of(AREA_FOCUS[area])
+    builds = [BY_SLUG[s] for s in AREA_BUILDS[area]]
+    new = [n for n, o in OUR.items() if o[0] == area and "new" in o[6]]
+
+    group_rows = []
+    for g, sks in groups:
+        g_points = sum(c * r for _, r, c, _, _ in sks)
+        users = [b for b in BUILDS if b["slug"] in AREA_BUILDS[area] and g.lower() in b["tree"].lower()] if area != "Core" else []
+        group_rows.append([f"<strong>{e(g)}</strong>", e(AREA_GROUP_FOCUS.get(g, "")), str(len(sks)), str(g_points),
+                           ", ".join(f'<a href="/builds/{b["slug"]}/">{e(b["short"])}</a>' for b in users) or "Utility for any build"])
+    group_table = table(["Group", "Focus", "Skills", "Points to max", "Our builds"], group_rows)
+
+    key = area_key_skills(area)[:12]
+    key_table = table(["Skill", "Group", "Cost", "In-game effect at max rank", "Used by our builds"], [
+        [f'<strong>{e(n)}</strong>{" " + badge("New in 1.0", "primary") if "new" in OUR[n][6] else ""}', e(OUR[n][1]), _cost_txt(n), e(game_text(n)),
+         ", ".join(f'<a href="/builds/{b}/">{e(BY_SLUG[b]["short"])}</a>' for b in us)] for n, us in key])
+
+    starts = area_starts(area)
+    start_list = "".join(f"<li><strong>{e(n)}</strong> ({_cost_txt(n)}) leads to {', '.join(e(x) for x in nxt) if nxt else 'nothing else: it is a single node'}</li>" for n, nxt in starts)
+
+    if builds:
+        stage_rows = [[f'<a href="/builds/{b["slug"]}/">{e(b["short"])}</a>'] + [
+            f'<a href="/skill-planner/#b={b["slug"]}&amp;s={i}">{label} ({bud} pt)</a>' if i < 3 else f'<a href="/skill-planner/#b={b["slug"]}">{label} ({bud} pt)</a>'
+            for i, (label, bud, _) in enumerate(STAGES, 1)] for b in builds]
+        route = f'''<p>Every build in this area follows the same three stages. Points come from levels and from the Shroud Roots and Elixir Wells you clear, so each stage below assumes you have explored the biomes that match your level. Each link opens that stage's preset in the planner:</p>
+{table(["Build", "Stage 1", "Stage 2", "Stage 3"], stage_rows)}
+<p>The general rule: in stage 1 take your weapon's specialization and the first damage nodes of your main group, in stage 2 buy and max the build-defining skills, and in stage 3 finish capstones and reach into one neighbouring group for defense or sustain. Each class guide explains why its skills come in that order.</p>'''
+    else:
+        users = {}
+        for b in PRESETS:
+            for n in PRESETS[b]:
+                if OUR.get(n, ("",))[0] == "Core":
+                    users.setdefault(n, []).append(b)
+        route = "<p>Core skills are cheap, so most builds pick up a few of them on the way to their own area. These are the Core skills our nine 1.0 presets take:</p><ul class=\"dots\">" + "".join(
+            f"<li><strong>{e(n)}</strong>: {', '.join(e(BY_SLUG[b]['short']) for b in bs)}</li>" for n, bs in sorted(users.items(), key=lambda kv: -len(kv[1]))) + "</ul>"
+
+    if new:
+        new_html = f"<p>1.0 added these skills to the {area} area. Values are the in-game text at max rank:</p>" + table(["Skill", "Group", "Cost", "Effect at max rank"], [
+            [f"<strong>{e(n)}</strong>", e(OUR[n][1]), _cost_txt(n), e(game_text(n))] for n in new])
+    else:
+        new_html = ""
+    extra = {"Mage": "Mages also got the most new spells in 1.0: nine new spell types including three totems and a skeleton summon, and an Eternal version of every spell that you can upgrade. See the <a href=\"/blog/enshrouded-1-0-new-skills/\">new 1.0 skills, rank by rank</a>.",
+             "Warrior": "No new combat skill landed in the Warrior area, but 1.0 moved all dagger skills to the Ranger area's Assassin group, lowered the cost of many skills and repositioned Veteran and One-Handed Specialization. Heavy melee attacks now hit several enemies, and stamina recovers while blocking.",
+             "Ranger": "The Ranger area also received every dagger skill from the Warrior area, so dagger builds now live entirely here. The <a href=\"/blog/enshrouded-1-0-skill-tree-changes/\">1.0 skill tree changes</a> post lists the moved skills.",
+             "Core": "Inner Fires and Snap were repositioned in 1.0, and Shroud time bonuses such as Inner Fires stack less well than before, according to the 1.0 changelog."}[area]
+
+    all_rows = ""
+    for g, sks in groups:
+        rows = [[f'<strong>{e(name)}</strong>{" " + badge("New in 1.0", "primary") if "new" in flags else ""}', _cost_txt(name),
+                 e(game_text(name, 1)) if ranks > 1 else "—", e(game_text(name)) or e(effect),
+                 f'<a href="/skill-planner/#n={type_of(name)}" class="text-primary hover:underline">Open</a>' if type_of(name) else ""]
+                for name, ranks, cost, effect, flags in sks]
+        all_rows += f'<h3 id="group-{g.lower()}">{e(g)} skills</h3>' + table(["Skill", "Cost", "Rank 1", "Max rank", "Planner"], rows)
+
+    other = " · ".join(f'<a href="{area_slug(a)}">{a} skill tree</a>' for a in AREA_BUILDS if a != area)
+    n_groups = len(groups)
+    faq = [
+        (f"How many skills are in the Enshrouded {area} skill tree?",
+         f"The {area} area of the 1.0 tree has {nodes} nodes and {skills} different skills" + (f" in {n_groups} groups ({', '.join(g for g, _ in groups)})" if n_groups > 1 else "") + f". Maxing every node would cost {points} skill points, against a budget of {budget} at level 50."),
+        (f"What is new in the {area} skill tree in 1.0?",
+         (f"1.0 added {', '.join(new)}. " if new else "No new combat skill was added to this area. ") + re.sub(r"<[^>]+>", "", extra)),
+        (f"Where do you start in the {area} area?",
+         "From its starting nodes, which you can learn without owning a neighbour: " + "; ".join(f"{n} ({_cost_txt(n)})" for n, _ in starts) + "."),
+    ]
+    if builds:
+        faq.append((f"Which builds use the {area} skill tree?", "Our " + ", ".join(b["short"] for b in builds) + f" builds spend most of their points in the {area} area."))
+    title = f"Enshrouded {area} Skill Tree: All Skills & Best Path (1.0)"
+    desc = (f"Enshrouded 1.0 {area} skill tree: all {skills} skills with costs and per-rank effects, " + ("the groups, " if n_groups > 1 else "")
+            + "where to start, key skills and the best path for each build.")
+    body = f'''
+<div class="hero-glow border-b"><div class="container py-12">{ch}
+<div class="flex flex-wrap gap-2">{badge("Enshrouded 1.0", "primary")}{badge(f"{nodes} nodes · {skills} skills", "outline")}{badge("Game build " + BUILD_ID, "outline")}</div>
+<h1 class="mt-4 text-3xl font-bold tracking-tight md:text-5xl">Enshrouded {area} Skill Tree (1.0)</h1>
+<p class="mt-4 max-w-3xl text-lg text-muted-foreground">{AREA_INTRO[area]}</p>
+<div class="mt-6 flex flex-wrap gap-3">{button(f"/skill-planner/#n={focus}", f"Open the {area} area in the planner")}{button("/skill-tree/", "Whole skill tree", "outline")}</div></div></div>
+<div class="container py-10"><article class="prose-eb mx-auto max-w-4xl">
+<h2 class="!mt-0" id="overview">The {area} area at a glance</h2>
+<p>The {area} area has <strong>{nodes} nodes</strong> and <strong>{skills} different skills</strong>. Maxing every one of them would cost <strong>{points} points</strong>, which is {round(100 * points / budget)}% of the {budget} points a fully explored level 50 character has. {"So no build can take the whole area: you choose a path through it." if points > budget else "You could fill it, but most builds only take the few skills they need."}</p>
+{group_table if n_groups > 1 else ""}
+<h2 id="key-skills">Key {area} skills</h2>
+<p>These are the {area} skills our 1.0 build presets are built around, most shared first, with their in-game effect at max rank:</p>
+{key_table}
+<h2 id="new-in-1-0">What's new in the {area} skill tree in 1.0</h2>
+{new_html}
+<p>{extra}</p>
+<h2 id="where-to-start">Where to start in the {area} area</h2>
+<p>A few nodes can be learned without owning a neighbour. They are the entry points of the {area} area:</p>
+<ul class="dots">{start_list}</ul>
+<p>From there, a node unlocks once it connects to one you already have. Use the <a href="/skill-planner/#n={focus}">planner</a> to see the cheapest path to any skill.</p>
+<h2 id="leveling">{area} leveling route: level 1 to 50</h2>
+{route}
+<h2 id="all-skills">All {area} skills by group</h2>
+<p>Every {area} skill with its cost and the in-game effect at rank 1 and at max rank. <em>Open</em> shows the skill in the planner.</p>
+{all_rows}
+<h2 id="faq">{area} skill tree FAQ</h2>
+{accordion(faq)}
+<p class="mt-8">Other areas: {other} · <a href="/respec/">how to respec</a></p>
+{sources()}
+</article></div>'''
+    write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, active="/skill-tree/",
+                     keywords=f"enshrouded {area.lower()} skill tree, enshrouded {area.lower()} skills, enshrouded 1.0 {area.lower()} skill tree",
+                     schemas=[article_schema(path, title, desc), cs, faq_schema(faq)]), "0.7")
+
+
+# ============================================================ RESPEC
+
+def respec():
+    path = "/respec/"
+    ch, cs = breadcrumb([("/", "Home"), ("/skill-tree/", "Skill Tree"), (path, "Respec")])
+    cost_rows = [[f"<strong>{label}</strong>", f"{bud} points", f"<strong>{bud} Runes</strong>"] for label, bud, _ in STAGES]
+    cost_table = table(["If you reset at the end of", "Points spent (fully explored)", "Reset cost"], cost_rows)
+    plan_rows = [[f'<a href="/builds/{b["slug"]}/">{e(b["short"])}</a>'] + [
+        f'<a href="/skill-planner/#b={b["slug"]}&amp;s={i}">{label}</a>' if i < 3 else f'<a href="/skill-planner/#b={b["slug"]}">{label}</a>'
+        for i, (label, _, _) in enumerate(STAGES, 1)] for b in sorted(BUILDS, key=lambda b: TIER_ORDER[b["tier"]])]
+    faq = [
+        ("How do you respec in Enshrouded?", "At a Flame Altar. According to the Enshrouded Wiki, the altar lets you reset your skill tree at a cost of 1 Rune per skill point you have spent. The reset refunds your points so you can spend them again."),
+        ("How much does a respec cost in Enshrouded 1.0?", f"1 Rune per spent skill point. A fully explored level 50 character with all {STAGES[-1][1]} points spent pays {STAGES[-1][1]} Runes; at level 15 with two biomes explored it's {STAGES[0][1]}."),
+        ("Did Enshrouded 1.0 reset my skill tree?", "Yes, once and for free. The 1.0 changelog says: \"When playing for the first time in version 1.0.0.0 with an existing save game, the skill tree will be reset. Please make sure to spend the skill points again!\""),
+        ("How can I avoid paying for a respec twice?", "Plan the whole new build first in our free skill planner, which follows the game's rules for connections and costs, then reset once and buy it point by point."),
+    ]
+    body = f'''
+<div class="hero-glow border-b"><div class="container py-12">{ch}
+<div class="flex flex-wrap gap-2">{badge("Enshrouded 1.0", "primary")}{badge("Updated " + UPDATED_HUMAN, "outline")}</div>
+<h1 class="mt-4 text-3xl font-bold tracking-tight md:text-5xl">How to Respec in Enshrouded 1.0</h1>
+<p class="mt-4 max-w-3xl text-lg text-muted-foreground">Reset your skill tree at a Flame Altar for 1 Rune per skill point you have spent. Here is how it works, what it costs at each stage of the game, and how to plan the new build so you only pay once.</p>
+<div class="mt-6 flex flex-wrap gap-3">{button("/skill-planner/", "Plan your new build")}{button("#cost", "Respec cost", "outline")}</div></div></div>
+<div class="container py-10"><article class="prose-eb mx-auto max-w-4xl">
+<h2 class="!mt-0" id="how">How to reset your skill tree</h2>
+<ol class="my-4 list-decimal space-y-2 pl-5">
+<li><strong>Plan the new build first.</strong> Build it in the <a href="/skill-planner/">skill planner</a>, which uses the real 1.0 tree, costs and connections. Copy the link so you can follow it in game.</li>
+<li><strong>Collect enough Runes.</strong> The reset costs 1 Rune per skill point you have spent (see the table below).</li>
+<li><strong>Go to a Flame Altar</strong> and choose the option to reset your skill tree. All spent points come back to you.</li>
+<li><strong>Re-buy your plan</strong> point by point, starting from the nodes nearest your new main skills.</li>
+</ol>
+<h2 id="cost">How much a respec costs</h2>
+<p>The Enshrouded Wiki's Flame Altar page says the altar "allows players to reset their skill tree at a cost of 1 Runes per spent skill point". So the cost grows with your character. With the point budgets our guides use for each stage of the game:</p>
+{cost_table}
+<p>If you haven't cleared every Shroud Root and Elixir Well, you have fewer points spent and the reset costs less. The planner shows your exact total when you set your level and explored biomes.</p>
+<h2 id="free-reset">The free 1.0 reset</h2>
+<p>Every character that existed before 1.0 got one reset for free. The changelog's "public safety announcement" reads: "When playing for the first time in version 1.0.0.0 with an existing save game, the skill tree will be reset. Please make sure to spend the skill points again!" If you haven't re-spent those points yet, you don't need the altar: just spend them. Many skills changed cost, effect or position in 1.0, and the dagger skills moved to the Assassin group, so don't rebuy your old build node for node. <a href="/blog/enshrouded-1-0-skill-tree-changes/">What changed in the 1.0 skill tree</a> lists the changes.</p>
+<h2 id="plan">Plan your respec with a build preset</h2>
+<p>Every build guide has a preset for each stage of the game. Open the one for your level, adjust it, and copy the link before you go to the altar:</p>
+{table(["Build", "Stage 1", "Stage 2", "Stage 3"], plan_rows)}
+<h2 id="tips">Respec tips</h2>
+<ul class="dots">
+<li><strong>Reset once, not often.</strong> The cost goes up with every point you own, so late-game resets are the most expensive.</li>
+<li><strong>Pick one main archetype.</strong> The whole tree costs {sum(c * r for _, gs in TREE for _, sks in gs for _, r, c, _, _ in sks)} points and you get {STAGES[-1][1]} at most. See the <a href="/skill-tree/">skill tree guide</a> and the area pages for the <a href="/skill-tree/mage/">Mage</a>, <a href="/skill-tree/warrior/">Warrior</a>, <a href="/skill-tree/ranger/">Ranger</a> and <a href="/skill-tree/core/">Core</a> skills.</li>
+<li><strong>Re-check your hotbar and weapon swaps</strong> after you re-buy your skills, so they match the new build.</li>
+<li>Coming back to the game after 1.0? Follow the <a href="/enshrouded-1-0-builds/#checklist">1.0 re-spec checklist</a>.</li>
+</ul>
+<h2 id="faq">Respec FAQ</h2>
+{accordion(faq)}
+{sources([("https://enshrouded.wiki.gg/wiki/Flame_Altar", "Enshrouded Wiki: Flame Altar")])}
+</article></div>'''
+    title = "How to Respec in Enshrouded 1.0: Skill Reset Cost"
+    desc = "How to respec in Enshrouded 1.0: reset your skill tree at a Flame Altar for 1 Rune per spent point, the cost at each stage, and how to plan the new build."
+    write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, active="/skill-tree/",
+                     keywords="enshrouded respec, enshrouded reset skills, enshrouded skill reset cost, enshrouded 1.0 respec",
+                     schemas=[article_schema(path, title, desc), cs, faq_schema(faq)]), "0.7")
 
 
 # ============================================================ ABOUT / 404 / SEO FILES
@@ -1066,6 +1342,9 @@ if __name__ == "__main__":
     tier_list()
     skill_planner()
     skill_tree()
+    for area in AREA_BUILDS:
+        area_page(area)
+    respec()
     about()
     privacy()
     terms()
