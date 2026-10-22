@@ -3,7 +3,7 @@ import json
 
 from layout import UPDATED_HUMAN, badge, e
 from skills_data import TREE
-from tree_data import BIOMES, BUILD_ID, PROGRESSION, RAW, our_name
+from tree_data import BIOMES, BUILD_ID, NODES, PROGRESSION, RAW, STAGES, build_preset, our_name, skill_cost
 
 AREA_COLORS = {"Mage": "#60a5fa", "Warrior": "#f87171", "Ranger": "#4ade80", "Core": "#fbbf24"}
 
@@ -51,6 +51,64 @@ def type_key_by_name():
     return {our_name(k): k for k in RAW["types"]}
 
 
+TIERS = [("S", "Strongest picks for 1.0"), ("A", "Strong with the right playstyle or group"), ("B", "Situational, high skill")]
+
+
+def stage_picks(slug):
+    """Per stage: what the preset adds over the previous stage, as (skills [(name, rank, max)], attribute counts {attr: n})."""
+    out, prev_skills, prev_attrs = [], {}, {}
+    for label, budget, _ in STAGES:
+        skills, attrs = {}, {}
+        for nid, rank in build_preset(slug, budget)[0].items():
+            name = our_name(NODES[nid]["type"])
+            if name.endswith(" node"):
+                attrs[name[:-5]] = attrs.get(name[:-5], 0) + 1
+            else:
+                skills[name] = max(skills.get(name, 0), rank)
+        new_skills = [(n, r, skill_cost(n)[1]) for n, r in skills.items() if r > prev_skills.get(n, 0)]
+        new_attrs = {a: c - prev_attrs.get(a, 0) for a, c in attrs.items() if c > prev_attrs.get(a, 0)}
+        out.append((label, budget, new_skills, new_attrs))
+        prev_skills, prev_attrs = skills, attrs
+    return out
+
+
+def build_ranking(builds_lookup):
+    """Tiered list of our builds; each card loads its stage presets into the planner above and links to the full guide."""
+    btn = "inline-flex h-8 items-center justify-center rounded-md border px-2.5 text-xs font-medium hover:bg-accent data-[on]:border-primary data-[on]:bg-primary data-[on]:text-primary-foreground"
+    html = ""
+    for tier, blurb in TIERS:
+        cards = ""
+        for slug, _ in BUILD_NAMES:
+            b = builds_lookup[slug]
+            if b["tier"] != tier:
+                continue
+            stages = stage_picks(slug)
+            loads = "".join(
+                f'<a href="#b={slug}&amp;s={i if i < 3 else 0}" data-load="{slug}" data-stage="{i if i < 3 else 0}" class="{btn}">Lv {label.split(" ")[1]}</a>'
+                for i, (label, _, _, _) in enumerate(stages, 1))
+            steps = ""
+            for label, budget, skills, attrs in stages:
+                items = ", ".join(f"{e(n)}" + (f" {r}/{m}" if m > 1 else "") for n, r, m in skills)
+                extra = ", ".join(f"+{c} {e(a)}" for a, c in attrs.items())
+                steps += (f'<li><p class="font-medium">{label} <span class="text-muted-foreground">({budget} points)</span></p>'
+                          f'<p class="text-muted-foreground">{items or "Ranks only"}{"; attributes: " + extra if extra else ""}</p></li>')
+            cards += f'''<div class="flex flex-col rounded-lg border bg-card p-4 shadow-sm">
+  <div class="flex items-center justify-between gap-2"><h4 class="text-base font-semibold">{e(b["short"])} build</h4><span class="text-xs text-muted-foreground">{e(b["difficulty"])}</span></div>
+  <p class="mt-1 text-xs text-muted-foreground">{e(b["role"])} · {e(b["weapon"])}</p>
+  <p class="mt-3 text-xs font-medium">Load into the planner:</p>
+  <div class="mt-1.5 flex flex-wrap gap-1.5">{loads}</div>
+  <details class="mt-3 text-xs"><summary class="cursor-pointer font-medium text-primary">What to take at each level</summary><ol class="mt-2 space-y-2">{steps}</ol></details>
+  <a href="/builds/{slug}/" class="mt-auto pt-3 text-sm font-medium text-primary hover:underline">Full {e(b["short"])} guide: gear, spells and skill order →</a>
+</div>'''
+        html += (f'<h3 class="mb-3 mt-8 flex items-center gap-2 text-xl font-bold">{badge(tier + "-Tier", "primary" if tier == "S" else "outline")}'
+                 f'<span class="text-sm font-normal text-muted-foreground">{blurb}</span></h3><div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{cards}</div>')
+    return f'''<section id="best-builds" class="container scroll-mt-16 py-8" aria-labelledby="best-builds-h">
+<h2 id="best-builds-h" class="text-2xl font-bold md:text-3xl">Best Enshrouded 1.0 builds: load any build by level</h2>
+<p class="mt-2 max-w-3xl text-muted-foreground">Our nine 1.0 builds, ranked by tier. Pick a level range to load that stage of the build into the planner above, with the matching level and explored biomes. Open <em>What to take at each level</em> to see which skills each stage adds, and the full guide for gear, spells and playstyle. Rankings explained in the <a href="/tier-list/" class="text-primary hover:underline">tier list</a>.</p>
+{html}
+</section>'''
+
+
 def planner_page(builds_lookup):
     keys = type_key_by_name()
     field = "h-9 w-full rounded-md border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -85,6 +143,7 @@ def planner_page(builds_lookup):
 <div class="flex flex-wrap gap-2">{badge("Free tool", "primary")}{badge("Enshrouded 1.0", "outline")}{badge("231 nodes · 178 skills · 212 points", "outline")}{badge("Game build " + BUILD_ID, "outline")}</div>
 <h1 class="mt-4 max-w-4xl text-3xl font-bold tracking-tight md:text-5xl">Enshrouded Skill Planner (1.0)</h1>
 <p class="mt-3 max-w-3xl text-lg text-muted-foreground">This free <strong>Enshrouded skill planner</strong> shows the real 1.0 skill tree, with every node and link taken from the game files. Plan your build point by point, check your 212-point budget and share it with one link.</p>
+<p class="mt-4"><a href="#best-builds" class="inline-flex h-9 items-center justify-center rounded-md border bg-background/60 px-4 text-sm font-medium hover:bg-accent">Load a top 1.0 build by level ↓</a></p>
 </div></div>
 <section id="planner" class="container scroll-mt-16 py-6" aria-label="Enshrouded skill tree planner">
   <noscript><p class="mb-4 rounded-md border p-3 text-sm">The skill planner needs JavaScript. The <a href="/skill-tree/#all-skills">full skill list</a> works without it.</p></noscript>
@@ -104,6 +163,7 @@ def planner_page(builds_lookup):
     <aside>{controls}</aside>
   </div>
 </section>
+{build_ranking(builds_lookup)}
 <div class="container"><article class="prose-eb mx-auto max-w-4xl">
 <h2 id="about-planner">Enshrouded skill tree planner for the 1.0 release</h2>
 <p>Enshrouded 1.0 reset every character's skill tree, so most players are re-planning their build right now. This <strong>Enshrouded skill tree planner</strong> lets you do that before you spend a single point in the game. It draws the full 1.0 tree, with 231 nodes covering 178 different skills, at the positions and with the links the game uses. Like in Enshrouded itself, you can only learn a skill that connects to one you already have.</p>

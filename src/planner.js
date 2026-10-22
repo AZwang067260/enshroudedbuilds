@@ -196,6 +196,15 @@
     document.querySelectorAll('[data-biome]').forEach(function (c, i) { c.checked = !st || i < st[1]; });
   }
   pre.addEventListener('change', function () { var v = pre.value; if (v) loadPreset(v); pre.value = v; render(); });
+  document.querySelectorAll('[data-load]').forEach(function (a) {
+    a.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      var b = a.getAttribute('data-load'), st = +a.getAttribute('data-stage');
+      loadPreset(b, st); pre.value = b; fit(); render();
+      document.querySelectorAll('[data-load]').forEach(function (x) { x.toggleAttribute('data-on', x === a); });
+      document.getElementById('planner').scrollIntoView({ behavior: 'smooth' });
+    });
+  });
   [lv, fl].forEach(function (x) { x.addEventListener('input', render); });
   document.querySelectorAll('[data-biome]').forEach(function (c) { c.addEventListener('change', render); });
   $('#pl-reset').addEventListener('click', function () { if (!Object.keys(sel).length || window.confirm('Reset every skill point?')) { sel = {}; pre.value = ''; render(); } });
