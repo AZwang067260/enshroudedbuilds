@@ -212,6 +212,91 @@
     var t = $('#pl-copy'), done = function () { t.textContent = 'Link copied'; setTimeout(function () { t.textContent = 'Copy build link'; }, 1600); };
     try { navigator.clipboard.writeText(location.href).then(done, done); } catch (e) { done(); }
   });
+  // ---------- share image: drawn on a canvas from the current build, no server involved
+  function roundRect(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+  function drawImage() {
+    var W = 1200, H = 675, S = 2, cv = document.createElement('canvas'), c = cv.getContext('2d');
+    cv.width = W * S; cv.height = H * S; c.scale(S, S);
+    c.fillStyle = '#0b0b10'; c.fillRect(0, 0, W, H);
+    var glow = c.createRadialGradient(330, 337, 40, 330, 337, 420); glow.addColorStop(0, 'rgba(249,115,22,.10)'); glow.addColorStop(1, 'rgba(249,115,22,0)');
+    c.fillStyle = glow; c.fillRect(0, 0, 680, H);
+    // tree
+    var k = 640 / 1960, ox = 340, oy = 337, P = function (x, y) { return [ox + x * k, oy + y * k]; };
+    c.lineCap = 'round';
+    function line(a, b, on) { var p = P(a[0], a[1]), q = P(b[0], b[1]); c.strokeStyle = on ? '#fb923c' : 'rgba(160,160,180,.22)'; c.lineWidth = on ? 2.2 : 1; c.beginPath(); c.moveTo(p[0], p[1]); c.lineTo(q[0], q[1]); c.stroke(); }
+    D.edges.forEach(function (e) { line([N[e[0]].x, N[e[0]].y], [N[e[1]].x, N[e[1]].y], sel[e[0]] && sel[e[1]]); });
+    ORDER.forEach(function (id) { var n = N[id]; if (n.base) line([n.x, n.y], [n.ax, n.ay], !!sel[id]); });
+    ORDER.forEach(function (id) {
+      var n = N[id], t = type(id), p = P(n.x, n.y), r = isAttr(id) ? 2.4 : t.c >= 4 ? 5.2 : 4.2, col = color(id);
+      c.beginPath(); c.arc(p[0], p[1], r, 0, Math.PI * 2);
+      if (sel[id]) { c.fillStyle = col; c.shadowColor = col; c.shadowBlur = 8; c.fill(); c.shadowBlur = 0; }
+      else { c.fillStyle = '#16161d'; c.fill(); c.strokeStyle = col; c.globalAlpha = .45; c.lineWidth = 1; c.stroke(); c.globalAlpha = 1; }
+    });
+    c.textAlign = 'center'; c.font = '700 11px Cinzel, serif';
+    Object.keys(groups).forEach(function (g) {
+      var o = groups[g], cx = o.x / o.n, cy = o.y / o.n, d = Math.hypot(cx, cy) || 1, f = (d + 200) / d, p = P(cx * f, cy * f);
+      c.fillStyle = D.colors[o.a]; c.globalAlpha = .7; c.fillText(g.toUpperCase(), p[0], p[1]); c.globalAlpha = 1;
+    });
+    // panel
+    var x = 700, y = 56, st = stats(), sp = spent(), bu = budget();
+    var name = ($('#pl-name') && $('#pl-name').value.trim()) || (pre.value ? pre.options[pre.selectedIndex].text : 'My Enshrouded build');
+    c.textAlign = 'left'; c.fillStyle = '#f97316'; c.font = '600 13px Inter, sans-serif'; c.fillText('ENSHROUDED 1.0 BUILD', x, y);
+    c.fillStyle = '#f4f4f5'; c.font = '700 30px Cinzel, serif';
+    var title = name; while (c.measureText(title).width > 460 && title.length > 4) title = title.slice(0, -2);
+    c.fillText(title === name ? title : title + '…', x, y + 40);
+    c.fillStyle = '#a1a1aa'; c.font = '500 15px Inter, sans-serif';
+    c.fillText('Level ' + (lv.value || D.levelCap) + '  ·  Flame ' + (fl.value || 1) + '  ·  ' + sp + ' / ' + bu + ' skill points', x, y + 70);
+    roundRect(c, x, y + 84, 460, 8, 4); c.fillStyle = '#27272a'; c.fill();
+    if (sp > 0) { roundRect(c, x, y + 84, Math.max(8, Math.min(1, bu ? sp / bu : 0) * 460), 8, 4); c.fillStyle = '#f97316'; c.fill(); }
+    var areas = { Mage: 0, Warrior: 0, Ranger: 0, Core: 0 }; for (var id in sel) areas[type(id).a] = (areas[type(id).a] || 0) + sel[id] * type(id).c;
+    var ax = x; c.font = '500 13px Inter, sans-serif';
+    Object.keys(areas).forEach(function (a) { c.fillStyle = D.colors[a]; c.beginPath(); c.arc(ax + 5, y + 114, 5, 0, Math.PI * 2); c.fill(); c.fillStyle = '#d4d4d8'; var s = a + ' ' + areas[a]; c.fillText(s, ax + 15, y + 119); ax += c.measureText(s).width + 32; });
+    var attrs = [['Strength', st.STR], ['Dexterity', st.DEX], ['Intelligence', st.INT], ['Constitution', st.CONS], ['Spirit', st.SPIRIT], ['Endurance', st.ENDURANCE]];
+    attrs.forEach(function (a, i) {
+      var cx = x + (i % 3) * 155, cy = y + 146 + Math.floor(i / 3) * 52;
+      roundRect(c, cx, cy, 145, 44, 8); c.fillStyle = '#18181b'; c.fill();
+      c.fillStyle = '#a1a1aa'; c.font = '500 11px Inter, sans-serif'; c.fillText(a[0].toUpperCase(), cx + 12, cy + 17);
+      c.fillStyle = '#f4f4f5'; c.font = '700 18px Inter, sans-serif'; c.fillText(String(a[1]), cx + 12, cy + 37);
+    });
+    var skills = Object.keys(sel).filter(function (id) { return !isAttr(id); }).map(function (id) { var t = type(id); return { n: t.n, r: sel[id], m: t.m, p: sel[id] * t.c, a: t.a }; });
+    skills.sort(function (a, b) { return b.p - a.p || a.n.localeCompare(b.n); });
+    c.fillStyle = '#a1a1aa'; c.font = '600 12px Inter, sans-serif'; c.fillText('KEY SKILLS (' + skills.length + ' TOTAL)', x, y + 276);
+    c.font = '500 14px Inter, sans-serif';
+    skills.slice(0, 14).forEach(function (s, i) {
+      var cx = x + (i % 2) * 235, cy = y + 302 + Math.floor(i / 2) * 26, label = s.n + (s.m > 1 ? '  ' + s.r + '/' + s.m : '');
+      c.fillStyle = D.colors[s.a]; c.beginPath(); c.arc(cx + 4, cy - 5, 3.5, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#e4e4e7'; while (c.measureText(label).width > 210 && label.length > 4) label = label.slice(0, -2);
+      c.fillText(label, cx + 14, cy);
+    });
+    if (!skills.length) { c.fillStyle = '#71717a'; c.fillText('No skills learned yet', x, y + 302); }
+    // footer
+    c.strokeStyle = '#27272a'; c.lineWidth = 1; c.beginPath(); c.moveTo(x, H - 62); c.lineTo(W - 40, H - 62); c.stroke();
+    c.fillStyle = '#f97316'; c.font = '700 16px Cinzel, serif'; c.fillText('ENSHROUDED BUILDS', x, H - 34);
+    c.fillStyle = '#a1a1aa'; c.font = '500 13px Inter, sans-serif'; c.fillText('Plan yours: enshroudedbuilds.org/skill-planner', x, H - 15);
+    return { canvas: cv, name: name };
+  }
+  $('#pl-image') && $('#pl-image').addEventListener('click', function () {
+    var btn = this, label = btn.textContent;
+    btn.textContent = 'Drawing…';
+    var fonts = document.fonts ? Promise.all([document.fonts.load('700 30px Cinzel'), document.fonts.load('500 14px Inter'), document.fonts.load('700 18px Inter')]).catch(function () {}) : Promise.resolve();
+    fonts.then(function () {
+      var out = drawImage(), file = (out.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'enshrouded-build') + '.png';
+      out.canvas.toBlob(function (blob) {
+        btn.textContent = label;
+        if (!blob) return notice('Could not create the image in this browser.');
+        var f = typeof File === 'function' ? new File([blob], file, { type: 'image/png' }) : null;
+        var link = 'https://enshroudedbuilds.org/skill-planner/' + location.hash;
+        if (f && navigator.canShare && navigator.canShare({ files: [f] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
+          navigator.share({ files: [f], title: out.name, text: link }).catch(function () {});
+          return;
+        }
+        var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+        notice('Image saved. Post it with your build link so others can open it.');
+      }, 'image/png');
+    });
+  });
   $('#pl-search').addEventListener('input', function () { query = this.value.trim().toLowerCase(); render(); });
   document.querySelectorAll('[data-find]').forEach(function (a) {
     a.addEventListener('click', function (ev) {
