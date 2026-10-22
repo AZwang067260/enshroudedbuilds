@@ -70,6 +70,7 @@ HUBS = [
     ("/tier-list/", "Builds Tier List (1.0)", "Every Enshrouded build ranked for the 1.0 full release."),
     ("/skill-planner/", "Skill Planner (1.0)", "Plan your build on the real 1.0 skill tree (231 nodes) with a 212-point budget."),
     ("/skill-tree/", "Skill Tree Guide (1.0)", "All 12 archetypes, attributes, skill points and respecs."),
+    ("/classes/", "Enshrouded Classes", "No fixed classes: all 12 archetypes and which one to play."),
     ("/respec/", "How to Respec (1.0)", "Reset your skill tree at a Flame Altar: cost per stage and how to plan it."),
     ("/builds/", "All Enshrouded Builds", "Compare every class build by role, stats and difficulty."),
 ]
@@ -274,7 +275,7 @@ def build_page(b):
 
 HOME_FAQ = [
 ("What are the best Enshrouded builds in 1.0?", "The top Enshrouded 1.0 builds are the <a href='/builds/battlemage/'>Battlemage wand build</a> (best overall and best solo), the new <a href='/builds/necromancer/'>Necromancer summoner build</a>, the <a href='/builds/wizard/'>Wizard</a> (best area damage) and the <a href='/builds/barbarian/'>two-handed Barbarian</a> (highest physical DPS). The <a href='/builds/tank/'>Tank</a> and <a href='/builds/healer/'>Healer</a> are the most valuable picks in co-op."),
-("Does Enshrouded have classes?", "No. Enshrouded uses one large skill tree with twelve archetypes: Warrior, Tank, Barbarian and Athlete; Wizard, Battlemage, Healer and Trickster; Ranger, Assassin, Beastmaster and Survivor. A \"class build\" is a path through these archetypes, and you can mix them freely."),
+("Does Enshrouded have classes?", "No. Enshrouded uses one large skill tree with twelve archetypes: Warrior, Tank, Barbarian and Athlete; Wizard, Battlemage, Healer and Trickster; Ranger, Assassin, Beastmaster and Survivor. A \"class build\" is a path through these archetypes, and you can mix them freely. See <a href=\"/classes/\">Enshrouded classes explained</a>."),
 ("When did Enshrouded 1.0 release?", "Enshrouded 1.0 launched on October 15, 2026 on PC (Steam) and PlayStation 5, ending Early Access. An Xbox version is expected in 2027."),
 ("Did Enshrouded 1.0 reset my skills?", "Yes. Every skill tree was reset at launch and all points were refunded. Your character level and items carry over, but you need to re-spend your points. Keen Games recommends doing this before leaving your base."),
 ("What is the max level in Enshrouded 1.0?", "The player level cap went up from 45 to 50, and gear now goes up to level 55."),
@@ -453,7 +454,7 @@ def builds_hub():
 {out}
 <div class="prose-eb mt-16 max-w-4xl">
 <h2>Choosing between Enshrouded builds</h2>
-<p>Because Enshrouded has no locked classes, every build here is a starting point, not a cage. Most players settle on one main archetype and borrow a few nodes from a neighboring one. A Warrior might take Tank armor scaling, a Wizard might add Battlemage wand sustain, and a Ranger might take Assassin crits. Each build page ends with a <em>Hybrid builds</em> section that shows which combinations work well.</p>
+<p>Because Enshrouded has no locked classes, every build here is a starting point, not a cage. Most players settle on one main archetype and borrow a few nodes from a neighboring one. A Warrior might take Tank armor scaling, a Wizard might add Battlemage wand sustain, and a Ranger might take Assassin crits. Each build page ends with a <em>Hybrid builds</em> section that shows which combinations work well. If you want a build that is both S-tier and easy, start with the <a href="/builds/necromancer/">Enshrouded Necromancer build</a>: summoned skeletons and totems take the hits while you attack from behind. New to the game? <a href="/classes/">Enshrouded classes explained</a> covers all twelve archetypes.</p>
 <p>If you are coming back after Update 1.0 (October 15, 2026), remember that your skill points were refunded. It is the best time to try something new, since you have to re-spend everything anyway. Our <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds guide</a> covers every change and the re-spec checklist.</p>
 <h2 id="also-known-as">What players call these builds</h2>
 <p>Players use different names for the same playstyles. If you search for one of these, this is the guide you want:</p>
@@ -763,7 +764,7 @@ def tier_list():
 <h2 class="!mt-0">How we rank Enshrouded builds</h2>
 <p>Every build on this list can finish Enshrouded 1.0. For what Update 1.0 changed on October 15, 2026 and how to re-spec, read the <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds guide</a>. The tiers measure how <em>efficient</em> and <em>forgiving</em> a build is at the new level 50 cap with gear up to level 55. We score four things: damage output, survivability, solo strength and ease of use. A-tier builds are not weak. Several of them, like the Tank and Healer, are more valuable than S-tier builds in a coordinated co-op group.</p>
 <h2>S-tier Enshrouded builds</h2>
-<p>The <a href="/builds/battlemage/">Battlemage</a> is the build almost every 1.0 guide ranks first: Unity and Arcane Deflection keep its mana nearly infinite, and a ward or shield covers mistakes. The <a href="/builds/necromancer/">Necromancer (summoner)</a> joins it in S-tier because Advanced Necromancy and Totem Mastery let skeletons and totems hold whole fights. The <a href="/builds/wizard/">Wizard</a> has the best area damage in the game thanks to the new 1.0 spells and Blast and Cast. The <a href="/builds/barbarian/">Barbarian</a> brings the highest physical damage, using two-handed stuns as defense.</p>
+<p>The <a href="/builds/battlemage/">Battlemage</a> is the build almost every 1.0 guide ranks first: Unity and Arcane Deflection keep its mana nearly infinite, and a ward or shield covers mistakes. The <a href="/builds/necromancer/">Enshrouded Necromancer build</a>, a summoner, joins it in S-tier because Advanced Necromancy and Totem Mastery let skeletons and totems hold whole fights. The <a href="/builds/wizard/">Wizard</a> has the best area damage in the game thanks to the new 1.0 spells and Blast and Cast. The <a href="/builds/barbarian/">Barbarian</a> brings the highest physical damage, using two-handed stuns as defense.</p>
 <h2>A-tier Enshrouded builds</h2>
 <p>The <a href="/builds/tank/">Tank</a> and <a href="/builds/healer/">Healer</a> rank lower only because they shine in groups. The <a href="/builds/warrior/">Warrior</a> is the best build for beginners. The <a href="/builds/ranger/">Ranger</a> improved a lot with Eternal arrows and Puncture.</p>
 <h2>B-tier Enshrouded builds</h2>
@@ -834,7 +835,7 @@ def skill_tree():
 {attrs}
 <h2>Planning a build in 1.0</h2>
 <p>Update 1.0 (October 15, 2026) reset every skill tree, so everyone is re-spending points right now. The <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds guide</a> has the full re-spec checklist. With the level cap at 50, you have more points than in Early Access, but still not enough to fill everything. The best builds pick <strong>one main archetype</strong>, go deep for its key skills, and use a <strong>neighbouring archetype</strong> for support: Tank armor for a Warrior, Battlemage sustain for a Wizard, Assassin crits for a Ranger. Avoid spreading single points across the whole tree. Many weak nodes add up to much less than a few strong capstones.</p>
-<p>Utility archetypes like <strong>Athlete, Trickster, Beastmaster and Survivor</strong> are rarely a build's main focus, but one or two of their nodes can help a lot with movement, control or exploring the Shroud.</p>
+<p>Utility archetypes like <strong>Athlete, Trickster, Beastmaster and Survivor</strong> are rarely a build's main focus, but one or two of their nodes can help a lot with movement, control or exploring the Shroud. Trickster matters most for summoners: Quick Charge and Mana Currents are core skills of our <a href="/builds/necromancer/">Necromancer summoner build</a>, which casts skeletons and totems all fight long. For a plain-language overview of the archetypes, see <a href="/classes/">Enshrouded classes explained</a>.</p>
 <h2 id="skill-points">Enshrouded skill points: how many you get</h2>
 <p>You earn <strong>2 skill points per level</strong> after level 1, so 98 by the level 50 cap. Exploration adds the rest: <strong>1 point for each Shroud Root</strong> you destroy and <strong>3 points for each Elixir Well</strong> you cleanse, 114 points across the seven biomes. A fully explored level 50 character has <strong>212 skill points</strong>, while the whole tree (231 nodes, 178 different skills) costs 675. The <a href="/skill-planner/">Enshrouded skill planner</a> calculates your budget for any level and set of explored biomes.</p>
 <h2 id="respec">How to respec in Enshrouded 1.0</h2>
@@ -1035,6 +1036,99 @@ def area_page(area):
     write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, active="/skill-tree/",
                      keywords=f"enshrouded {area.lower()} skill tree, enshrouded {area.lower()} skills, enshrouded 1.0 {area.lower()} skill tree",
                      schemas=[article_schema(path, title, desc), cs, faq_schema(faq)]), "0.7")
+
+
+# ============================================================ CLASSES
+
+GROUP_BUILD = {"Wizard": "wizard", "Battlemage": "battlemage", "Healer": "healer", "Trickster": "necromancer", "Warrior": "warrior",
+               "Tank": "tank", "Barbarian": "barbarian", "Ranger": "ranger", "Assassin": "assassin"}
+GROUP_ROLE = {
+    "Wizard": "The damage caster. Staff and wand damage, elemental damage, spell crits and, since 1.0, the summon limits for skeletons and totems.",
+    "Battlemage": "The wand fighter. Wand damage and mana sustain, ward and shield parries, and the new 1.0 wand attacks.",
+    "Healer": "The support. Healing, auras that protect the group, Blink and stronger revives.",
+    "Trickster": "The spell utility group. Faster spell charging and mana regeneration, which every caster and especially summoners want.",
+    "Warrior": "The one-handed fighter. Sword, axe and club damage, crit healing and sustain.",
+    "Tank": "The frontline. Armor scaling, resistances when surrounded, aggro and group protection.",
+    "Barbarian": "The two-handed fighter. Two-handed weapon damage and attack speed, crits and Blood Rage.",
+    "Athlete": "The movement group. Stamina, parry stamina, jump attacks and swimming dashes.",
+    "Ranger": "The archer. Bow damage, crits, weak-point shots and extra arrows.",
+    "Assassin": "The crit and dagger group. Dagger damage, backstabs, poison, and gliding.",
+    "Beastmaster": "The hunter. Damage against wildlife and specific enemy types, plus poison resistance.",
+    "Survivor": "The explorer. Shroud time, stamina and survival perks, such as keeping food buffs through death.",
+}
+
+
+def group_skills(area, group, n=3):
+    """Skills to know in a group: those our presets use most, then the costliest, attribute nodes left out."""
+    sks = [s for s in dict(dict(TREE)[area])[group] if not s[0].endswith(" node")]
+    used = {name: sum(name in PRESETS[b] for b in PRESETS) for name, *_ in sks}
+    ranked = sorted(sks, key=lambda s: (-used[s[0]], -s[2] * s[1]))
+    return [s[0] for s in ranked[:n]]
+
+
+def classes_page():
+    path = "/classes/"
+    ch, cs = breadcrumb([("/", "Home"), (path, "Classes")])
+    sections = ""
+    for area in ("Mage", "Warrior", "Ranger"):
+        groups = dict(TREE)[area]
+        sections += f'<h3 id="{area.lower()}-classes">{area} classes</h3><p>All four sit in the <a href="{area_slug(area)}">{area} area of the skill tree</a>.</p><ul class="dots">'
+        for g, sks in groups:
+            pts = sum(c * r for _, r, c, _, _ in sks)
+            b = BY_SLUG.get(GROUP_BUILD.get(g, ""))
+            build = (f' Build: <a href="/builds/{b["slug"]}/">Enshrouded {e(b["short"])} build</a> ({b["tier"]}-tier).' if b
+                     else " Not a main build on its own: players take a few of its nodes for utility.")
+            sections += (f"<li><strong>{e(g)}</strong> ({len(sks)} skills, {pts} points to max). {GROUP_ROLE[g]} "
+                         f"Skills to know: {', '.join(e(x) for x in group_skills(area, g))}.{build}</li>")
+        sections += "</ul>"
+    pick = table(["If you want to...", "Play", "Main class (archetype)", "Difficulty"], [
+        [want, f'<a href="/builds/{s}/">{e(BY_SLUG[s]["short"])}</a>', cls, e(BY_SLUG[s]["difficulty"])]
+        for want, s, cls in [("Let minions fight for you", "necromancer", "Wizard + Trickster"), ("Cast big area spells", "wizard", "Wizard"),
+                             ("Shoot a wand behind a shield", "battlemage", "Battlemage"), ("Keep a co-op group alive", "healer", "Healer"),
+                             ("Swing a two-handed weapon", "barbarian", "Barbarian"), ("Use sword and shield", "warrior", "Warrior"),
+                             ("Hold aggro for friends", "tank", "Tank"), ("Shoot a bow from range", "ranger", "Ranger"),
+                             ("Crit with daggers from stealth", "assassin", "Assassin")]])
+    hybrids = "".join(f'<li><strong>{e(b["short"])}</strong>: ' + "; ".join(f'<a href="/builds/{o}/">{e(BY_SLUG[o]["short"])}</a> ({e(t[0].lower() + t[1:])})' for o, t in b["hybrids"][:2]) + "</li>" for b in BUILDS)
+    n_skills = len(OUR)
+    faq = [
+        ("Does Enshrouded have classes?", "Not fixed ones. Every character uses the same skill tree, and your class is the part of it you spend points in. The tree has twelve archetypes, which players call classes: Wizard, Battlemage, Healer and Trickster (Mage), Warrior, Tank, Barbarian and Athlete (Warrior), and Ranger, Assassin, Beastmaster and Survivor (Ranger)."),
+        ("How many classes are there in Enshrouded?", "Twelve archetypes in three combat areas, plus the shared Core. Nine of them are strong enough to be a main build; Athlete, Beastmaster and Survivor are utility groups that builds dip into."),
+        ("What is the best class in Enshrouded 1.0?", "Our S-tier picks are the Wizard, Battlemage, Necromancer and Barbarian. For a first character, the Necromancer, Warrior or Tank are the most forgiving. See the tier list for the full ranking."),
+        ("Can you change your class in Enshrouded?", "Yes. Reset your skill tree at a Flame Altar for 1 Rune per spent skill point (Enshrouded Wiki) and spend the points on a different class. 1.0 also reset every existing character once for free."),
+        ("Can you combine classes?", "Yes, and most good builds do: one main archetype for damage and a neighbour for defense or sustain, such as Battlemage with Tank armor."),
+    ]
+    body = f'''
+<div class="hero-glow border-b"><div class="container py-12">{ch}
+<div class="flex flex-wrap gap-2">{badge("Enshrouded 1.0", "primary")}{badge("12 archetypes · 3 areas", "outline")}</div>
+<h1 class="mt-4 text-3xl font-bold tracking-tight md:text-5xl">Enshrouded Classes Explained (1.0)</h1>
+<p class="mt-4 max-w-3xl text-lg text-muted-foreground">Enshrouded has no fixed classes. Every character shares one skill tree, and your class is where you spend your points. Here are the twelve archetypes players call classes, what each one does, and which one to pick.</p>
+<div class="mt-6 flex flex-wrap gap-3">{button("#pick", "Which class to pick")}{button("/builds/", "All class builds", "outline")}</div></div></div>
+<div class="container py-10"><article class="prose-eb mx-auto max-w-4xl">
+<h2 class="!mt-0" id="no-classes">Does Enshrouded have classes?</h2>
+<p>Not in the usual sense. You don't choose a class when you create a character, and nothing locks you in. Instead, every Flameborn uses the same skill tree of {n_skills} skills. The tree is split into three combat areas, Mage, Warrior and Ranger, around a shared Core, and each area holds four groups called archetypes. When players talk about Enshrouded classes, they mean these archetypes, or the builds made from them.</p>
+<p>Two things decide your class in practice: the archetype you spend most of your skill points in, and the attribute you raise with them (Intelligence for magic, Strength for melee, Dexterity for bows and daggers). Your weapons and armor follow from that choice.</p>
+<h2 id="all-classes">The 12 Enshrouded classes</h2>
+<p>Each archetype below lists its size, what it does, the skills worth knowing first and the build guide that uses it.</p>
+{sections}
+<p>The <a href="/skill-tree/core/">Core</a> in the middle of the tree isn't a class: it holds general skills like Double Jump and Merciless Attack that any build can take.</p>
+<h2 id="pick">Which Enshrouded class should you play?</h2>
+<p>Pick by how you want to fight. Each row links to a full build guide with a level 1–50 skill order:</p>
+{pick}
+<p>Not sure? The <a href="/tier-list/">1.0 tier list</a> ranks all nine builds, and the <a href="/skill-planner/">skill planner</a> lets you try any of them before you spend a point.</p>
+<h2 id="mixing">Mixing classes: hybrid builds</h2>
+<p>Because nothing is locked, most strong builds use one main archetype and a neighbour for what it lacks. The combinations our guides recommend:</p>
+<ul class="dots">{hybrids}</ul>
+<h2 id="change">Can you change class?</h2>
+<p>Yes. Reset your skill tree at a Flame Altar for 1 Rune per spent skill point and spend the points on another archetype. Our <a href="/respec/">respec guide</a> shows the cost at each stage. Characters from before 1.0 also got one free reset when the update launched.</p>
+<h2 id="faq">Enshrouded classes FAQ</h2>
+{accordion(faq)}
+{sources([("https://enshrouded.wiki.gg/wiki/Flame_Altar", "Enshrouded Wiki: Flame Altar")])}
+</article></div>'''
+    title = "Enshrouded Classes: All 12 Archetypes Explained (1.0)"
+    desc = "Enshrouded has no fixed classes. All 12 archetypes explained for 1.0: what each does, key skills, the build that uses it, and which class to play."
+    write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, active="/builds/",
+                     keywords="enshrouded classes, enshrouded class, enshrouded archetypes, enshrouded best class, enshrouded 1.0 classes",
+                     schemas=[article_schema(path, title, desc), cs, faq_schema(faq)]), "0.8")
 
 
 # ============================================================ RESPEC
@@ -1345,6 +1439,7 @@ if __name__ == "__main__":
     for area in AREA_BUILDS:
         area_page(area)
     respec()
+    classes_page()
     about()
     privacy()
     terms()
