@@ -1,0 +1,23 @@
+# Tell IndexNow (Bing and others) about new or updated pages after each deploy.
+name: IndexNow
+on:
+  push:
+    branches: [main]
+    paths: [public/sitemap.xml]
+  workflow_dispatch:
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Wait for Cloudflare to deploy
+        run: sleep 120
+      - name: Submit changed URLs
+        run: |
+          if [ "${{ github.event_name }}" = "push" ] && git show HEAD^:public/sitemap.xml > /tmp/old-sitemap.xml 2>/dev/null; then
+            python3 src/indexnow.py /tmp/old-sitemap.xml
+          else
+            python3 src/indexnow.py
+          fi

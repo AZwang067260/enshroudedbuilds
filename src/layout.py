@@ -5,6 +5,7 @@ from html import escape
 SITE = "https://enshroudedbuilds.org"
 SITE_NAME = "Enshrouded Builds"
 CONTACT_EMAIL = "contact@enshroudedbuilds.org"
+INDEXNOW_KEY = "93123c3a148e74ba9ea5b2d6f9c93f0d"  # served at /<key>.txt for IndexNow
 UPDATED = "2026-10-20"
 UPDATED_HUMAN = "October 20, 2026"
 # game version the facts were last checked against

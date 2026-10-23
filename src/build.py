@@ -13,7 +13,7 @@ from planner import PLANNER_FAQ, client_payload, planner_page, skills_table
 from skills_data import PRESETS, TREE
 from tree_data import ADJ as NODE_ADJ, NODES as NODES_ALL, cost as node_cost, max_rank as node_max, our_name
 from tree_data import BIOMES, BUILD_ID, OUR, STAGES, build_preset, game_text, skill_cost, type_of
-from layout import (CONTACT_EMAIL, GAME_VERSION, SITE, UPDATED, UPDATED_HUMAN, accordion, alert, badge, breadcrumb, button, card, e,
+from layout import (CONTACT_EMAIL, INDEXNOW_KEY, GAME_VERSION, SITE, UPDATED, UPDATED_HUMAN, accordion, alert, badge, breadcrumb, button, card, e,
                     faq_schema, page, table)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -1387,6 +1387,8 @@ def seo_files():
         f.write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n')
     with open(os.path.join(OUT, "robots.txt"), "w") as f:
         f.write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
+    with open(os.path.join(OUT, INDEXNOW_KEY + ".txt"), "w") as f:
+        f.write(INDEXNOW_KEY)
     with open(os.path.join(OUT, "ads.txt"), "w") as f:
         f.write("google.com, pub-7872976152483576, DIRECT, f08c47fec0942fa0\n")
     with open(os.path.join(OUT, "favicon.svg"), "w") as f:
