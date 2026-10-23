@@ -10,6 +10,9 @@
   var T = D.types, N = {}, ORDER = [], ADJ = {}, sel = {}, focus = null, query = '', zoomTo = null;
   var FLAME = { THICK_SKIN: 'CONS', BARBARIAN: 'STR', EXALTED: 'INT', ARCANE_CONCENTRATION: 'SPIRIT', GRACEFUL_STRIDE: 'DEX', ENDURANCE_OF_THE_FLAME: 'ENDURANCE' };
   var B36 = '0123456789abcdefghijklmnopqrstuvwxyz';
+  // GA4 events; no-op when analytics is not loaded (offline copies, blockers)
+  var started = false;
+  function track(name, params) { try { if (window.gtag) window.gtag('event', name, params || {}); } catch (e) {} }
   D.nodes.forEach(function (r) {
     N[r[0]] = { id: r[0], t: r[1], x: r[2], y: r[3], base: r.length > 4, ax: r[4], ay: r[5] };
     ORDER.push(r[0]); ADJ[r[0]] = [];
@@ -73,6 +76,7 @@
     if ((sel[id] || 0) >= t.m) return notice(t.n + ' is already at max rank.');
     if (spent() + t.c > budget()) return notice('Not enough points for ' + t.n + ' (' + t.c + ' pt). Raise your level or explored biomes.');
     sel[id] = (sel[id] || 0) + 1; pre.value = ''; render();
+    if (!started) { started = true; track('planner_start', { skill: t.n }); }
   }
   function remove(id) {
     if (!sel[id]) return;
@@ -195,12 +199,13 @@
     lv.value = st ? st[0] : D.levelCap;
     document.querySelectorAll('[data-biome]').forEach(function (c, i) { c.checked = !st || i < st[1]; });
   }
-  pre.addEventListener('change', function () { var v = pre.value; if (v) loadPreset(v); pre.value = v; render(); });
+  pre.addEventListener('change', function () { var v = pre.value; if (v) { loadPreset(v); track('planner_preset_load', { build: v, stage: 'full', source: 'menu' }); } pre.value = v; render(); });
   document.querySelectorAll('[data-load]').forEach(function (a) {
     a.addEventListener('click', function (ev) {
       ev.preventDefault();
       var b = a.getAttribute('data-load'), st = +a.getAttribute('data-stage');
       loadPreset(b, st); pre.value = b; fit(); render();
+      track('planner_preset_load', { build: b, stage: st ? String(st) : 'full', source: 'ranking' });
       document.querySelectorAll('[data-load]').forEach(function (x) { x.toggleAttribute('data-on', x === a); });
       document.getElementById('planner').scrollIntoView({ behavior: 'smooth' });
     });
@@ -211,6 +216,7 @@
   $('#pl-copy').addEventListener('click', function () {
     var t = $('#pl-copy'), done = function () { t.textContent = 'Link copied'; setTimeout(function () { t.textContent = 'Copy build link'; }, 1600); };
     try { navigator.clipboard.writeText(location.href).then(done, done); } catch (e) { done(); }
+    track('planner_copy_link', { build: pre.value || 'custom', points: spent() });
   });
   // ---------- share image: drawn on a canvas from the current build, no server involved
   function roundRect(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
@@ -288,16 +294,19 @@
         var link = 'https://enshroudedbuilds.org/skill-planner/' + location.hash;
         if (f && navigator.canShare && navigator.canShare({ files: [f] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
           navigator.share({ files: [f], title: out.name, text: link }).catch(function () {});
+          track('planner_save_image', { build: pre.value || 'custom', method: 'share' });
           return;
         }
         var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file;
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
         notice('Image saved. Post it with your build link so others can open it.');
+        track('planner_save_image', { build: pre.value || 'custom', method: 'download' });
       }, 'image/png');
     });
   });
   $('#pl-search').addEventListener('input', function () { query = this.value.trim().toLowerCase(); render(); });
+  $('#pl-search').addEventListener('change', function () { var q = this.value.trim(); if (q) track('search', { search_term: q, source: 'planner' }); });
   document.querySelectorAll('[data-find]').forEach(function (a) {
     a.addEventListener('click', function (ev) {
       ev.preventDefault(); var key = a.getAttribute('data-find');
@@ -308,7 +317,8 @@
   });
   (function fromHash() {
     var h = {}; location.hash.slice(1).split('&').forEach(function (kv) { var a = kv.split('='); if (a[0]) h[a[0]] = decodeURIComponent(a[1] || ''); });
-    if (h.b && D.presets[h.b]) { loadPreset(h.b, +h.s || 0); pre.value = h.b; }
+    if (h.b && D.presets[h.b]) { loadPreset(h.b, +h.s || 0); pre.value = h.b; track('planner_preset_load', { build: h.b, stage: +h.s ? String(+h.s) : 'full', source: 'link' }); }
+    else if (h.t) track('planner_shared_build_open', {});
     if (h.l) lv.value = h.l; if (h.f) fl.value = h.f;
     if (h.e !== undefined) document.querySelectorAll('[data-biome]').forEach(function (c, i) { c.checked = !!(+h.e & (1 << i)); });
     if (h.t !== undefined) {
