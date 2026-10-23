@@ -228,6 +228,7 @@ def page(*, path, title, description, body, builds, active="", schemas=(), og_ty
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="p:domain_verify" content="37c6ae976297424f2c7cf420ab062ea3">
 <title>{e(title)}</title>
 <meta name="description" content="{e(description)}">{kw}
 <link rel="canonical" href="{url}">
