@@ -2,7 +2,7 @@
 the first week and one per week after that. Values in posts are generated from the 1.0 game export, not typed by hand."""
 from layout import e, table
 from skills_data import PRESETS
-from tree_data import (BIOMES, BUILD_ID, NODES, OUR, PROGRESSION, STAGES, build_preset, cheapest_path, cost, game_text, max_rank,
+from tree_data import (BIOMES, BUILD_ID, NODES, OUR, PROGRESSION, RAW, STAGES, build_preset, cheapest_path, cost, game_text, max_rank,
                        nodes_named, our_name, skill_cost)
 
 NEW_SKILLS = ["Blast and Cast", "Aerial Wand Attack", "Wand Evasion Attack", "Advanced Necromancy", "Totem Mastery",
@@ -228,6 +228,69 @@ def necromancer_post():
 '''
 
 
+def _full_text(name):
+    """Every line of a skill's in-game description at max rank, tags stripped."""
+    import re
+    t = RAW["types"][next(k for k in RAW["types"] if our_name(k) == name)]
+    rank = t.get("maxLevel", 1)
+    def sub(m):
+        k = m.group(1)
+        if k in t.get("gameLevelValues", {}):
+            return str(t["gameLevelValues"][k][rank - 1])
+        return str(t.get("gameValues", {}).get(k, m.group(0)))
+    def clean(d):
+        d = d.replace("</b><br/>", ": ").replace("<br/>", " ")
+        return re.sub(r"\{\{(\w+)\}\}", sub, re.sub(r"<[^>]+>", "", d)).strip()
+    return " ".join(clean(d) for d in t.get("description", []))
+
+
+def ranger_post():
+    from content_builds import BUILDS
+    rb = next(b for b in BUILDS if b["slug"] == "ranger")
+    archer = ["Puncture", "Barrage", "Survival Instinct"]
+    stage, stage_budget = _stage_has("ranger", archer)
+    p_pts, _ = _max_from_scratch("Puncture")
+    ranked = table(["Skill", "Area / group", "Cost", "What each rank gives (in-game text)"], [
+        [f"<strong>{n}</strong>", f"{OUR[n][0]} / {OUR[n][1]}", _ranks(n), _per_rank(n)] for n in archer])
+    compare = table(["", "Before 1.0", "In 1.0"], [
+        ["Arrows", "No arrow upgrades and no Eternal Ember or Voltaic arrows", "Eternal Ember and Eternal Voltaic arrows at several tiers, upgradeable like weapons; arrow costs and effects rebalanced; less ectoplasm in arrow recipes"],
+        ["New bow skills", "None", f"Puncture, Barrage and Survival Instinct ({_total(archer)} points for all three at max rank)"],
+        ["Armor", "Marksman and Sharpshooter were the ranged sets for Revelwood and Nomad Highlands", "Both are now loot from those biomes' chests; each of those tiers has one craftable ranged set and one craftable dagger set"],
+        ["Aiming", "One auto-target setting for everything", "Separate ranged and melee auto-target settings, faster hard-lock target switching with bows, better controller aim assist"],
+        ["Daggers", "Dagger skills in the Warrior area", "Dagger skills in the Ranger area's Assassin group, next to the bow skills"],
+        ["Shroud time", "Stacked Shroud time bonuses were more effective", "Stacked Shroud time extensions are less effective; hourglass capsules are far more common"],
+    ])
+    multi = "".join(f"<li><strong>{n}</strong> ({_ranks(n)}): {e(_full_text(n))}</li>" for n in ["Multi Shot", "Multi Shot Trigger", "Skill Shot"])
+    core = [k for k in PRESETS["ranger"] if not k.endswith(" node")]
+    return f'''
+<p>The bow was a solid choice in Early Access, but it came with chores: crafting stacks of arrows, repairing bows and juggling targets. Update 1.0 fixed most of that and added three new archer skills. This post compares the Ranger before and after 1.0, with skill values from the 1.0 game files (build {BUILD_ID}) and quotes from Keen Games' 1.0 changelog.</p>
+<p><strong>Short version:</strong> 1.0 gave bows upgradeable Eternal arrows, three new skills (Puncture, Barrage and Survival Instinct, {_total(archer)} points together), better aiming and target switching, and reworked ranged armor. The bow build itself plays the same: crits and weak-point shots.</p>
+<h2 id="what-changed">What changed for bows in 1.0</h2>
+<ul class="dots">
+<li><strong>Eternal arrows.</strong> The changelog "added new eternal ember arrows and eternal voltaic arrows at various tiers", and "Eternal spells, and arrows, can now be upgraded just like weapons or other equipment." The crafting survivors for each combat class now offer those upgrades.</li>
+<li><strong>Arrow balance.</strong> Keen "revisited the balancing of the various arrows to make sure costs and effectiveness provide better options for rangers", and reduced the ectoplasm needed in arrow recipes.</li>
+<li><strong>Aiming and targeting.</strong> "Switching targets with wands and bows in hard-lock is now possible much faster after the attack." Ranged and melee weapons now have separate auto-target settings, and controller aim assist for ranged weapons was improved.</li>
+<li><strong>Armor.</strong> The ranger armor sets for the Revelwood and Nomad Highlands tiers were reworked: "both the tier 2 and 3 have one craftable ranged combat set and one craftable dagger set each", while the Marksman and Sharpshooter sets became loot from those biomes' chests.</li>
+<li><strong>A boss change to know.</strong> The weak point on the back of the Albaneve Summits boss "now works as a regular weak point for all weapons; previously, it only worked as a weak point for arrows." Bows lost a unique edge there, though the changelog adds that stun arrows now work "significantly better than before" on that fight.</li>
+</ul>
+<h2 id="new-skills">The three new archer skills</h2>
+<p>All three sit in the Ranger area. Values are the in-game text at each rank:</p>
+{ranked}
+<p><strong>Puncture</strong> is the one that matters most: a flat bonus to ranged Piercing damage with no condition attached. <strong>Barrage</strong> is quality of life: bow hits can restore durability, which means fewer repair trips. <strong>Survival Instinct</strong> gives back Shroud time for Shroud kills with a bow or dagger, which is worth more now that stacked Shroud time bonuses are weaker. All eight new 1.0 skills are compared in <a href="/blog/enshrouded-1-0-new-skills/">Enshrouded 1.0 new skills</a>.</p>
+<h2 id="compare">Ranger before vs after 1.0</h2>
+{compare}
+<h2 id="multi-shot">How Multi Shot and Skill Shot work in 1.0</h2>
+<p>These three skills cause the most confusion, so here is the full in-game text at max rank:</p>
+<ul class="dots">{multi}</ul>
+<p>In short: Multi Shot only fires extra arrows from regular arrows, and those arrows come out of your ammo. Multi Shot Trigger extends that to special arrows, which also use ammo. Skill Shot rewards weak-point hits, especially on enemies without helmets.</p>
+<h2 id="how-to-skill">How to skill a Ranger in 1.0</h2>
+<p>Maxing Puncture from an empty tree costs <strong>{p_pts} points</strong> by the cheapest path, and our planner preset already has all three new archer skills at max rank by the end of the <strong>{stage.lower()}</strong> stage ({stage_budget} points). The full core of our Ranger preset: {", ".join(e(c) for c in core)}.</p>
+<p>Open the <a href="/skill-planner/#b=ranger&amp;s=1">level 1–15 Ranger preset</a> or the <a href="/skill-planner/#b=ranger">full level 50 build</a> in the planner. The <a href="/builds/ranger/">Ranger build guide</a> has the complete skill order, bows, arrows and armor, and the <a href="/skill-tree/ranger/">Ranger skill tree page</a> lists every skill in the area by group.</p>
+<h2 id="worth-it">Is the Ranger worth playing in 1.0?</h2>
+<p>Yes, if you enjoy aiming. Our tier list puts the Ranger at <strong>{rb["tier"]}-tier</strong>: Eternal arrows and Puncture removed most of the old friction, but the build is still {e(rb["cons"][0].lower())} and weaker in tight spaces than melee or magic. Many players pair it with daggers: since 1.0 the dagger skills sit in the same area, which makes the <a href="/builds/assassin/">Assassin</a> a natural hybrid. For the bigger picture, read <a href="/blog/enshrouded-1-0-skill-tree-changes/">what changed in the 1.0 skill tree</a> and the <a href="/tier-list/">1.0 tier list</a>.</p>
+'''
+
+
 # slug, publish date, title (<=60), description (<=155), H1, body function
 POSTS = [
     {"slug": "enshrouded-1-0-new-skills", "date": "2026-10-20",
@@ -248,4 +311,10 @@ POSTS = [
      "h1": "Enshrouded Necromancer: Before and After Update 1.0",
      "summary": "From lucky skeletons on kills to a summoner you control: the new summon spells and skills, the 1.0 creature cap, and how to skill a Necromancer now.",
      "body": necromancer_post},
+    {"slug": "enshrouded-ranger-before-after-1-0", "date": "2026-10-23",
+     "title": "Enshrouded Ranger Before vs After 1.0: Bows & Arrows",
+     "description": "How bows changed in Enshrouded 1.0: Eternal arrows, Puncture, Barrage and Survival Instinct, aiming fixes, reworked armor and how to skill a Ranger now.",
+     "h1": "Enshrouded Ranger: Bow Builds Before and After Update 1.0",
+     "summary": "Eternal arrows, three new archer skills, faster target switching and reworked ranged armor: what 1.0 changed for bows and how to skill a Ranger now.",
+     "body": ranger_post},
 ]
