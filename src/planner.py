@@ -131,7 +131,9 @@ def planner_page(builds_lookup):
     <label class="text-xs font-medium">Level (1–{PROGRESSION["leveling"]["playerLevelCap"]})<input id="pl-level" type="number" min="1" max="{PROGRESSION["leveling"]["playerLevelCap"]}" value="{PROGRESSION["leveling"]["playerLevelCap"]}" class="mt-1 {field}"></label>
     <label class="text-xs font-medium">Flame level (1–{PROGRESSION["flame"]["flameLevelCap"]})<input id="pl-flame" type="number" min="1" max="{PROGRESSION["flame"]["flameLevelCap"]}" value="{PROGRESSION["flame"]["flameLevelCap"]}" class="mt-1 {field}"></label>
   </div>
-  <details class="rounded-md border px-3 py-2 text-sm"><summary class="flex items-center justify-between text-xs font-medium">Explored biomes (Shroud Roots &amp; Elixir Wells) <span class="text-muted-foreground">▾</span></summary><div class="mt-2 space-y-0.5">{biomes}</div></details>
+  <details class="rounded-md border px-3 py-2 text-sm"><summary class="flex items-center justify-between text-xs font-medium">Explored biomes (Shroud Roots &amp; Elixir Wells) <span class="text-muted-foreground">▾</span></summary><div class="mt-2 space-y-0.5">{biomes}</div>
+  <p class="mt-2 text-xs text-muted-foreground">A full biome means every Shroud Root and Elixir Well in it. Missed a few? Enter the total from your in-game skill tree instead.</p>
+  <label class="mt-2 block text-xs font-medium">My total skill points (optional)<input id="pl-points" type="number" min="1" max="999" placeholder="Use level and biomes" class="mt-1 {field}"></label></details>
   <div><p class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Attributes</p><ul id="pl-attrs" class="space-y-1 text-sm"></ul></div>
   <label class="block text-xs font-medium">Build name for the image (optional)<input id="pl-name" type="text" maxlength="40" placeholder="e.g. Frost Necro" class="mt-1 {field}"></label>
   <div class="flex gap-2"><button id="pl-copy" type="button" class="inline-flex h-9 flex-1 items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90">Copy build link</button>

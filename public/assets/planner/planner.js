@@ -21,7 +21,7 @@
   });
   D.edges.forEach(function (e) { ADJ[e[0]].push(e[1]); ADJ[e[1]].push(e[0]); });
 
-  var svg = $('#tree-svg'), view = $('#tree-view'), lv = $('#pl-level'), fl = $('#pl-flame'), pre = $('#pl-preset');
+  var svg = $('#tree-svg'), view = $('#tree-view'), lv = $('#pl-level'), fl = $('#pl-flame'), pre = $('#pl-preset'), pts = $('#pl-points');
   var vt = { k: 1, x: 0, y: 0 };
   function el(tag, attrs, parent) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
   function type(id) { return T[N[id].t]; }
@@ -55,6 +55,7 @@
 
   // ---------- rules
   function budget() {
+    var own = parseInt(pts.value, 10); if (own > 0) return own;
     var l = Math.max(1, Math.min(D.levelCap, +lv.value || 1)), b = 2 * (l - 1);
     document.querySelectorAll('[data-biome]').forEach(function (c) { if (c.checked) b += +c.getAttribute('data-points'); });
     return b;
@@ -137,7 +138,8 @@
     var code = ORDER.map(function (id) { return B36[sel[id] || 0]; }).join('').replace(/0+$/, '');
     var bm = 0; document.querySelectorAll('[data-biome]').forEach(function (c, i) { if (c.checked) bm |= 1 << i; });
     var c = packCode(bm);
-    history.replaceState(null, '', c ? '#c=' + c : '#t=' + code + '&l=' + lv.value + '&e=' + bm + '&f=' + fl.value + (pre.value ? '&b=' + pre.value : ''));
+    var own = parseInt(pts.value, 10) > 0 ? '&p=' + parseInt(pts.value, 10) : '';
+    history.replaceState(null, '', (c ? '#c=' + c : '#t=' + code + '&l=' + lv.value + '&e=' + bm + '&f=' + fl.value + (pre.value ? '&b=' + pre.value : '')) + own);
   }
 
   // ---------- short share code: one mixed-radix number in base62 (a taken bit per node, plus rank for multi-rank nodes)
@@ -229,6 +231,7 @@
   function loadPreset(b, stage) {
     var st = STAGE[stage], p = D.presets[st ? b + ':' + stage : b] || {};
     sel = {}; for (var id in p) sel[id] = p[id];
+    pts.value = '';
     lv.value = st ? st[0] : D.levelCap;
     document.querySelectorAll('[data-biome]').forEach(function (c, i) { c.checked = !st || i < st[1]; });
   }
@@ -243,7 +246,7 @@
       document.getElementById('planner').scrollIntoView({ behavior: 'smooth' });
     });
   });
-  [lv, fl].forEach(function (x) { x.addEventListener('input', render); });
+  [lv, fl, pts].forEach(function (x) { x.addEventListener('input', render); });
   document.querySelectorAll('[data-biome]').forEach(function (c) { c.addEventListener('change', render); });
   $('#pl-reset').addEventListener('click', function () { if (!Object.keys(sel).length || window.confirm('Reset every skill point?')) { sel = {}; pre.value = ''; render(); } });
   $('#pl-copy').addEventListener('click', function () {
@@ -356,7 +359,7 @@
       var okc = reachable(null); Object.keys(sel).forEach(function (id) { if (!okc[id]) delete sel[id]; });
       delete h.l; delete h.f; delete h.e; delete h.t;
     }
-    if (h.l) lv.value = h.l; if (h.f) fl.value = h.f;
+    if (h.l) lv.value = h.l; if (h.f) fl.value = h.f; if (+h.p > 0) pts.value = +h.p;
     if (h.e !== undefined) document.querySelectorAll('[data-biome]').forEach(function (c, i) { c.checked = !!(+h.e & (1 << i)); });
     if (h.t !== undefined) {
       sel = {};
