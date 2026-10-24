@@ -367,7 +367,7 @@ POSTS = [
      "body": ranger_post},
     {"slug": "enshrouded-battlemage-before-after-1-0", "date": "2026-10-24",
      "title": "Enshrouded Battlemage Before vs After 1.0: Wands Reworked",
-     "description": "How wands changed in Enshrouded 1.0: heavy attack, Wand Evasion Attack, Aerial Wand Attack, Blast and Cast, ward repairs, leech changes and how to skill now.",
+     "description": "How wands changed in Enshrouded 1.0: heavy attack, Wand Evasion Attack, Aerial Wand Attack, Blast and Cast, ward repairs, leech changes and skill order.",
      "h1": "Enshrouded Battlemage: Wand Builds Before and After Update 1.0",
      "summary": "A heavy attack, two new wand attack skills, Blast and Cast, uninterruptible specials, ward repairs and the leech rebalance: the Battlemage before and after 1.0.",
      "body": battlemage_post},
