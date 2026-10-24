@@ -10,6 +10,8 @@
   var T = D.types, N = {}, ORDER = [], ADJ = {}, sel = {}, focus = null, query = '', zoomTo = null;
   var FLAME = { THICK_SKIN: 'CONS', BARBARIAN: 'STR', EXALTED: 'INT', ARCANE_CONCENTRATION: 'SPIRIT', GRACEFUL_STRIDE: 'DEX', ENDURANCE_OF_THE_FLAME: 'ENDURANCE' };
   var B36 = '0123456789abcdefghijklmnopqrstuvwxyz';
+  var B62 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  var BUILDS = Object.keys(D.presets).filter(function (k) { return k.indexOf(':') < 0; });
   // GA4 events; no-op when analytics is not loaded (offline copies, blockers)
   var started = false;
   function track(name, params) { try { if (window.gtag) window.gtag('event', name, params || {}); } catch (e) {} }
@@ -134,7 +136,38 @@
     info();
     var code = ORDER.map(function (id) { return B36[sel[id] || 0]; }).join('').replace(/0+$/, '');
     var bm = 0; document.querySelectorAll('[data-biome]').forEach(function (c, i) { if (c.checked) bm |= 1 << i; });
-    history.replaceState(null, '', '#t=' + code + '&l=' + lv.value + '&e=' + bm + '&f=' + fl.value + (pre.value ? '&b=' + pre.value : ''));
+    var c = packCode(bm);
+    history.replaceState(null, '', c ? '#c=' + c : '#t=' + code + '&l=' + lv.value + '&e=' + bm + '&f=' + fl.value + (pre.value ? '&b=' + pre.value : ''));
+  }
+
+  // ---------- short share code: one mixed-radix number in base62 (a taken bit per node, plus rank for multi-rank nodes)
+  function clampInt(v, lo, hi) { v = parseInt(v, 10); return isNaN(v) ? hi : Math.max(lo, Math.min(hi, v)); }
+  function biomeCount() { return document.querySelectorAll('[data-biome]').length; }
+  function packCode(bm) {
+    if (typeof BigInt === 'undefined') return null;
+    var n = BigInt(0), mul = BigInt(1), b62 = BigInt(62), s = '';
+    function put(d, r) { n += BigInt(d) * mul; mul *= BigInt(r); }
+    put(BUILDS.indexOf(pre.value) + 1, BUILDS.length + 1);
+    put(clampInt(lv.value, 1, +lv.max), +lv.max + 1);
+    put(clampInt(fl.value, 1, +fl.max), +fl.max + 1);
+    put(bm, 1 << biomeCount());
+    ORDER.forEach(function (id) { var r = sel[id] || 0, m = type(id).m; put(r ? 1 : 0, 2); if (r && m > 1) put(r - 1, m); });
+    while (n > 0) { s = B62[Number(n % b62)] + s; n /= b62; }
+    return '1' + s;
+  }
+  function unpackCode(c) {
+    if (typeof BigInt === 'undefined' || c[0] !== '1') return false;
+    var n = BigInt(0), b62 = BigInt(62);
+    for (var i = 1; i < c.length; i++) { var d = B62.indexOf(c[i]); if (d < 0) return false; n = n * b62 + BigInt(d); }
+    function take(r) { var R = BigInt(r), d = Number(n % R); n /= R; return d; }
+    var b = take(BUILDS.length + 1);
+    pre.value = b ? BUILDS[b - 1] : '';
+    lv.value = take(+lv.max + 1); fl.value = take(+fl.max + 1);
+    var bm = take(1 << biomeCount());
+    document.querySelectorAll('[data-biome]').forEach(function (x, i) { x.checked = !!(bm & (1 << i)); });
+    sel = {};
+    ORDER.forEach(function (id) { var m = type(id).m; if (take(2)) sel[id] = m > 1 ? take(m) + 1 : 1; });
+    return true;
   }
   function info() {
     var box = $('#pl-info');
@@ -318,7 +351,11 @@
   (function fromHash() {
     var h = {}; location.hash.slice(1).split('&').forEach(function (kv) { var a = kv.split('='); if (a[0]) h[a[0]] = decodeURIComponent(a[1] || ''); });
     if (h.b && D.presets[h.b]) { loadPreset(h.b, +h.s || 0); pre.value = h.b; track('planner_preset_load', { build: h.b, stage: +h.s ? String(+h.s) : 'full', source: 'link' }); }
-    else if (h.t) track('planner_shared_build_open', {});
+    else if (h.c || h.t) track('planner_shared_build_open', {});
+    if (h.c && unpackCode(h.c)) {
+      var okc = reachable(null); Object.keys(sel).forEach(function (id) { if (!okc[id]) delete sel[id]; });
+      delete h.l; delete h.f; delete h.e; delete h.t;
+    }
     if (h.l) lv.value = h.l; if (h.f) fl.value = h.f;
     if (h.e !== undefined) document.querySelectorAll('[data-biome]').forEach(function (c, i) { c.checked = !!(+h.e & (1 << i)); });
     if (h.t !== undefined) {
