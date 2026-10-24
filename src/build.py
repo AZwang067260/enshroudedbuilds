@@ -199,6 +199,9 @@ def build_page(b):
     stages = (f'<h3 id="stages">{n} build by level: points per stage</h3><p>Your budget grows with your level and the biomes you explore: 2 points per level plus the Shroud Roots and Elixir Wells of each finished biome. '
               f'Each card opens a planner preset for that stage that follows real paths through the 1.0 skill tree.</p>'
               f'<div class="my-5 grid gap-3 sm:grid-cols-3">{stage_cards}</div>')
+    post = next((q for q in published_posts() if q["slug"] == f'enshrouded-{b["slug"]}-before-after-1-0'), None)
+    if post:
+        stages += f'<p>How this build changed in the update, skill by skill: <a href="/blog/{post["slug"]}/">{e(n)} before and after 1.0</a>.</p>'
 
     full_spent = build_preset(b["slug"])[1]
     quick_answer = (f'<div class="not-prose mb-8 rounded-lg border border-primary/40 bg-primary/5 p-5" id="quick-answer"><p class="text-xs font-semibold uppercase tracking-wide text-primary">Quick answer</p>'
