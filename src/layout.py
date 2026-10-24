@@ -12,6 +12,7 @@ UPDATED_HUMAN = "October 20, 2026"
 GAME_VERSION = "1.0.0.2 (Steam build 1269579)"
 # Google Analytics 4 measurement ID (e.g. "G-XXXXXXXXXX"); leave empty to disable tracking
 GA_ID = "G-ZFZ6Q4KKHS"
+ADSENSE_CLIENT = "ca-pub-7872976152483576"  # must match ads.txt
 
 NAV = [
     ("/builds/", "All Builds"),
@@ -218,6 +219,11 @@ def analytics():
             f"gtag('js',new Date());gtag('config','{GA_ID}');</script>\n")
 
 
+def adsense():
+    return (f'<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={ADSENSE_CLIENT}"'
+            ' crossorigin="anonymous"></script>\n')
+
+
 def page(*, path, title, description, body, builds, active="", schemas=(), og_type="article", keywords="", og_image="/og-image.png", og_alt="Best Enshrouded Builds for 1.0 - EnshroudedBuilds.org"):
     url = SITE + path
     graph = [{"@type": "WebSite", "@id": SITE + "/#website", "url": SITE + "/", "name": SITE_NAME,
@@ -252,7 +258,7 @@ def page(*, path, title, description, body, builds, active="", schemas=(), og_ty
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-{analytics()}<script>{THEME_BOOT}</script>
+{analytics()}{adsense()}<script>{THEME_BOOT}</script>
 <link rel="stylesheet" href="/assets/styles.css">
 <script type="application/ld+json">{ld}</script>
 </head>
