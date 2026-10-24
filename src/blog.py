@@ -241,7 +241,7 @@ def _full_text(name):
     def clean(d):
         d = d.replace("</b><br/>", ": ").replace("<br/>", " ")
         return re.sub(r"\{\{(\w+)\}\}", sub, re.sub(r"<[^>]+>", "", d)).strip()
-    return " ".join(clean(d) for d in t.get("description", []))
+    return re.sub(r"\s+", " ", " ".join(clean(d) for d in t.get("description", [])))
 
 
 def ranger_post():
@@ -291,6 +291,54 @@ def ranger_post():
 '''
 
 
+def battlemage_post():
+    from content_builds import BUILDS
+    bb = next(b for b in BUILDS if b["slug"] == "battlemage")
+    wand_new = ["Wand Evasion Attack", "Aerial Wand Attack", "Blast and Cast"]
+    stage, stage_budget = _stage_has("battlemage", wand_new)
+    ev_pts, _ = _max_from_scratch("Wand Evasion Attack")
+    new_table = table(["Skill", "Area / group", "Cost", "In-game text"], [
+        [f"<strong>{n}</strong>", f"{OUR[n][0]} / {OUR[n][1]}", _ranks(n), e(_full_text(n))] for n in wand_new])
+    group = [n for n, o in OUR.items() if o[1] == "Battlemage" and "Wand" in _full_text(n) and n not in wand_new]
+    group_table = table(["Skill", "Cost", "In-game effect at max rank"], [[f"<strong>{n}</strong>", _ranks(n), e(_full_text(n))] for n in group])
+    compare = table(["", "Before 1.0", "In 1.0"], [
+        ["Attacks", "Light attack and the wand special ability", "A heavy attack from the start, plus Wand Evasion Attack and Aerial Wand Attack as skills"],
+        ["Special ability", "Could be interrupted by enemy attacks", "No longer interrupted while casting"],
+        ["Targeting", "Shared auto-target with other weapons", "Range-aware wand targeting, faster hard-lock switching, an optional free-aim mode, and explosive barrels can be targeted"],
+        ["Wand + staff", "Two separate weapons", "Blast and Cast: a wand crit gives the next staff attack +50% base damage"],
+        ["Wards", "Not repaired at camp anvils", "Anvils in enemy camps repair equipped wards and shields; wards renamed for consistency"],
+        ["Leech perks", "Percentage leech, strong in the late game", "Flat leech early; percentage leech kept for specific late-game weapons and gear"],
+    ])
+    core = [k for k in PRESETS["battlemage"] if not k.endswith(" node")]
+    return f'''
+<p>The wand was already the easiest way to play magic in Enshrouded, but before 1.0 it had one attack and a special ability that enemies could knock you out of. Update 1.0 gave it a full moveset and tied it to the staff. This post compares the Battlemage before and after 1.0, with skill values from the 1.0 game files (build {BUILD_ID}) and quotes from Keen Games' 1.0 changelog.</p>
+<p><strong>Short version:</strong> wands now have a heavy attack from the start, two new attack skills (Wand Evasion Attack and Aerial Wand Attack), a staff combo (Blast and Cast), uninterruptible special abilities and much better targeting. Wards can now be repaired at camp anvils, and leech perks were rebalanced. The three new skills cost {_total(wand_new)} points together.</p>
+<h2 id="what-changed">What changed for wands in 1.0</h2>
+<ul class="dots">
+<li><strong>A full moveset.</strong> "Wand gameplay has been expanded with a heavy attack that is immediately available, as well as unlockable evasive and aerial attacks as active skills."</li>
+<li><strong>No more interrupted specials.</strong> "Wand special abilities don't get interrupted by enemy attacks while casting anymore."</li>
+<li><strong>Targeting.</strong> Wand targeting "now better considers the maximum range of the projectile of each individual wand", hard-lock target switching with wands is "possible much faster after the attack", and "a new free aiming mode for wand gameplay has been added to the combat section in the gameplay settings". You can also target explosive barrels with wands now.</li>
+<li><strong>Wand and staff work together.</strong> The new Blast and Cast skill rewards switching to a staff right after a wand crit.</li>
+</ul>
+<h2 id="wards-and-gear">Wards, shields and leech perks</h2>
+<p>Two gear changes matter for a Battlemage who carries a ward or shield. First, "anvils found in enemy camps now finally repair equipped shields and wards", so long trips no longer end with a broken off-hand. Wards were also renamed for consistency, so don't be surprised if yours has a new name.</p>
+<p>Second, Keen rebalanced leech: "In version 0.8 percentage based leech perks were too strong in the late game." Now "perks with leech now use a flat value" early on, and "the very valuable percentage leech is reserved for specific weapons and gear" in the late game. If your old build relied on percentage mana or health leech, expect less of it until you find those items. Unity and Arcane Deflection, which restore mana from the skill tree, matter more as a result.</p>
+<h2 id="new-skills">The three new wand skills</h2>
+{new_table}
+<p><strong>Wand Evasion Attack</strong> is the best of the three for a Battlemage: you dodge all the time anyway, and now every dodge fires a piercing disc. <strong>Aerial Wand Attack</strong> is cheap utility. <strong>Blast and Cast</strong> sits in the Trickster group and pays off if you carry a staff as your second weapon. The <a href="/blog/enshrouded-1-0-new-skills/">new 1.0 skills post</a> compares all eight.</p>
+<h2 id="wand-skills">The other wand skills in the Battlemage group</h2>
+<p>The rest of the wand kit in the Battlemage group, with the 1.0 in-game text at max rank:</p>
+{group_table}
+<h2 id="compare">Battlemage before vs after 1.0</h2>
+{compare}
+<h2 id="how-to-skill">How to skill a Battlemage in 1.0</h2>
+<p>Wand Evasion Attack costs <strong>{ev_pts} points</strong> from an empty tree by the cheapest path, and our planner preset already has all three new wand skills by the end of the <strong>{stage.lower()}</strong> stage ({stage_budget} points). The full core of our Battlemage preset: {", ".join(e(c) for c in core)}.</p>
+<p>Load the <a href="/skill-planner/#b=battlemage&amp;s=1">level 1–15 Battlemage preset</a> or the <a href="/skill-planner/#b=battlemage">full level 50 build</a> in the planner. The <a href="/builds/battlemage/">Battlemage build guide</a> has the complete skill order, wands, wards and spells, and the <a href="/skill-tree/mage/">Mage skill tree page</a> lists every skill in the area.</p>
+<h2 id="worth-it">Is the Battlemage still the best build in 1.0?</h2>
+<p>For most players, yes. Our tier list keeps it at <strong>{bb["tier"]}-tier</strong> and calls it the easiest strong solo build: the ward covers mistakes, and Unity and Arcane Deflection keep the mana flowing even with weaker leech. Its main trade-off: {e(bb["cons"][0].lower())}. If you want that burst, look at the <a href="/builds/wizard/">Wizard</a>, or read how the <a href="/blog/enshrouded-necromancer-before-after-1-0/">Necromancer</a> and <a href="/blog/enshrouded-ranger-before-after-1-0/">Ranger</a> changed in 1.0.</p>
+'''
+
+
 # slug, publish date, title (<=60), description (<=155), H1, body function
 POSTS = [
     {"slug": "enshrouded-1-0-new-skills", "date": "2026-10-20",
@@ -317,4 +365,10 @@ POSTS = [
      "h1": "Enshrouded Ranger: Bow Builds Before and After Update 1.0",
      "summary": "Eternal arrows, three new archer skills, faster target switching and reworked ranged armor: what 1.0 changed for bows and how to skill a Ranger now.",
      "body": ranger_post},
+    {"slug": "enshrouded-battlemage-before-after-1-0", "date": "2026-10-24",
+     "title": "Enshrouded Battlemage Before vs After 1.0: Wands Reworked",
+     "description": "How wands changed in Enshrouded 1.0: heavy attack, Wand Evasion Attack, Aerial Wand Attack, Blast and Cast, ward repairs, leech changes and how to skill now.",
+     "h1": "Enshrouded Battlemage: Wand Builds Before and After Update 1.0",
+     "summary": "A heavy attack, two new wand attack skills, Blast and Cast, uninterruptible specials, ward repairs and the leech rebalance: the Battlemage before and after 1.0.",
+     "body": battlemage_post},
 ]
