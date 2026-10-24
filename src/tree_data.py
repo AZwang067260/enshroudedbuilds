@@ -136,7 +136,40 @@ def build_preset(build, budget=212):
             sel[nid] += 1
         else:
             take(nid, 1)
+    if budget >= 212:
+        tweak_full(build, sel)
     return sel, spent()
+
+
+# Level 50 presets only: travel skills players expect (Updraft, plus 1 rank of Airborne), paid for
+# by trimming low-value ranks (co-op revive health, Shroud/climbing perks, proc reflects).
+FULL_TWEAKS = {
+    "wizard": {"Updraft": 1, "Airborne": 1, "Healing Revive": 1, "Shroud Resistance": 2},
+    "battlemage": {"Updraft": 1, "Airborne": 1, "Healing Revive": 1, "Shroud Resistance": 1, "Counterstrike": 2},
+    "necromancer": {"Updraft": 1, "Airborne": 1, "Healing Revive": 1, "Shroud Resistance": 1},
+    "healer": {"Updraft": 1, "Airborne": 1, "Counterstrike": 1, "Shroud Resistance": 1},
+    "warrior": {"Updraft": 1},
+    "tank": {"Updraft": 1, "Purification": 0},
+    "barbarian": {"Updraft": 1, "Purification": 1},
+    "ranger": {"Updraft": 1, "Arachnoid": 2},
+}
+
+
+def tweak_full(build, sel):
+    for name, rank in FULL_TWEAKS.get(build, {}).items():
+        nid = nodes_named(name)[0]
+        if rank:
+            sel[nid] = rank
+        else:
+            sel.pop(nid, None)
+    assert sum(cost(n) * r for n, r in sel.items()) <= 212, build
+    seen, todo = set(), [n for n in sel if NODES[n].get("base")]
+    while todo:
+        n = todo.pop()
+        if n not in seen:
+            seen.add(n)
+            todo += [m for m in ADJ[n] if m in sel]
+    assert seen == set(sel), f"{build}: preset tweak disconnects the tree"
 
 
 def stage_budget(level, biome_count):
