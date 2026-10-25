@@ -196,6 +196,7 @@ def footer(builds):
       <li><a href="/classes/" class="hover:text-foreground">Enshrouded Classes</a></li>
       <li><a href="/respec/" class="hover:text-foreground">How to Respec</a></li>
       <li><a href="/skill-points/" class="hover:text-foreground">Skill Points</a></li>
+      <li><a href="/summon-spells/" class="hover:text-foreground">Summon Spells</a></li>
       <li><a href="/builds/" class="hover:text-foreground">All Builds</a></li>
       <li><a href="/blog/" class="hover:text-foreground">Blog</a></li>
     </ul></div>

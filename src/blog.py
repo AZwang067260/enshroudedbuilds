@@ -55,7 +55,7 @@ def new_skills_post():
 <p><strong>Wand Evasion Attack</strong> (Battlemage) fires a magical disc when you press the use-item key while evading. The disc pierces enemies and deals 50% additional weapon damage, for 50 mana. Battlemages dodge constantly, so this is free damage on top of movement you were going to make anyway.</p>
 <p><strong>Aerial Wand Attack</strong> (Battlemage) adds a special attack when you hold the use-item key during a jump. It costs 25 stamina. It's the weakest of the three on its own, but it is cheap and sits on the path most wand builds walk anyway.</p>
 <h2 id="summoner">Summoner: Advanced Necromancy and Totem Mastery</h2>
-<p>These two skills are why the <a href="/builds/necromancer/">Necromancer</a> exists as a real build in 1.0. Each has three ranks and both together cost <strong>{_total(summon)} points</strong>. They don't add damage directly. They raise how many summons you can keep up at once, which matters because 1.0 also added four summon spells: Summon Fire Totem, Summon Ice Totem, Summon Shock Totem and Summon Hollow Skeleton.</p>
+<p>These two skills are why the <a href="/builds/necromancer/">Necromancer</a> exists as a real build in 1.0. Each has three ranks and both together cost <strong>{_total(summon)} points</strong>. They don't add damage directly. They raise how many summons you can keep up at once, which matters because 1.0 also added four summon spells: Fire Totem, Ice Totem, Shock Totem and Hollow Wretch, the skeleton summon.</p>
 {ranked(summon)}
 <p>Healers can take Totem Mastery too: an Ice Totem slows enemies that are chasing the group, which keeps your allies alive without a single heal.</p>
 <h2 id="archer">Archer: Puncture, Barrage and Survival Instinct</h2>

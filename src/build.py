@@ -7,7 +7,7 @@ import shutil
 import subprocess
 
 from art import ART, alt_text, build_svg
-from blog import POSTS, _biome_rows, _tree_numbers
+from blog import POSTS, _biome_rows, _full_text, _max_from_scratch, _tree_numbers
 from content_builds import BUILDS
 from planner import PLANNER_FAQ, client_payload, planner_page, skills_table
 from skills_data import PRESETS, TREE
@@ -73,6 +73,7 @@ HUBS = [
     ("/classes/", "Enshrouded Classes", "No fixed classes: all 12 archetypes and which one to play."),
     ("/respec/", "How to Respec (1.0)", "Reset your skill tree at a Flame Altar: cost per stage and how to plan it."),
     ("/skill-points/", "Skill Points (1.0)", "How many skill points you get: 212 at level 50, by level and by biome."),
+    ("/summon-spells/", "Summon Spells (1.0)", "How to summon skeletons and totems: every spell, recipe and summon cap."),
     ("/builds/", "All Enshrouded Builds", "Compare every class build by role, stats and difficulty."),
 ]
 
@@ -341,7 +342,7 @@ def home():
     <li><strong>Full skill tree reset</strong> for every character. Points are refunded and your level is kept.</li>
     <li><strong>Level cap raised from 45 to 50</strong>, and gear now goes up to <strong>level 55</strong>.</li>
     <li><strong>Eight new skills</strong>: five for mages (Advanced Necromancy, Totem Mastery, Aerial Wand Attack, Wand Evasion Attack, Blast and Cast) and three for archers (Puncture, Barrage, Survival Instinct).</li>
-    <li><strong>Nine new spells</strong>, including summons: Mana Drain, Entangle, Pillar of Flames, Blizzard, Ball Lightning, Summon Fire/Ice/Shock Totem and Summon Hollow Skeleton.</li>
+    <li><strong>Nine new spells</strong>, including summons: Mana Drain, Entangle, Pillar of Flames, Blizzard, Ball Lightning, Fire, Ice and Shock Totem and Hollow Wretch (a skeleton summon).</li>
     <li><strong>22 Eternal spells and new Eternal arrows</strong> that can be upgraded and don't use up spell charges or ammo (Eternal arrows cost mana instead).</li>
     <li><strong>Dagger skills moved</strong> from the Warrior tree to the Assassin tree, and many existing skills got cheaper or stronger.</li>
   </ul>
@@ -482,7 +483,7 @@ ONE_FAQ = [
 ("When was Enshrouded 1.0 released?", "October 15, 2026, on Steam (PC) and PlayStation 5. The Xbox version is planned for 2027."),
 ("Do I lose my character in Enshrouded 1.0?", "No. Existing saves carry over. Only the skill tree is reset, and all points are refunded."),
 ("What is the best build after the 1.0 update?", "For most players, the <a href='/builds/battlemage/'>Battlemage</a>, which nearly every 1.0 guide ranks first, or the new <a href='/builds/necromancer/'>Necromancer</a>. For pure area damage, the <a href='/builds/wizard/'>Wizard</a>. For melee, the <a href='/builds/barbarian/'>Barbarian</a>. See our <a href='/tier-list/'>tier list</a>."),
-("What new spells are in Enshrouded 1.0?", "Mana Drain, Entangle, Pillar of Flames, Blizzard, Ball Lightning, Summon Fire Totem, Summon Ice Totem, Summon Shock Totem and Summon Hollow Skeleton."),
+("What new spells are in Enshrouded 1.0?", "Mana Drain, Entangle, Pillar of Flames, Blizzard, Ball Lightning, Fire Totem, Ice Totem, Shock Totem and Hollow Wretch (a skeleton summon)."),
 ("Is there crossplay in Enshrouded 1.0?", "There is no crossplay at launch."),
 ]
 
@@ -618,7 +619,7 @@ def one_point_oh():
 PATCH_FAQ = [
 ("When were the Enshrouded 1.0 patch notes released?", "Update 1.0 went live on October 15, 2026 on PC (Steam) and PlayStation 5, ending Early Access. The Xbox version is planned for 2027."),
 ("What are the new skills in Enshrouded 1.0?", "Eight new skills: five for mages (Advanced Necromancy, Totem Mastery, Aerial Wand Attack, Wand Evasion Attack, Blast and Cast) and three for archers (Puncture, Barrage, Survival Instinct)."),
-("What are the new spells in Enshrouded 1.0?", "Nine new spells: Mana Drain, Entangle, Pillar of Flames, Blizzard, Ball Lightning, Summon Fire Totem, Summon Ice Totem, Summon Shock Totem and Summon Hollow Skeleton."),
+("What are the new spells in Enshrouded 1.0?", "Nine new spells: Mana Drain, Entangle, Pillar of Flames, Blizzard, Ball Lightning, Fire Totem, Ice Totem, Shock Totem and Hollow Wretch (a skeleton summon)."),
 ("Did Enshrouded 1.0 reset my skill tree?", "Yes. Every character's skill tree was reset and all skill points were refunded the first time you load your save in 1.0. Your level, items and base are kept."),
 ("What is the new level cap in Enshrouded 1.0?", "The player level cap went up from 45 to 50, and gear now goes up to level 55. A level 50 character has 212 skill points in total."),
 ("Does Enshrouded 1.0 have crossplay?", "No, there is no crossplay at launch."),
@@ -644,10 +645,10 @@ def patch_notes():
         ["<strong>Ball Lightning</strong>", "Shock damage", "Mobile damage that chases targets"],
         ["<strong>Mana Drain</strong>", "Utility", "Mana sustain in long fights"],
         ["<strong>Entangle</strong>", "Control", "Roots enemies in place"],
-        ["<strong>Summon Fire Totem</strong>", "Summon", "Stationary fire damage"],
-        ["<strong>Summon Ice Totem</strong>", "Summon", "Slows enemies near it"],
-        ["<strong>Summon Shock Totem</strong>", "Summon", "Stationary shock damage"],
-        ["<strong>Summon Hollow Skeleton</strong>", "Summon", "Minion that fights and draws aggro"],
+        ["<strong>Fire Totem</strong>", "Summon", "Stationary fire damage"],
+        ["<strong>Ice Totem</strong>", "Summon", "Slows enemies near it"],
+        ["<strong>Shock Totem</strong>", "Summon", "Stationary shock damage"],
+        ["<strong>Hollow Wretch</strong> (skeleton)", "Summon", "Minion that fights and draws aggro"],
     ])
     glance = table(["Change", "Before 1.0", "In Update 1.0"], [
         ["Release", "Early Access", "<strong>Full release, October 15, 2026</strong> (PC & PS5)"],
@@ -1280,6 +1281,88 @@ def skill_points():
                      schemas=[article_schema(path, title, desc), cs, faq_schema(faq)]), "0.8")
 
 
+def summon_spells():
+    from summon_data import SPELLS, wiki_url
+    path = "/summon-spells/"
+    ch, cs = breadcrumb([("/", "Home"), ("/builds/necromancer/", "Necromancer"), (path, "Summon Spells")])
+    kind = {"skeleton": "Skeleton (Hollow ally)", "fire": "Fire totem", "ice": "Ice totem", "shock": "Shock totem"}
+    overview = table(["Spell", "Type", "Level", "Mana", "Damage", "Lasts", "Extra effect"], [
+        [f"<strong>{e(n)}</strong>", kind[k], str(lv), str(mana), str(dmg), f"{dur}s", e(fx) or "Attacks enemies"]
+        for n, k, lv, _, mana, dmg, dur, fx, *_ in SPELLS])
+    def recipes(kinds):
+        return table(["Spell", "Crafter", "Station", "Ingredients", "You get"], [
+            [f"<strong>{e(n)}</strong>", crafter, station or "-", ", ".join(f"{q} {e(i)}" for i, q in ing), f"{out} {'charges' if out > 1 else '(Eternal, no charges)'}"]
+            for n, k, _, _, _, _, _, _, crafter, station, ing, out in SPELLS if k in kinds])
+    an_c, an_r = skill_cost("Advanced Necromancy")
+    tm_c, tm_r = skill_cost("Totem Mastery")
+    cap_table = table(["Skill", "Cost", "Rank 1", "Rank 2", "Rank 3"], [
+        [f"<strong>{n}</strong>", f"{c} pt per rank"] + [e(game_text(n, r)) for r in range(1, rr + 1)]
+        for n, c, rr in (("Advanced Necromancy", an_c, an_r), ("Totem Mastery", tm_c, tm_r))])
+    an_pts, _ = _max_from_scratch("Advanced Necromancy")
+    tm_pts, _ = _max_from_scratch("Totem Mastery")
+    wretch1 = SPELLS[0]
+    faq = [
+        ("How do you summon skeletons in Enshrouded?", f"Cast the Hollow Wretch spell from a staff. Hollow Wretch I is a level {wretch1[2]} spell crafted by the Collector from {wretch1[10][0][1]} Ectoplasm Fragment and {wretch1[10][1][1]} Bones, which gives {wretch1[11]} charges."),
+        ("What is the skeleton summon spell called in Enshrouded?", "Hollow Wretch. There are four versions: Hollow Wretch I and II, and Eternal Hollow Wretch I and II, which never run out of charges."),
+        ("How many skeletons can you summon in Enshrouded?", f"1 by default. Advanced Necromancy adds up to 3 more ({an_c} points per rank), for 4 Hollow allies from spells."),
+        ("How many totems can you have out at once?", f"1 by default. Totem Mastery adds up to 3 more ({tm_c} points per rank), for 4 totems."),
+        ("Where do you get totem spells in Enshrouded?", "The Alchemist crafts them. Tier I totems are made at an Alchemy Station; the higher tiers and Eternal totems need a Laboratory."),
+        ("Is there a limit on summons in Enshrouded 1.0?", "Yes. Besides the per-spell caps, the 1.0 changelog says the game counts the active creatures spawned by players and enforces a maximum: when you go over it, the oldest creature is replaced."),
+    ]
+    srcs = [(wiki_url(n), f"Enshrouded Wiki: {n}") for n in ("Hollow Wretch I", "Fire Totem I", "Ice Totem I", "Shock Totem I", "Gem of Lesser Necromancy")]
+    srcs.append(("https://enshrouded.wiki.gg/wiki/1.0_Update", "Enshrouded Wiki: 1.0 Update changelog"))
+    body = f'''
+<div class="hero-glow border-b"><div class="container py-12">{ch}
+<div class="flex flex-wrap gap-2">{badge("Enshrouded 1.0", "primary")}{badge("Updated " + UPDATED_HUMAN, "outline")}</div>
+<h1 class="mt-4 text-3xl font-bold tracking-tight md:text-5xl">How to Summon Skeletons and Totems in Enshrouded 1.0</h1>
+<p class="mt-4 max-w-3xl text-lg text-muted-foreground">The skeleton summon is a spell called <strong>Hollow Wretch</strong>, crafted by the Collector. The Fire, Ice and Shock totems come from the Alchemist. You can keep 1 of each kind out by default and up to 4 with two skills. Here is every summon spell, its recipe and how to raise the cap.</p>
+<div class="mt-6 flex flex-wrap gap-3">{button("/builds/necromancer/", "Necromancer build")}{button("#skeletons", "Skeleton recipes", "outline")}</div></div></div>
+<div class="container py-10"><article class="prose-eb mx-auto max-w-4xl">
+<h2 class="!mt-0" id="all">Every summon spell in Enshrouded 1.0</h2>
+<p>Update 1.0 added summoning to the game: "Players can now actively summon skeletons to fight alongside them", in the changelog's words. There are four skeleton spells and seven totem spells. Stats are base values from the Enshrouded Wiki, before staff, skill and Intelligence bonuses:</p>
+{overview}
+<p>Spells marked Eternal don't use charges: you craft them once and keep them. The changelog says every spell in 1.0 has an Eternal version, and Eternal spells can be upgraded like weapons.</p>
+<h2 id="skeletons">How to get the skeleton spell (Hollow Wretch)</h2>
+<p>All Hollow Wretch spells are crafted by the <strong>Collector</strong>. The first one only needs Bones and Ectoplasm Fragments, which Hollow enemies drop in the Springlands and Revelwood Hollow Halls:</p>
+{recipes({"skeleton"})}
+<p>A Hollow Wretch is an ally that attacks enemies with Cutting and Ice damage and stays for 60 to 120 seconds depending on the tier. Its mana cost is high ({wretch1[4]} for the first tier), so cast it before the fight starts.</p>
+<h2 id="totems">How to get totem spells</h2>
+<p>All totems are crafted by the <strong>Alchemist</strong>. Tier I totems need an Alchemy Station; Ice Totem II, Shock Totem II and all Eternal totems need a Laboratory:</p>
+{recipes({"fire", "ice", "shock"})}
+<h2 id="which-totem">Which totem to use</h2>
+<ul class="dots">
+<li><strong>Fire Totem:</strong> the highest damage per tier, and it explodes when it expires. Best for damage.</li>
+<li><strong>Ice Totem:</strong> its projectiles slow enemies by 50% for 5 seconds, so enemies take longer to reach you.</li>
+<li><strong>Shock Totem:</strong> the cheapest totem to cast, and its hits deal Stamina damage that fills the enemy's stun bar. The Stamina damage scales with your Intelligence.</li>
+</ul>
+<p>Totems last 8 to 11 seconds, so you recast them often. With Totem Mastery you can have several out at once, and you can mix types, for example Ice to slow and Fire to damage.</p>
+<h2 id="cap">How many skeletons and totems you can have</h2>
+<p>Every summon spell says the maximum is "1 by default which can be increased via skills". Two skills raise it, one rank at a time. The text below is the in-game text from the 1.0 game files (build {BUILD_ID}):</p>
+{cap_table}
+<p>So the maximum is <strong>4 Hollow Wretches and 4 totems</strong>. From an empty tree, maxing Advanced Necromancy costs {an_pts} points by the cheapest path and Totem Mastery {tm_pts}. On top of that, 1.0 added a global limit: the game "counts the currently active creatures spawned by players and enforces a maximum. When players cast more creatures than the allowed maximum, the oldest creature gets replaced."</p>
+<h2 id="other-minions">Other ways to get minions</h2>
+<ul class="dots">
+<li><strong>Necromancer skill</strong> ({e(_ranks_txt("Necromancer"))}): {e(_full_text("Necromancer"))}</li>
+<li><strong>Gem of Lesser Necromancy:</strong> a weapon gem that has a chance to raise an unarmored Hollow ally when you kill an enemy, if you don't already have one. The wiki says it drops from the Hollow Reaper in the Nomad Highlands Hollow Halls. 1.0 gave it a limit on how many companions it can raise, and gem companions now "start to lose health after a while when out of combat."</li>
+</ul>
+<h2 id="build">Build a summoner around these spells</h2>
+<p>Our <a href="/builds/necromancer/">Necromancer build</a> takes Advanced Necromancy, Totem Mastery and the Trickster nodes that speed up spellcasting, and has a full skill order from level 1 to 50. Load it in the <a href="/skill-planner/#b=necromancer">skill planner</a> to see every node, or start from the <a href="/skill-planner/#b=necromancer&amp;s=1">level 1 to 15 stage</a>. For what changed in 1.0, read <a href="/blog/enshrouded-necromancer-before-after-1-0/">the Necromancer before and after 1.0</a>. Healers and Battlemages can borrow a totem too: see the <a href="/builds/healer/">Healer</a> and <a href="/builds/battlemage/">Battlemage</a> builds.</p>
+<h2 id="faq">Summon spells FAQ</h2>
+{accordion(faq)}
+{sources(srcs)}
+</article></div>'''
+    title = "Enshrouded Summon Spells: How to Summon Skeletons & Totems"
+    desc = "How to summon skeletons and totems in Enshrouded 1.0: every Hollow Wretch and totem spell, recipes, who crafts them, and how to raise the cap to 4 of each."
+    write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, active="/builds/",
+                     keywords="enshrouded summon skeleton, enshrouded hollow wretch, enshrouded totem, enshrouded summon spells, enshrouded summoner",
+                     schemas=[article_schema(path, title, desc), cs, faq_schema(faq)]), "0.8")
+
+
+def _ranks_txt(name):
+    c, r = skill_cost(name)
+    return f"{c} pt" if r == 1 else f"{c} pt per rank, {r} ranks"
+
+
 # ============================================================ ABOUT / 404 / SEO FILES
 
 def about():
@@ -1534,6 +1617,7 @@ if __name__ == "__main__":
         area_page(area)
     respec()
     skill_points()
+    summon_spells()
     classes_page()
     about()
     privacy()

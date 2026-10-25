@@ -162,7 +162,7 @@ BUILDS = [
 ],
 "spells": [
 ("Entangle", "Roots enemies so you can keep firing from your spot."),
-("Summon Shock / Fire Totem", "Extra damage that stays put while you kite."),
+("Shock Totem / Fire Totem", "Extra damage that stays put while you kite."),
 ("Mana Drain", "Backup sustain in long boss fights."),
 ],
 "playstyle": [
@@ -200,7 +200,7 @@ BUILDS = [
 "keywords": "enshrouded necromancer build, enshrouded 1.0 necromancer build, enshrouded summoner build, enshrouded necromancer skill order, enshrouded 1.0 summon build, advanced necromancy",
 "tagline": "The Enshrouded 1.0 summoner build: raise Hollow skeletons, plant elemental totems and let your army do the work, with a full skill order from level 1 to 50.",
 "intro": [
-"The <strong>Enshrouded Necromancer build</strong> is the newest archetype in the game and is getting a lot of searches after the 1.0 launch. 1.0 added four summoning spells (<strong>Summon Hollow Skeleton, Summon Fire Totem, Summon Ice Totem</strong> and <strong>Summon Shock Totem</strong>) and two new skills, <strong>Advanced Necromancy</strong> and <strong>Totem Mastery</strong>, which raise how many skeletons and totems you can keep active.",
+"The <strong>Enshrouded Necromancer build</strong> is the newest archetype in the game and is getting a lot of searches after the 1.0 launch. 1.0 added four summoning spells (<strong>Hollow Wretch</strong> (the skeleton summon), <strong>Fire Totem, Ice Totem</strong> and <strong>Shock Totem</strong>) and two new skills, <strong>Advanced Necromancy</strong> and <strong>Totem Mastery</strong>, which raise how many skeletons and totems you can keep active. Every summon spell, its recipe and the summon caps are in our <a href="/summon-spells/">Enshrouded summon spells guide</a>.",
 "This summoner build takes those tools and puts them in a mage framework. Skeletons draw aggro and deal steady damage, totems hold chokepoints with elemental area damage, and you fire a wand from behind them. The guide explains how to path the new summon skills, which spells to slot, and how to keep your minions alive against 1.0 bosses.",
 ],
 "why": [
@@ -220,7 +220,7 @@ BUILDS = [
 ("Intelligence + Spirit nodes", "Mana pool for summons."),
 ]),
 ("Levels 16–35", [
-("Advanced Necromancy (new)", "+1 summoned Hollow ally per rank (+3 at max). Max it as soon as you have Summon Hollow Skeleton."),
+("Advanced Necromancy (new)", "+1 summoned Hollow ally per rank (+3 at max). Max it as soon as you have the Hollow Wretch spell."),
 ("Totem Mastery (new)", "+1 active totem per rank (3 ranks). Take it alongside your first totem spell."),
 ("Necromancer", "Kills with a magic weapon have a 5% chance per rank (15% at max) to summon a friendly skull."),
 ("Quick Charge", "Trickster node: 10% shorter spell charge time per rank, so summons and totems come out faster."),
@@ -244,16 +244,16 @@ BUILDS = [
 ("Main weapon", "<strong>Wand</strong> with Intelligence rolls", "Personal DPS and mana via Unity."),
 ("Community picks", "<strong>Staff of Reeds</strong> + <strong>Candlelight Wand</strong>", "Recommended by several 1.0 summoner guides. Swap to higher-level gear as you find it."),
 ("Armor options", "<strong>Flame Arcanist</strong> set (level 45) or Vorgoth's Soulbound pieces, plus the Ring of the Mother Flame", "Guides disagree on exact pieces. Prioritise mana and Intelligence rolls."),
-("Spells", "Summon Hollow Skeleton + 1–2 totem spells", "Upgrade Eternal versions when available."),
+("Spells", "Hollow Wretch (skeleton summon) + 1–2 totem spells", "Upgrade Eternal versions when available."),
 ("Armor", "Light set with mana / Intelligence bonuses", "Mana is the bottleneck."),
 ("Accessories", "Max mana, mana regen, magic damage", "Sustain first."),
 ("Food", "Mana dish, health dish, Intelligence dish", "Always fill all three."),
 ],
 "spells": [
-("Summon Hollow Skeleton", "Frontline minions that draw aggro."),
-("Summon Ice Totem", "Slows enemies so they stay in your kill zone."),
-("Summon Fire Totem", "Area damage that explodes when the totem expires."),
-("Summon Shock Totem", "Fills enemy stun bars so Merciless Attacks open up for your group."),
+("Hollow Wretch (skeleton summon)", "Frontline minions that draw aggro."),
+("Ice Totem", "Slows enemies so they stay in your kill zone."),
+("Fire Totem", "Area damage that explodes when the totem expires."),
+("Shock Totem", "Fills enemy stun bars so Merciless Attacks open up for your group."),
 ("Entangle", "Roots dangerous elites."),
 ],
 "playstyle": [
@@ -273,8 +273,8 @@ BUILDS = [
 "hybrids": [("wizard", "Wizard burst with summon support"), ("healer", "Summoner/Healer for co-op support"), ("battlemage", "Wand-heavy summoner")],
 "faqs": [
 ("What is the best necromancer skill order in Enshrouded 1.0?", "Open with Wand Mastery and Intelligence/Spirit nodes (levels 1–15). In the mid game (16–35) take Advanced Necromancy, Totem Mastery, Necromancer, Quick Charge, Mana Currents and Unity. Finish with Constitution, Life Burst and Chain Hit (36–50). The full step-by-step table is in the skill order section above."),
-("Is the necromancer build the same as the summoner build?", "Yes. Players search for both names, but in Enshrouded 1.0 they mean the same build: a mage that fights with Summon Hollow Skeleton and the Fire, Ice and Shock totems, scaled by Advanced Necromancy and Totem Mastery."),
-("Is there a Necromancer class in Enshrouded?", "There are no fixed classes, but Enshrouded 1.0 added Summon Hollow Skeleton, three elemental totem spells and the Advanced Necromancy and Totem Mastery skills. Together they make a real summoner build."),
+("Is the necromancer build the same as the summoner build?", "Yes. Players search for both names, but in Enshrouded 1.0 they mean the same build: a mage that fights with the Hollow Wretch skeleton summon and the Fire, Ice and Shock totems, scaled by Advanced Necromancy and Totem Mastery."),
+("Is there a Necromancer class in Enshrouded?", "There are no fixed classes, but Enshrouded 1.0 added the Hollow Wretch skeleton summon, three elemental totem spells and the Advanced Necromancy and Totem Mastery skills. Together they make a real summoner build."),
 ("What does Advanced Necromancy do?", "It raises how many Hollow skeletons you can have at the same time by one per rank, from a cap of 1 up to 4 at max rank. It is one of the eight new skills in Enshrouded 1.0."),
 ("What does Totem Mastery do?", "It raises your active totem limit by one per rank (up to 4 totems), so you can stack Fire, Ice and Shock totems together."),
 ("What does the Necromancer skill do?", "Necromancer is a Mage-tree skill that gives magic kills a chance to summon a friendly skull companion. Game-file planners list a 5% chance per rank, 15% at three ranks."),
@@ -342,7 +342,7 @@ BUILDS = [
 ],
 "spells": [
 ("Entangle", "Peel enemies off allies."),
-("Summon Ice Totem", "Slow incoming packs."),
+("Ice Totem", "Slow incoming packs."),
 ("Mana Drain", "Emergency mana."),
 ],
 "playstyle": [
