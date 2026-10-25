@@ -7,7 +7,7 @@ import shutil
 import subprocess
 
 from art import ART, alt_text, build_svg
-from blog import POSTS
+from blog import POSTS, _biome_rows, _tree_numbers
 from content_builds import BUILDS
 from planner import PLANNER_FAQ, client_payload, planner_page, skills_table
 from skills_data import PRESETS, TREE
@@ -72,6 +72,7 @@ HUBS = [
     ("/skill-tree/", "Skill Tree Guide (1.0)", "All 12 archetypes, attributes, skill points and respecs."),
     ("/classes/", "Enshrouded Classes", "No fixed classes: all 12 archetypes and which one to play."),
     ("/respec/", "How to Respec (1.0)", "Reset your skill tree at a Flame Altar: cost per stage and how to plan it."),
+    ("/skill-points/", "Skill Points (1.0)", "How many skill points you get: 212 at level 50, by level and by biome."),
     ("/builds/", "All Enshrouded Builds", "Compare every class build by role, stats and difficulty."),
 ]
 
@@ -842,7 +843,7 @@ def skill_tree():
 <p>Update 1.0 (October 15, 2026) reset every skill tree, so everyone is re-spending points right now. The <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds guide</a> has the full re-spec checklist. With the level cap at 50, you have more points than in Early Access, but still not enough to fill everything. The best builds pick <strong>one main archetype</strong>, go deep for its key skills, and use a <strong>neighbouring archetype</strong> for support: Tank armor for a Warrior, Battlemage sustain for a Wizard, Assassin crits for a Ranger. Avoid spreading single points across the whole tree. Many weak nodes add up to much less than a few strong capstones.</p>
 <p>Utility archetypes like <strong>Athlete, Trickster, Beastmaster and Survivor</strong> are rarely a build's main focus, but one or two of their nodes can help a lot with movement, control or exploring the Shroud. Trickster matters most for summoners: Quick Charge and Mana Currents are core skills of our <a href="/builds/necromancer/">Necromancer summoner build</a>, which casts skeletons and totems all fight long. For a plain-language overview of the archetypes, see <a href="/classes/">Enshrouded classes explained</a>.</p>
 <h2 id="skill-points">Enshrouded skill points: how many you get</h2>
-<p>You earn <strong>2 skill points per level</strong> after level 1, so 98 by the level 50 cap. Exploration adds the rest: <strong>1 point for each Shroud Root</strong> you destroy and <strong>3 points for each Elixir Well</strong> you cleanse, 114 points across the seven biomes. A fully explored level 50 character has <strong>212 skill points</strong>, while the whole tree (231 nodes, 178 different skills) costs 675. The <a href="/skill-planner/">Enshrouded skill planner</a> calculates your budget for any level and set of explored biomes.</p>
+<p>You earn <strong>2 skill points per level</strong> after level 1, so 98 by the level 50 cap. Exploration adds the rest: <strong>1 point for each Shroud Root</strong> you destroy and <strong>3 points for each Elixir Well</strong> you cleanse, 114 points across the seven biomes. A fully explored level 50 character has <strong>212 skill points</strong>, while the whole tree (231 nodes, 178 different skills) costs 675. The <a href="/skill-planner/">Enshrouded skill planner</a> calculates your budget for any level and set of explored biomes, and the <a href="/skill-points/">Enshrouded skill points</a> page has the full table by level and biome.</p>
 <h2 id="respec">How to respec in Enshrouded 1.0</h2>
 <p>Every existing character got one <strong>free skill tree reset</strong> when loading a save in Update 1.0, with all points refunded. After that:</p>
 <ul class="dots">
@@ -1193,6 +1194,92 @@ def respec():
                      schemas=[article_schema(path, title, desc), cs, faq_schema(faq)]), "0.7")
 
 
+def skill_points():
+    path = "/skill-points/"
+    ch, cs = breadcrumb([("/", "Home"), ("/skill-tree/", "Skill Tree"), (path, "Skill Points")])
+    from tree_data import PROGRESSION
+    per, cap = PROGRESSION["leveling"]["skillPointsPerLevel"], PROGRESSION["leveling"]["playerLevelCap"]
+    biomes = _biome_rows()
+    roots, wells, explore = sum(r[1] for r in biomes), sum(r[2] for r in biomes), sum(r[3] for r in biomes)
+    from_levels = per * (cap - 1)
+    total = from_levels + explore
+    nodes, area_pts = _tree_numbers()
+    full = sum(area_pts.values())
+    running, biome_rows = 0, []
+    for label, r, w, pts in biomes:
+        running += pts
+        biome_rows.append([label, str(r), str(w), f"<strong>{pts}</strong>", str(running)])
+    biome_table = table(["Biome (in story order)", "Shroud Roots (1 pt)", "Elixir Wells (3 pt)", "Skill points", "Running total"],
+                        biome_rows + [["<strong>Total</strong>", f"<strong>{roots}</strong>", f"<strong>{wells}</strong>", f"<strong>{explore}</strong>", ""]])
+    levels = [lv for lv in range(5, cap + 1, 5)]
+    level_table = table(["Level", "Points from levels"], [[str(lv), str(per * (lv - 1))] for lv in levels])
+    cum = [0]
+    for _, _, _, pts in biomes:
+        cum.append(cum[-1] + pts)
+    grid = table(["Level"] + [f"{i} biome{'s' if i != 1 else ''}" for i in range(len(cum))],
+                 [[f"<strong>{lv}</strong>"] + [str(per * (lv - 1) + c) for c in cum] for lv in [10, 15, 20, 25, 30, 35, 40, 45, cap]])
+    area_table = table(["Area", "Nodes", "Points to fill it", f"Share of {total} points"],
+                       [[a, str(nodes[a]), str(area_pts[a]), f"{round(100 * area_pts[a] / total)}%"] for a in ("Mage", "Ranger", "Warrior", "Core")]
+                       + [["<strong>Whole tree</strong>", f"<strong>{sum(nodes.values())}</strong>", f"<strong>{full}</strong>", f"{round(100 * full / total)}%"]])
+    stage_list = "".join(f"<li><strong>{label}:</strong> {bud} points with {b} biomes explored</li>" for label, bud, b in STAGES)
+    faq = [
+        ("How many skill points are there in Enshrouded 1.0?", f"{total} at most: {from_levels} from levels 2 to {cap}, plus {explore} from {roots} Shroud Roots and {wells} Elixir Wells."),
+        ("How many skill points do you get per level?", f"{per} for every level after level 1, so {from_levels} by the level {cap} cap."),
+        ("How many skill points does an Elixir Well give?", "3 skill points. A Shroud Root gives 1."),
+        ("Does the Flame level give skill points?", "No. In the 1.0 game data each Flame level adds attribute points, not skill points. Skill points only come from levels, Shroud Roots and Elixir Wells."),
+        ("Can you max out the skill tree in Enshrouded?", f"No. The whole tree costs {full} points and you get {total}, about {round(100 * total / full)}% of it. Every build picks a path through one area."),
+        ("Why do I have fewer than 212 skill points at level 50?", f"You are missing Shroud Roots or Elixir Wells. {roots} Roots and {wells} Wells exist, including 6 Roots that 1.0 added in the new areas near the edge of the map."),
+    ]
+    body = f'''
+<div class="hero-glow border-b"><div class="container py-12">{ch}
+<div class="flex flex-wrap gap-2">{badge("Enshrouded 1.0", "primary")}{badge("Updated " + UPDATED_HUMAN, "outline")}</div>
+<h1 class="mt-4 text-3xl font-bold tracking-tight md:text-5xl">How Many Skill Points in Enshrouded 1.0?</h1>
+<p class="mt-4 max-w-3xl text-lg text-muted-foreground">A fully explored level {cap} character has <strong>{total} skill points</strong>: {from_levels} from levels and {explore} from Shroud Roots and Elixir Wells. Below: where every point comes from, how many you have at each level, and what {total} points can buy.</p>
+<div class="mt-6 flex flex-wrap gap-3">{button("/skill-planner/", "Plan your points")}{button("#by-level", "Points by level", "outline")}</div></div></div>
+<div class="container py-10"><article class="prose-eb mx-auto max-w-4xl">
+<h2 class="!mt-0" id="sources">Where skill points come from</h2>
+<p>Enshrouded has three sources of skill points. All numbers on this page come from the 1.0 game files (build {BUILD_ID}).</p>
+<ul class="dots">
+<li><strong>Levels:</strong> {per} points for every level after 1. Level {cap} is the 1.0 cap, so that's <strong>{from_levels} points</strong>.</li>
+<li><strong>Shroud Roots:</strong> 1 point each. There are <strong>{roots}</strong>, worth {roots} points.</li>
+<li><strong>Elixir Wells:</strong> 3 points each. There are <strong>{wells}</strong>, worth {wells * 3} points.</li>
+</ul>
+<p>That adds up to <strong>{from_levels} + {roots} + {wells * 3} = {total}</strong>. More than half of your points come from exploring, not from levels.</p>
+<h2 id="by-level">Skill points from levels</h2>
+<p>Points from leveling alone, before any Roots or Wells:</p>
+{level_table}
+<h2 id="biomes">Shroud Roots and Elixir Wells by biome</h2>
+<p>The game data lists how many points each biome holds and how many point sources it has. Since a Root is worth 1 and a Well 3, that gives the split:</p>
+{biome_table}
+<p>Cinder's Cradle, the new 1.0 biome, has Shroud Roots only. The 1.0 changelog says it "brings 12 new Shroud Roots", and that the new areas near the edge of the world in Springlands, Blackmire and the Kindlewastes have "6 additional Shroud Roots".</p>
+<h2 id="lookup">Skill points by level and explored biomes</h2>
+<p>Find your level in the left column and the number of biomes you have fully cleared (in the order above). The cell is your total skill points:</p>
+{grid}
+<p>Our build guides use three of these as stages:</p>
+<ul class="dots">{stage_list}</ul>
+<p>Not sure how many Roots you have? Your in-game skill tree shows the exact total. Type it into the <a href="/skill-planner/">skill planner</a> under <em>Explored biomes</em> and it will use your real budget.</p>
+<h2 id="what-it-buys">What {total} skill points can buy</h2>
+<p>The 1.0 tree has {sum(nodes.values())} nodes and costs <strong>{full} points</strong> to fill, so even a fully explored character can afford about {round(100 * total / full)}% of it:</p>
+{area_table}
+<p>Filling the Mage or Ranger area alone takes more than your whole budget. That's why every one of our <a href="/builds/">1.0 builds</a> goes deep in one area and borrows a few nodes from a neighbour. The <a href="/skill-tree/">skill tree guide</a> explains the archetypes inside each area.</p>
+<h2 id="missing">Why you might have fewer than {total}</h2>
+<ul class="dots">
+<li><strong>Missed Shroud Roots.</strong> 1.0 added Roots in new areas at the edge of the map, which are easy to skip.</li>
+<li><strong>Uncleansed Elixir Wells.</strong> Each one is 3 points, so one missed Well costs as much as three Roots.</li>
+<li><strong>Not level {cap} yet.</strong> Each level is {per} points.</li>
+</ul>
+<p>Respecs don't cost points: a reset at a Flame Altar refunds everything for 1 Rune per spent point. See <a href="/respec/">how to respec</a>.</p>
+<h2 id="faq">Skill points FAQ</h2>
+{accordion(faq)}
+{sources([("https://enshrouded.wiki.gg/wiki/1.0_Update", "Enshrouded Wiki: 1.0 Update changelog")])}
+</article></div>'''
+    title = "Enshrouded Skill Points: How Many You Get in 1.0 (212)"
+    desc = f"Enshrouded 1.0 has {total} skill points at level {cap}: {from_levels} from levels, {roots} Shroud Roots and {wells} Elixir Wells. Points by level, biome and what they buy."
+    write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, active="/skill-tree/",
+                     keywords="enshrouded skill points, enshrouded max skill points, how many skill points enshrouded, enshrouded shroud roots, enshrouded elixir wells",
+                     schemas=[article_schema(path, title, desc), cs, faq_schema(faq)]), "0.8")
+
+
 # ============================================================ ABOUT / 404 / SEO FILES
 
 def about():
@@ -1446,6 +1533,7 @@ if __name__ == "__main__":
     for area in AREA_BUILDS:
         area_page(area)
     respec()
+    skill_points()
     classes_page()
     about()
     privacy()

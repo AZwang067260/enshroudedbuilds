@@ -128,7 +128,7 @@ def tree_changes_post():
 </ul>
 <p>The 1.0 game data lists how many points each biome holds and how many point sources it has. Because a Root is worth 1 point and a Well 3, those two numbers tell you how many of each there are:</p>
 {biome_table}
-<p>That's {roots} Roots and {wells} Wells for {explore} exploration points, plus {from_levels} from levels: <strong>{budget} in total</strong>. Cinder's Cradle has no Elixir Wells in the data, only Roots. Exploration is a big share early on: a level 15 character who has cleared Springlands and Revelwood has {per_level * 14} points from levels and {biomes[0][3] + biomes[1][3]} from those two biomes. Our build guides use exactly these stage budgets (level 15 with 2 biomes, level 35 with 4, level 50 with all 7).</p>
+<p>That's {roots} Roots and {wells} Wells for {explore} exploration points, plus {from_levels} from levels: <strong>{budget} in total</strong>. Cinder's Cradle has no Elixir Wells in the data, only Roots. Exploration is a big share early on: a level 15 character who has cleared Springlands and Revelwood has {per_level * 14} points from levels and {biomes[0][3] + biomes[1][3]} from those two biomes. Our build guides use exactly these stage budgets (level 15 with 2 biomes, level 35 with 4, level 50 with all 7). For every level and biome combination, see <a href="/skill-points/">how many skill points you have</a>.</p>
 <h2 id="tree-in-numbers">The 1.0 tree in numbers</h2>
 <p>The 1.0 tree has <strong>{sum(nodes.values())} nodes</strong> and {len(OUR)} different skills, split into three combat areas around a shared Core. Filling every node to max rank would cost {full} points:</p>
 {area_table}
