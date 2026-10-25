@@ -339,6 +339,72 @@ def battlemage_post():
 '''
 
 
+def build_impact_post():
+    from content_builds import BUILDS
+    tier = {b["slug"]: b["tier"] for b in BUILDS}
+    cap = PROGRESSION["leveling"]["playerLevelCap"]
+    full = STAGES[-1][1]
+    wand_new = ["Wand Evasion Attack", "Aerial Wand Attack", "Blast and Cast"]
+    summon_new = ["Advanced Necromancy", "Totem Mastery"]
+    archer_new = ["Puncture", "Barrage", "Survival Instinct"]
+    moved = table(["Moved skill", "Where it is in 1.0", "Cost"], [
+        [f"<strong>{n}</strong>", f"{OUR[n][0]} area / {OUR[n][1]} group", _ranks(n)] for n in ["Veteran", "One-Handed Specialization", "Inner Fires", "Snap"]])
+    rows = [
+        ("wizard", "9 new spell types, more tiers for old spells, an Eternal version of every spell, a ground cursor for area spells, cheaper spell charges", "The biggest winner on paper: more spells for every stage and fewer trips back for crafting resources"),
+        ("battlemage", f"Wand heavy attack, specials that can't be interrupted, better targeting and free aim, {_total(wand_new)} points of new wand skills, flat leech early", "Plays much smoother; mana sustain now leans on skills like Unity rather than leech gear"),
+        ("necromancer", f"New summon spells, Advanced Necromancy and Totem Mastery ({_total(summon_new)} points), a cap on player-spawned creatures, gem companions limited and losing health out of combat", "A real build for the first time, but with limits on how many creatures you can field"),
+        ("healer", "Eternal versions of all spells and the general spell rebalance; the notes name no healer-specific change", "Mostly unchanged; still a co-op role"),
+        ("warrior", "Stamina recovers while blocking, blocking follows the camera, shields repaired at camp anvils, One-Handed Specialization moved", "Safer to play; block-heavy play costs less stamina"),
+        ("tank", "Stamina while blocking, camera-direction blocking, shield repairs, Veteran moved into the Tank group", "Same role, less downtime"),
+        ("barbarian", "Heavy melee attacks can hit several close enemies, two-handed axe attack ranges fixed, stamina recovers while blocking", "Better against groups and more reliable swings"),
+        ("ranger", f"Eternal ember and voltaic arrows, upgradeable arrows, arrow rebalance, {_total(archer_new)} points of new archer skills, faster target switching", "Less ammo chore; the Albaneve boss weak point is no longer bow-only"),
+        ("assassin", "Dagger skills moved to the Assassin group, craftable dagger sets in tiers 2 and 3, dagger set perks changed from sneak attack damage to melee crit chance", "Easier to build and gear, but the sneak attack bonus on sets is gone"),
+    ]
+    impact = table(["Build", "Our tier", "1.0 changes that matter", "What it means"], [
+        [f'<a href="/builds/{s}/">{BUILD_NAMES[s]}</a>', tier[s], e(c), e(m)] for s, c, m in rows])
+    return f'''
+<p>The 1.0 changelog is long, and most of it is about the world, quests and building. This post pulls out only the lines that change how a build plays, and sorts them by build. Quotes are from Keen Games' 1.0 changelog (as published on the Enshrouded Wiki); skill costs are from the 1.0 game files (build {BUILD_ID}). For the full list of what's new, see our <a href="/enshrouded-1-0-patch-notes/">Enshrouded 1.0 patch notes summary</a>.</p>
+<p><strong>Short version:</strong> mages gained the most (new spells, Eternal spells, wand attacks, summons), melee got a smoother stamina and blocking loop, bows lost most of their ammo chores, and daggers moved to their own tree. Two changes hit everyone: the skill tree reset and the Shroud time rework.</p>
+<h2 id="everyone">Changes that hit every build</h2>
+<ul class="dots">
+<li><strong>Skill tree reset, level {cap}.</strong> Every old character's tree was reset on first load, and a fully explored level {cap} character now has {full} skill points. The numbers are in <a href="/blog/enshrouded-1-0-skill-tree-changes/">what changed in the 1.0 skill tree</a>.</li>
+<li><strong>Shroud time.</strong> Keen found that stacking Shroud time effects pushed the timer "very far into the background", so "their overall effectiveness has been reduced", while "many more hourglass capsules" now appear. Don't spend many points on Shroud time skills.</li>
+<li><strong>Leech perks.</strong> Percentage leech "was too strong in the late game". Early perks now use a flat value, and "the very valuable percentage leech is reserved for specific weapons and gear."</li>
+<li><strong>Enemy resistances.</strong> "Enemy damage susceptibilities have been reworked for a large number of enemies", and the "Effective" and "Resisted" labels now only show at 20% or more. Matching your damage type to the enemy pays off more consistently.</li>
+<li><strong>Boss retries.</strong> Enemies now recover health over time after you leave combat instead of resetting instantly, so a quick retry after a wipe starts with a partly damaged boss.</li>
+<li><strong>Gems.</strong> Gem of Battle Mania and Gem of Obsession had "some stats" lowered, and Gem of Toxic Reaction got "+21% dps on level 10 up to 65% on level 50."</li>
+<li><strong>Armor.</strong> Each Flame upgrade now unlocks the next tier's armor sets automatically.</li>
+</ul>
+<h2 id="by-build">What 1.0 changed for each build</h2>
+{impact}
+<h2 id="mages">Mage builds: spells, wands and summons</h2>
+<p>The changelog "added 9 new types of spells", "numerous additional tiers for previously existing spells", and says "all spells now have an eternal version". Eternal spells and arrows can be upgraded at the combat crafting survivors. Spell charges got cheaper: rare resources were removed from recipes, mined gems were added, and less ectoplasm is needed. That helps the <a href="/builds/wizard/">Wizard</a> and <a href="/builds/healer/">Healer</a> most.</p>
+<p>The <a href="/builds/battlemage/">Battlemage</a> got its own rework: a heavy attack, specials that "don't get interrupted by enemy attacks while casting anymore", range-aware targeting and a free-aim mode. Details in <a href="/blog/enshrouded-battlemage-before-after-1-0/">Battlemage before and after 1.0</a>.</p>
+<p>The <a href="/builds/necromancer/">Necromancer</a> came with limits. The Gem of Lesser Necromancy "now has a limit for the resurrected companions it can spawn", gem companions "start to lose health after a while when out of combat", and the game now "counts the currently active creatures spawned by players and enforces a maximum." On the plus side, skeleton companions' attacks "are no longer interrupted by enemy attacks." More in <a href="/blog/enshrouded-necromancer-before-after-1-0/">Necromancer before and after 1.0</a>.</p>
+<h2 id="melee">Melee builds: blocking, stamina and heavy attacks</h2>
+<ul class="dots">
+<li>"The player character's stamina now also recovers while blocking." This is the biggest change for the <a href="/builds/warrior/">Warrior</a> and <a href="/builds/tank/">Tank</a>.</li>
+<li>Blocking now uses "the camera blocking direction, rather than the direction the character is facing", which "should make blocking feel more responsive."</li>
+<li>"Heavy melee attacks can now hit several enemies when they are close to each other", and Keen "fixed the attack ranges for two-handed axes". Both help the <a href="/builds/barbarian/">Barbarian</a>.</li>
+<li>The Reaping weapon perk was "greatly buffed": its stamina regeneration "was previously too short to make a noticeable difference in combat."</li>
+<li>Anvils in enemy camps "now finally repair equipped shields and wards."</li>
+<li>Melee auto-targeting now "more strongly prefers enemies that are in close proximity to the player."</li>
+</ul>
+<p>Four skills also moved. If your old build used them, they are in a different spot now:</p>
+{moved}
+<h2 id="ranged">Ranger and Assassin: arrows and daggers</h2>
+<p>For the <a href="/builds/ranger/">Ranger</a>, Keen "revisited the balancing of the various arrows", "added new eternal ember arrows and eternal voltaic arrows", and made target switching with bows "possible much faster after the attack". The Albaneve Summits boss's back weak point "now works as a regular weak point for all weapons; previously, it only worked as a weak point for arrows." See <a href="/blog/enshrouded-ranger-before-after-1-0/">Ranger before and after 1.0</a>.</p>
+<p>For the <a href="/builds/assassin/">Assassin</a>, the dagger skills moved "from the warrior area of the skill tree to the assassin tree". Tiers 2 and 3 now each have "one craftable ranged combat set and one craftable dagger set". The dagger sets Assassin, Frostbite Slasher and Blood Feather now have "a melee attack critical hit chance improvement upgrade perk instead of a sneak attack damage increase."</p>
+<h2 id="what-to-do">What to do with your build now</h2>
+<ol>
+<li>Spend your refunded points. An empty tree is the biggest power loss in 1.0.</li>
+<li>Don't rebuy your old build node for node: costs changed and some skills moved.</li>
+<li>Plan in the <a href="/skill-planner/">skill planner</a> first. It has every build at level 15, 35 and 50, and you can enter your in-game point total.</li>
+<li>Check the <a href="/tier-list/">1.0 tier list</a> if you're choosing a new build, and the <a href="/respec/">respec guide</a> if you need to change one later.</li>
+</ol>
+'''
+
+
 # slug, publish date, title (<=60), description (<=155), H1, body function
 POSTS = [
     {"slug": "enshrouded-1-0-new-skills", "date": "2026-10-20",
@@ -371,4 +437,10 @@ POSTS = [
      "h1": "Enshrouded Battlemage: Wand Builds Before and After Update 1.0",
      "summary": "A heavy attack, two new wand attack skills, Blast and Cast, uninterruptible specials, ward repairs and the leech rebalance: the Battlemage before and after 1.0.",
      "body": battlemage_post},
+    {"slug": "enshrouded-1-0-changes-by-build", "date": "2026-10-25",
+     "title": "What Enshrouded 1.0 Changed for Each Build, Class by Class",
+     "description": "The Enshrouded 1.0 patch notes sorted by build: what changed for mages, melee, bows and daggers, with changelog quotes and what to do with your build now.",
+     "h1": "Enshrouded 1.0 Patch Notes Explained: What Changed for Each Build",
+     "summary": "Only the 1.0 changelog lines that change how a build plays, sorted by build: spells and wands, blocking and stamina, arrows and daggers.",
+     "body": build_impact_post},
 ]
