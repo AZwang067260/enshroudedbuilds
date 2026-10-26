@@ -149,15 +149,35 @@ def router_section(b):
                    + table(["Mage build", "Tier", "Weapons", "Role", "Best for"], rows))
 
 
+def summoner_section(b):
+    """Necromancer page: 'summoner build' is the same skill line under another name, so it gets its own H2 here, not its own page."""
+    if not b.get("summoner_h2"):
+        return ""
+    rows = [[f"<strong>{n}</strong>", f"{skill_cost(n)[0]} pt per rank"] + [e(game_text(n, r)) for r in range(1, skill_cost(n)[1] + 1)]
+            for n in ("Advanced Necromancy", "Totem Mastery", "Necromancer")]
+    return section("summoner", "Enshrouded Summoner Build: Same Skill Tree, Different Name",
+                   "<p>Players call it the summoner build or the necromancer build; in Enshrouded 1.0 both use the same skill line. Summon spells start with a cap of 1 Hollow ally and 1 totem. "
+                   "Advanced Necromancy and Totem Mastery each raise their cap by up to 3, so a maxed summoner keeps <strong>4 Hollow Wretches and 4 totems</strong> out, and the Necromancer skill adds a chance for a skull companion on magic kills. "
+                   "The 1.0 changelog also added a global limit: past it, \"the oldest creature gets replaced.\" In-game text from the 1.0 game files:</p>"
+                   + table(["Skill", "Cost", "Rank 1", "Rank 2", "Rank 3"], rows)
+                   + '<p>The rest of the summoner build is the same as below: Intelligence and Spirit, Quick Charge and Mana Currents for faster casting, and a wand for your own damage. To get the spells themselves, see <a href="/summon-spells/">how to summon skeletons and totems</a>.</p>')
+
+
 def spell_stats(b):
     """Wiki base stats for the build's main spells."""
     if not b.get("spell_stats"):
         return ""
     from spells_data import SPELLS, wiki_url
-    rows = [[f'<strong>{e(nm)}</strong>', str(SPELLS[nm][0]), f"{SPELLS[nm][1]}s", str(SPELLS[nm][2]), str(SPELLS[nm][3]), e(SPELLS[nm][4]),
-             e(SPELLS[nm][5]) + (f" ({e(SPELLS[nm][6])})" if SPELLS[nm][6] else "")] for nm in b["spell_stats"]]
+    from summon_data import SPELLS as SUMMONS
+    summon = {n: (lv, None, mana, dmg, (fx or "Ally that attacks enemies") + f"; lasts {dur}s", crafter, station)
+              for n, _, lv, _, mana, dmg, dur, fx, crafter, station, _, _ in SUMMONS}
+    data = {**SPELLS, **summon}
+    rows = [[f'<strong>{e(nm)}</strong>', str(data[nm][0]), f"{data[nm][1]}s" if data[nm][1] else "-", str(data[nm][2]), str(data[nm][3]), e(data[nm][4]),
+             e(data[nm][5]) + (f" ({e(data[nm][6])})" if data[nm][6] else "")] for nm in b["spell_stats"]]
+    more = (' The other tiers, Eternal versions and every recipe are in our <a href="/summon-spells/">guide to summoning skeletons and totems</a>.'
+            if any(nm in summon for nm in b["spell_stats"]) else "")
     return ('<p class="mt-6">Base stats of the first tier of each spell, from the Enshrouded Wiki spell pages (for example <a href="' + wiki_url(b["spell_stats"][0]) + '">' + e(b["spell_stats"][0]) + '</a>), before staff, skill and Intelligence bonuses:</p>'
-            + table(["Spell", "Level", "Cast", "Mana", "Damage", "What it does", "Crafted by"], rows))
+            + table(["Spell", "Level", "Cast", "Mana", "Damage", "What it does", "Crafted by"], rows) + (f"<p>{more.strip()}</p>" if more else ""))
 
 
 def build_page(b):
@@ -168,6 +188,8 @@ def build_page(b):
            ("skill-order", "Skill order (1–50)"), ("key-skills", "Key skills"), ("gear", "Best gear")]
     if b.get("router"):
         toc.insert(1, ("best-mage", "Which mage build is best"))
+    if b.get("summoner_h2"):
+        toc.insert(1, ("summoner", "Summoner build"))
     if b["spells"]:
         toc.append(("spells", "Spells & arrows"))
     toc += [("playstyle", "Playstyle & rotation"), ("pros-cons", "Pros & cons"), ("mistakes", "Common mistakes"),
@@ -276,6 +298,7 @@ def build_page(b):
     {quick_answer}
     {section("overview", f"Enshrouded {n} build overview", paras(b["intro"]) + quick)}
     {router_section(b)}
+    {summoner_section(b)}
     {section("why-1-0", f"What changed for the {n} in Enshrouded 1.0", paras(b["why"]) + alert("Update 1.0 skill tree reset", 'Every character\'s skill tree was reset when Enshrouded Update 1.0 launched on October 15, 2026, and all points were refunded. Re-spend your points before leaving your base. Your character level is kept. See all <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds</a>.') + respec)}
     {section("attributes", f"{n} attribute priority", f"<p>Attribute points decide how your {n.lower()} build scales. Use this priority when you spend points on the skill tree. What each of the six attributes does is explained in our <a href=\"/skill-tree/\">Enshrouded skill tree guide</a>.</p>" + table(["Attribute", "Priority", "Why"], [[f"<strong>{e(a)}</strong>", e(p), e(w)] for a, p, w in b["attributes"]]))}
     {section("skill-order", f"Enshrouded 1.0 {n} Skills &amp; Skill Order (Level 1–50)", f"<p>This is the full {n.lower()} skill order for Enshrouded 1.0, from level 1 to the new level 50 cap. Take the skills from top to bottom and fill in attribute nodes as you path between them. Each row lists the level range where that skill fits.</p>" + order_table + stages + alert("Hotfixes", "Skill names, costs and values were checked against the 1.0 game files (hotfix 1.0.0.2). Keen Games may still adjust values in later hotfixes, so check the in-game tooltip before committing your points."))}
@@ -564,7 +587,7 @@ def one_point_oh():
         ["Mage skills", "-", "Advanced Necromancy, Totem Mastery, Aerial Wand Attack, Wand Evasion Attack, Blast and Cast", '<a href="/builds/wizard/">Wizard</a>, <a href="/builds/battlemage/">Battlemage</a>, <a href="/builds/necromancer/">Necromancer</a>'],
         ["Archer skills", "-", "Puncture, Barrage, Survival Instinct", '<a href="/builds/ranger/">Ranger</a>, <a href="/builds/assassin/">Assassin</a>'],
         ["Spells", "-", "9 new spells incl. 4 summons", "Mage builds"],
-        ["Eternal gear", "-", "22 Eternal spells (tier 7, upgradeable) and upgradeable Eternal arrows", "Mage, Ranger"],
+        ["Eternal gear", "-", "An Eternal version of every spell, plus Eternal arrows; both upgradeable", "Mage, Ranger"],
         ["Daggers", "Warrior tree", "<strong>Assassin tree</strong>", '<a href="/builds/assassin/">Assassin</a>, <a href="/builds/warrior/">Warrior</a>'],
     ])
     checklist = [
@@ -685,7 +708,7 @@ def patch_notes():
         ["Wands", "Light attack only", "<strong>New heavy attack</strong> that pierces and can interrupt weaker enemies"],
         ["New skills", "-", "<strong>8</strong> (5 mage, 3 archer)"],
         ["New spells", "-", "<strong>9</strong> (4 of them summons)"],
-        ["Eternal gear", "-", "<strong>22 tier-7 Eternal spells</strong> and <strong>upgradeable Eternal arrows</strong>"],
+        ["Eternal gear", "-", "<strong>41 Eternal spells</strong> and <strong>upgradeable Eternal arrows</strong>"],
         ["Dagger skills", "Warrior tree", "<strong>Assassin tree</strong>"],
         ["Saves", "-", "Carry over (only the skill tree resets)"],
         ["Crossplay", "-", "Not at launch"],
@@ -722,7 +745,7 @@ def patch_notes():
 {spells}
 
 <h2 id="eternal">Eternal spells and Eternal arrows</h2>
-<p>1.0 adds <strong>Eternal</strong> versions of spells: 22 tier-7 Eternal spells that cast without using up spell charges and can be upgraded with perks. Archers get upgradeable <strong>Eternal arrows</strong> (an Eternal Ember fire line unlocks at levels 15, 28 and 45, plus a shock line) that cost mana instead of arrows, which removes most of the arrow crafting grind. See the <a href="/builds/wizard/">Wizard</a> and <a href="/builds/ranger/">Ranger</a> guides for which ones to upgrade first.</p>
+<p>1.0 adds <strong>Eternal</strong> versions of spells: the changelog says "all spells now have an eternal version", and the Enshrouded Wiki lists 41 of them, from level 20 to 45. They cast without using up spell charges and can be upgraded like weapons. Archers get upgradeable <strong>Eternal arrows</strong>: new Eternal ember and Eternal voltaic arrows at several tiers. See the <a href="/builds/wizard/">Wizard</a> and <a href="/builds/ranger/">Ranger</a> guides for which ones to upgrade first.</p>
 
 <h2 id="wands">Wand heavy attack and combat changes</h2>
 <p>Keen Games' official combat post confirms that <strong>wands now have a heavy attack</strong> that pierces through enemies and can interrupt weaker foes. Lock-on targeting was improved, wands can now hit explosive barrels, and <strong>melee heavy attacks now hit multiple enemies</strong>. Mana costs and cast times of spells were rebalanced as well.</p>
@@ -1372,7 +1395,7 @@ def summon_spells():
 <li><strong>Gem of Lesser Necromancy:</strong> a weapon gem that has a chance to raise an unarmored Hollow ally when you kill an enemy, if you don't already have one. The wiki says it drops from the Hollow Reaper in the Nomad Highlands Hollow Halls. 1.0 gave it a limit on how many companions it can raise, and gem companions now "start to lose health after a while when out of combat."</li>
 </ul>
 <h2 id="build">Build a summoner around these spells</h2>
-<p>Our <a href="/builds/necromancer/">Necromancer build</a> takes Advanced Necromancy, Totem Mastery and the Trickster nodes that speed up spellcasting, and has a full skill order from level 1 to 50. Load it in the <a href="/skill-planner/#b=necromancer">skill planner</a> to see every node, or start from the <a href="/skill-planner/#b=necromancer&amp;s=1">level 1 to 15 stage</a>. For what changed in 1.0, read <a href="/blog/enshrouded-necromancer-before-after-1-0/">the Necromancer before and after 1.0</a>. Healers and Battlemages can borrow a totem too: see the <a href="/builds/healer/">Healer</a> and <a href="/builds/battlemage/">Battlemage</a> builds.</p>
+<p>Our <a href="/builds/necromancer/">Enshrouded summoner build</a> (the Necromancer) takes Advanced Necromancy, Totem Mastery and the Trickster nodes that speed up spellcasting, and has a full skill order from level 1 to 50. Load it in the <a href="/skill-planner/#b=necromancer">skill planner</a> to see every node, or start from the <a href="/skill-planner/#b=necromancer&amp;s=1">level 1 to 15 stage</a>. For what changed in 1.0, read <a href="/blog/enshrouded-necromancer-before-after-1-0/">the Necromancer before and after 1.0</a>. Healers and Battlemages can borrow a totem too: see the <a href="/builds/healer/">Healer</a> and <a href="/builds/battlemage/">Battlemage</a> builds.</p>
 <h2 id="faq">Summon spells FAQ</h2>
 {accordion(faq)}
 {sources(srcs)}
