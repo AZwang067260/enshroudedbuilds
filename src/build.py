@@ -263,7 +263,7 @@ def build_page(b):
     <div>
     {crumbs_html}
     <div class="flex flex-wrap gap-2">{tier_badge(b["tier"])}{badge("Enshrouded 1.0", "outline")}{badge(b["role"])}{badge("Updated " + UPDATED_HUMAN, "outline")}{badge("Checked against 1.0.0.2 · build " + BUILD_ID, "outline")}</div>
-    <h1 class="mt-4 max-w-4xl text-3xl font-bold tracking-tight md:text-5xl">Enshrouded 1.0 {e(b["name"])} Build</h1>
+    <h1 class="mt-4 max-w-4xl text-3xl font-bold tracking-tight md:text-5xl">{e(b.get("h1") or "Enshrouded 1.0 " + b["name"] + " Build")}</h1>
     <p class="mt-4 max-w-3xl text-lg text-muted-foreground">{e(b["tagline"])}</p>
     <p class="mt-3 max-w-3xl leading-relaxed text-foreground/85">{lead}</p>
     <div class="mt-6 flex flex-wrap gap-3">{button("#skill-order", "Skill order 1–50")}{button("#gear", "Best gear", "outline")}{button(f"/skill-planner/#b={b['slug']}", "Open in skill planner", "outline")}</div>

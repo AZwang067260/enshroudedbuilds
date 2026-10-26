@@ -8,8 +8,9 @@ BUILDS = [
 "tier": "S", "role": "Ranged burst DPS", "difficulty": "Medium", "best_for": "Solo & co-op",
 "weapon": "Staff + wand swap", "armor": "Light (mage sets)",
 "primary": "Intelligence, Spirit",
-"title": "Enshrouded 1.0 Wizard Build: Best Mage Skill Order & Gear",
-"desc": "Best Enshrouded 1.0 Wizard (mage) build: skill order to level 50, Intelligence and Spirit priority, new spells like Pillar of Flames, and staff gear.",
+"title": "Enshrouded 1.0 Mage Build (Wizard): Skill Order & Spells",
+"h1": "Enshrouded 1.0 Mage Build: Wizard Skill Order, Spells & Gear",
+"desc": "Best Enshrouded 1.0 mage build (Wizard): skill order to level 50, Intelligence and Spirit priority, the best spells with stats, and staff gear.",
 "keywords": "enshrouded wizard build, enshrouded mage build, enshrouded 1.0 mage build, best enshrouded builds",
 "tagline": "The Enshrouded mage build for elemental burst from a safe distance. With the 1.0 spell pass the Wizard deals the most area damage in the game, as long as you manage your mana.",
 "intro": [
