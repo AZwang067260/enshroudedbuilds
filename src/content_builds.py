@@ -11,9 +11,9 @@ BUILDS = [
 "title": "Enshrouded 1.0 Wizard Build: Best Mage Skill Order & Gear",
 "desc": "Best Enshrouded 1.0 Wizard (mage) build: skill order to level 50, Intelligence and Spirit priority, new spells like Pillar of Flames, and staff gear.",
 "keywords": "enshrouded wizard build, enshrouded mage build, enshrouded 1.0 mage build, best enshrouded builds",
-"tagline": "Elemental burst from a safe distance. With the 1.0 spell pass the Wizard deals the most area damage in the game, as long as you manage your mana.",
+"tagline": "The Enshrouded mage build for elemental burst from a safe distance. With the 1.0 spell pass the Wizard deals the most area damage in the game, as long as you manage your mana.",
 "intro": [
-"The <strong>Enshrouded Wizard build</strong> is still one of the strongest and most popular Enshrouded builds in the 1.0 full release. You stay at range and hit groups of enemies with fire, ice and lightning from a staff. When an enemy closes the distance you Blink away and swap to a wand to rebuild your mana. Enshrouded has no fixed classes, so \"Wizard\" here means a path through the blue Mage section of the skill tree, with nearly every point going into magic damage, magic critical chance and mana sustain.",
+"This <strong>Enshrouded mage build</strong> is the Wizard, still one of the strongest and most popular builds in the 1.0 full release. You stay at range and hit groups of enemies with fire, ice and lightning from a staff. When an enemy closes the distance you Blink away and swap to a wand to rebuild your mana. Enshrouded has no fixed classes, so \"Wizard\" here means a path through the blue Mage section of the skill tree, with nearly every point going into magic damage, magic critical chance and mana sustain.",
 "Enshrouded 1.0 reset every skill tree and added nine new spells, so this mage build has been rebuilt around the new toolkit. Pillar of Flames, Blizzard and Ball Lightning give the Wizard real area denial. Mana Drain and Entangle cover utility, and the Eternal versions of spells no longer use up charges. This guide covers the full skill order from level 1 to the new level 50 cap, the attributes to raise, the gear to farm and how to play the build in solo and co-op.",
 ],
 "why": [
@@ -69,9 +69,9 @@ BUILDS = [
 "spells": [
 ("Pillar of Flames", "Area fire damage. Your go-to opener on packs."),
 ("Blizzard", "Large frost area that slows groups and protects your space."),
-("Ball Lightning", "Mobile shock damage that is good at chasing fleeing targets."),
-("Mana Drain", "Utility for sustain in long fights."),
-("Eternal spells", "Tier-7 Eternal versions cast without using spell charges and can be upgraded with perks. Upgrade your main damage spell first."),
+("Ball Lightning", "A slow ball that passes through enemies and strikes everything nearby. Best on groups."),
+("Mana Drain", "Drains mana from enemies without damaging them. Sustain between casts."),
+("Eternal spells", "Eternal versions don't use charges and can be upgraded like weapons (1.0 changelog). Upgrade your main damage spell first."),
 ],
 "playstyle": [
 "Open every fight from max range with Pillar of Flames or Blizzard on the densest group.",
@@ -85,16 +85,21 @@ BUILDS = [
 "mistakes": [
 "Putting every point into Intelligence and ignoring Constitution. At level 50, late-game enemies will one-shot you.",
 "Spamming staff attacks until mana is gone instead of weaving wand attacks.",
-"Leaving Eternal spells unupgraded. Their perks are a big part of 1.0 mage power.",
+"Leaving Eternal spells unupgraded. In 1.0 you can upgrade them like weapons at the combat crafting survivors.",
 "Respeccing without re-checking your hotbar after the 1.0 skill tree reset.",
 ],
+"router": ["wizard", "battlemage", "necromancer", "healer"],
+"spell_stats": ["Fireball I", "Pillar Of Flames I", "Chain Lightning I", "Blizzard I", "Ball Lightning I", "Mana Drain I"],
 "hybrids": [("battlemage", "Wizard + Battlemage hybrid for heavier wand play"), ("necromancer", "Summoner hybrid using the new totems"), ("healer", "Wizard/Healer support for co-op groups")],
 "faqs": [
 ("Is the Wizard the best build in Enshrouded 1.0?", "It is one of the top-tier builds. The Wizard has the best area damage in the game, and the nine new spells in 1.0 made it even stronger. A Barbarian or Tank is more forgiving for new players, though."),
 ("What attributes should an Enshrouded mage use?", "Mostly Intelligence, then Spirit for mana. Add enough Constitution to survive late-game hits. Strength and Dexterity do nothing for a caster."),
 ("Did the 1.0 skill tree reset affect mage builds?", "Yes. Every skill tree was reset at launch and the points were refunded. Re-spend them before leaving your base. The new mage skills include Advanced Necromancy, Totem Mastery, Aerial Wand Attack, Wand Evasion Attack and Blast and Cast."),
+("What is the best mage build in Enshrouded?", "For most players the <a href='/builds/battlemage/'>Battlemage</a>: it is the safest strong solo build. For the most area damage, take this Wizard build. For summons, the <a href='/builds/necromancer/'>Necromancer</a>, and for co-op support the <a href='/builds/healer/'>Healer</a>. The table at the top of this page compares all four."),
+("Is Wizard or Battlemage better in Enshrouded?", "Both are S-tier in our tier list. The Battlemage is safer: a ward or shield covers mistakes and Unity and Arcane Deflection keep its mana up. The Wizard deals more area damage but has a low health pool and punishes mistakes harder."),
+("What is the best mage build for leveling?", "Follow the level 1–15 stage of this build: Wizard and Mage Apprentice first, then Wand Specialization, Wand Mastery and Blink. The wand carries the early game while your spell list grows."),
 ("Staff or wand for the Wizard build?", "Both. The wand builds mana and triggers Blast and Cast, and the staff and spells deliver burst damage. Swapping between them is the core rotation."),
-("What are the best spells for a Wizard in 1.0?", "Pillar of Flames and Blizzard for area damage, Ball Lightning for moving targets, and Mana Drain for sustain. Upgrade the Eternal version of your main damage spell as soon as you can."),
+("What are the best spells for a Wizard in 1.0?", "Pillar of Flames and Blizzard for area damage, Ball Lightning for groups, and Mana Drain for sustain. Their base stats are in the spell table above. Upgrade the Eternal version of your main damage spell as soon as you can."),
 ],
 },
 # ---------------------------------------------------------------- BATTLEMAGE
