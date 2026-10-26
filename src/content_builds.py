@@ -106,6 +106,7 @@ BUILDS = [
 # ---------------------------------------------------------------- BATTLEMAGE
 {
 "slug": "battlemage", "short": "Battlemage", "name": "Battlemage (Wand Build)",
+"h1": "Enshrouded 1.0 Battle Mage Build: Wand, Ward & Skill Order",
 "tree": "Mage tree (Battlemage, Wizard)",
 "tier": "S", "role": "Mid-range sustained DPS", "difficulty": "Easy–Medium", "best_for": "Solo",
 "weapon": "Wand + ward or shield", "armor": "Light / medium",
@@ -115,7 +116,7 @@ BUILDS = [
 "keywords": "enshrouded battlemage build, enshrouded wand build, enshrouded 1.0 battlemage, enshrouded solo build",
 "tagline": "Endless wand fire with a ward or shield on your arm. The easiest strong solo build in Enshrouded 1.0.",
 "intro": [
-"The <strong>Enshrouded Battlemage build</strong>, which many players just call the wand build, mixes ranged magic with close-range survivability. You fire wand projectiles nonstop and keep a ward or shield ready to parry, and your mana refills on its own through Unity and Arcane Deflection. You never really run out of resources, which is why many players think it is the best solo build in Enshrouded.",
+"The <strong>Enshrouded Battlemage build</strong> (also written battle mage, and often just called the <strong>wand build</strong>) mixes ranged magic with close-range survivability. You fire wand projectiles nonstop and keep a ward or shield ready to parry, and your mana refills on its own through Unity and Arcane Deflection. You never really run out of resources, which is why many players think it is the best solo build in Enshrouded.",
 "In 1.0, the Battlemage keeps its core skills (<strong>Wand Mastery, Sting, Unity, Life Burst</strong>) and gains new options. <strong>Wand Evasion Attack</strong> fires a piercing disc when you dodge, <strong>Aerial Wand Attack</strong> turns a mid-air shot into an explosion, and <strong>Blast and Cast</strong> lets you add a staff for burst. Keen Games also gave every wand a heavy attack in 1.0 that pierces enemies and can interrupt weaker ones. Below is the full 1.0 Battlemage skill order, attribute plan, gear list and rotation.",
 ],
 "why": [
@@ -135,7 +136,7 @@ BUILDS = [
 ("Wand Specialization", "Unlocks your wand's special abilities, which trigger once your Focus bar is full."),
 ("Wand Mastery", "Raises wand damage (3 ranks, +5% each)."),
 ("Arcane Proliferation", "30% chance to double your wand projectiles (the extra ones deal 50% less damage). One rank, 3 points."),
-("Sting", "Boosts your wand attacks. Pick it up as soon as it is reachable."),
+("Sting", "Repeated wand damage +20%. Pick it up as soon as it is reachable."),
 ("Intelligence + Constitution nodes", "Alternate them so you are not fragile."),
 ]),
 ("Levels 16–35", [
@@ -160,14 +161,14 @@ BUILDS = [
 ],
 "gear": [
 ("Main weapon", "Highest-level <strong>wand</strong> (fire or shock rolls preferred)", "Your only real damage source. Upgrade it first."),
-("Off-hand", "<strong>Ward</strong> (the Prismatic Ward is the popular pick) or a shield", "Wards are the mage off-hand. Both can block and parry, and parries trigger Arcane Deflection."),
+("Off-hand", "<strong>Ward</strong> or a shield", "Both can block and parry, and every parry triggers Arcane Deflection. Example: the Prismatic Ward is a level 43 ward with +7 mana regeneration, crafted by the Alchemist at a Blast Furnace (Enshrouded Wiki)."),
 ("Optional", "Staff for Blast and Cast burst", "Only if you take Blast and Cast."),
 ("Armor", "Light or medium set with Intelligence + Constitution", "Survivability matters more than for a Wizard."),
 ("Rings / necklace", "Magic damage, crit, health", "Choose based on your weak point."),
 ("Food", "Health, mana and damage dishes", "Keep all three slots filled."),
 ],
 "spells": [
-("Entangle", "Roots enemies so you can keep firing from your spot."),
+("Entangle", "Roots smaller enemies in place (bigger ones are only slowed), so you can keep firing from your spot."),
 ("Shock Totem / Fire Totem", "Extra damage that stays put while you kite."),
 ("Mana Drain", "Backup sustain in long boss fights."),
 ],
@@ -185,12 +186,14 @@ BUILDS = [
 "Skipping Constitution because the build \"is a mage\".",
 "Ignoring the new 1.0 wand skills after the reset.",
 ],
-"hybrids": [("wizard", "Go full Wizard for more burst"), ("tank", "Battlemage/Tank for a nearly unkillable solo character"), ("necromancer", "Add skeletons and totems")],
+"hybrids": [("wizard", "Go full Wizard for more burst"), ("tank", "The melee mage, spellblade or sword mage: Tank nodes and a one-handed weapon for close range, the wand for range. Every parry restores mana through Arcane Deflection"), ("necromancer", "Add skeletons and totems")],
 "faqs": [
 ("Is the Battlemage wand build good in Enshrouded 1.0?", "Yes. It is one of the best solo builds in 1.0. Unity and Arcane Deflection keep your mana topped up, and the new wand skills added more area damage."),
 ("Wand or staff for a Battlemage?", "The wand is your main weapon. Carry a staff only if you plan to use Blast and Cast for burst windows."),
 ("Do I need a shield on a Battlemage?", "You need an off-hand that can parry, but it does not have to be a shield. Wards are the mage off-hand in 1.0 and can block and parry too. Either one lets Arcane Deflection restore mana on a successful parry."),
-("Ward or shield for a Battlemage?", "Most 1.0 guides use a ward, with the Prismatic Ward the most common pick, because wards roll mana and magic stats. A shield blocks better. Choose the shield if you keep dying to melee packs."),
+("Ward or shield for a Battlemage?", "Either works: both block and parry, so both feed Arcane Deflection. Wards are magic shields and can carry mana stats; the Prismatic Ward, for example, adds +7 mana regeneration. Use the highest-level one you have."),
+("Is Wizard or Battlemage better in Enshrouded?", "Both are S-tier in our tier list. The Battlemage is the safer solo build: a ward or shield covers mistakes, and Unity and Arcane Deflection keep its mana up. The <a href='/builds/wizard/'>Wizard</a> deals more area damage but has a low health pool."),
+("What is the best battlemage build in Enshrouded 1.0?", "The wand build on this page: Wand Mastery, Sting, Unity and Arcane Deflection first, then the new 1.0 wand skills. This Enshrouded battlemage build 1.0 guide has the full 1.0 battlemage build skill order from level 1 to 50, and each stage opens in the <a href='/skill-planner/#b=battlemage'>skill planner</a>."),
 ("What level do I get Unity?", "Plan to reach it in the mid-game (around levels 16–35 in this path). The exact point depends on how many attribute nodes you take along the way."),
 ],
 },

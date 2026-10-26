@@ -233,7 +233,7 @@ def build_page(b):
         cost_txt = f"{c} pt" if ranks == 1 else f"{c} pt × {ranks}"
         o = OUR.get(nm)
         core_rows.append([f'<strong>{e(nm)}</strong><br><span class="text-xs text-muted-foreground">{e(o[1] if o else "")}</span>',
-                          cost_txt, e(game_text(nm)), e(notes.get(nm, ""))])
+                          cost_txt, e(_full_text(nm)), e(notes.get(nm, ""))])
     key = (f'<p>The skills this build depends on, with the in-game text at max rank from the 1.0 game files (build {BUILD_ID}) and why each one matters for the {n.lower()}:</p>'
            + table(["Skill", "Cost", "In-game effect (max rank)", f"Why it matters for the {n}"], core_rows))
 
@@ -531,7 +531,7 @@ def builds_hub():
 ONE_FAQ = [
 ("When was Enshrouded 1.0 released?", "October 15, 2026, on Steam (PC) and PlayStation 5. The Xbox version is planned for 2027."),
 ("Do I lose my character in Enshrouded 1.0?", "No. Existing saves carry over. Only the skill tree is reset, and all points are refunded."),
-("What is the best build after the 1.0 update?", "For most players, the <a href='/builds/battlemage/'>Battlemage</a>, which nearly every 1.0 guide ranks first, or the new <a href='/builds/necromancer/'>Necromancer</a>. For pure area damage, the <a href='/builds/wizard/'>Wizard</a>. For melee, the <a href='/builds/barbarian/'>Barbarian</a>. See our <a href='/tier-list/'>tier list</a>."),
+("What is the best build after the 1.0 update?", "For most players, the <a href='/builds/battlemage/'>Enshrouded battlemage build</a>, which nearly every 1.0 guide ranks first, or the new <a href='/builds/necromancer/'>Necromancer</a>. For pure area damage, the <a href='/builds/wizard/'>Wizard</a>. For melee, the <a href='/builds/barbarian/'>Barbarian</a>. See our <a href='/tier-list/'>tier list</a>."),
 ("What new spells are in Enshrouded 1.0?", "Mana Drain, Entangle, Pillar of Flames, Blizzard, Ball Lightning, Fire Totem, Ice Totem, Shock Totem and Hollow Wretch (a skeleton summon)."),
 ("Is there crossplay in Enshrouded 1.0?", "There is no crossplay at launch."),
 ]
@@ -820,7 +820,7 @@ def tier_list():
 <h2 class="!mt-0">How we rank Enshrouded builds</h2>
 <p>Every build on this list can finish Enshrouded 1.0. For what Update 1.0 changed on October 15, 2026 and how to re-spec, read the <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds guide</a>. The tiers measure how <em>efficient</em> and <em>forgiving</em> a build is at the new level 50 cap with gear up to level 55. We score four things: damage output, survivability, solo strength and ease of use. A-tier builds are not weak. Several of them, like the Tank and Healer, are more valuable than S-tier builds in a coordinated co-op group.</p>
 <h2>S-tier Enshrouded builds</h2>
-<p>The <a href="/builds/battlemage/">Battlemage</a> is the build almost every 1.0 guide ranks first: Unity and Arcane Deflection keep its mana nearly infinite, and a ward or shield covers mistakes. The <a href="/builds/necromancer/">Enshrouded Necromancer build</a>, a summoner, joins it in S-tier because Advanced Necromancy and Totem Mastery let skeletons and totems hold whole fights. The Wizard, our <a href="/builds/wizard/">Enshrouded mage build</a>, has the best area damage in the game thanks to the new 1.0 spells and Blast and Cast. The <a href="/builds/barbarian/">Barbarian</a> brings the highest physical damage, using two-handed stuns as defense.</p>
+<p>The <a href="/builds/battlemage/">Enshrouded battlemage build</a> is the one almost every 1.0 guide ranks first: Unity and Arcane Deflection keep its mana nearly infinite, and a ward or shield covers mistakes. The <a href="/builds/necromancer/">Enshrouded Necromancer build</a>, a summoner, joins it in S-tier because Advanced Necromancy and Totem Mastery let skeletons and totems hold whole fights. The Wizard, our <a href="/builds/wizard/">Enshrouded mage build</a>, has the best area damage in the game thanks to the new 1.0 spells and Blast and Cast. The <a href="/builds/barbarian/">Barbarian</a> brings the highest physical damage, using two-handed stuns as defense.</p>
 <h2>A-tier Enshrouded builds</h2>
 <p>The <a href="/builds/tank/">Tank</a> and <a href="/builds/healer/">Healer</a> rank lower only because they shine in groups. The <a href="/builds/warrior/">Warrior</a> is the best build for beginners. The <a href="/builds/ranger/">Ranger</a> improved a lot with Eternal arrows and Puncture.</p>
 <h2>B-tier Enshrouded builds</h2>
