@@ -405,6 +405,56 @@ def build_impact_post():
 '''
 
 
+def assassin_post():
+    from content_builds import BUILDS
+    ab = next(b for b in BUILDS if b["slug"] == "assassin")
+    group = [n for n, o in OUR.items() if o[1] == "Assassin"]
+    dagger = [n for n in group if "Dagger" in _full_text(n)]
+    other = [n for n in group if n not in dagger]
+    dagger_table = table(["Skill", "Cost", "In-game effect at max rank"], [[f"<strong>{n}</strong>", _ranks(n), e(_full_text(n))] for n in dagger])
+    other_table = table(["Skill", "Cost", "In-game effect at max rank"], [[f"<strong>{n}</strong>", _ranks(n), e(_full_text(n))] for n in other])
+    stealth = table(["Skill", "Where", "Cost", "In-game effect at max rank"], [
+        [f"<strong>{n}</strong>", f"{OUR[n][0]} / {OUR[n][1]}", _ranks(n), e(_full_text(n))] for n in ["Sneak Attack", "Cutthroat", "Silent Stride", "Fatal Precision", "Survival Instinct"]])
+    ds_pts, _ = _max_from_scratch("Dagger Specialization")
+    vm_pts, _ = _max_from_scratch("Venom Mastery")
+    ew_pts, _ = _max_from_scratch("Expose Weakness")
+    stage, budget = _stage_has("assassin", ["Dagger Specialization", "Dagger Mastery", "Backstab Mastery"])
+    core = [k for k in PRESETS["assassin"] if not k.endswith(" node")]
+    return f'''
+<p>Before 1.0, a dagger build had to spend points in two places: the dagger skills sat in the Warrior area, while the crit and stealth skills that make daggers work were on the Ranger side. Update 1.0 moved the dagger skills to the Assassin group in the Ranger area and gave daggers their own craftable armor. This post shows where everything is now and how to skill an Assassin, with skill values from the 1.0 game files (build {BUILD_ID}) and quotes from Keen Games' 1.0 changelog.</p>
+<p><strong>Short version:</strong> the Assassin group now holds {len(group)} skills, {len(dagger)} of them for daggers. Unlocking the dagger special ability costs <strong>{ds_pts} points</strong> from an empty tree. Tiers 2 and 3 now have a craftable dagger armor set, and the dagger sets now upgrade melee crit chance instead of sneak attack damage.</p>
+<h2 id="what-changed">What changed for daggers in 1.0</h2>
+<ul class="dots">
+<li><strong>The skills moved.</strong> Keen "moved dagger-related skills from the warrior area of the skill tree to the assassin tree, where it makes much more sense." A dagger build no longer splits its points between two areas.</li>
+<li><strong>Craftable dagger armor.</strong> In the Revelwood and Nomad Highlands tiers, "the dagger sets could only be found as loot." Now "both the tier 2 and 3 have one craftable ranged combat set and one craftable dagger set each."</li>
+<li><strong>A different set perk.</strong> "The dagger sets Assassin, Frostbite Slasher, Blood Feather, and a new set now have a melee attack critical hit chance improvement upgrade perk instead of a sneak attack damage increase." Crit chance helps every hit; the old perk only helped openers.</li>
+</ul>
+<h2 id="dagger-skills">Every dagger skill in the Assassin group</h2>
+<p>All of these sit in the Assassin group of the Ranger area. The text is the in-game text at max rank:</p>
+{dagger_table}
+<p>Two things stand out. <strong>Expose Weakness</strong> works on dagger crits, so crit chance is worth more on an Assassin than on most builds. And the poison pair, <strong>Venomous Blades</strong> and <strong>Venom Mastery</strong>, only does something with daggers that have the Venomous Blades perk, so check your weapon before you buy them ({vm_pts} points to reach Venom Mastery from an empty tree).</p>
+<h2 id="other-skills">The rest of the Assassin group</h2>
+<p>The group also has skills that aren't tied to daggers. Some are survival picks for a light-armor build, others belong to bomb or travel builds:</p>
+{other_table}
+<p>Veiled Vigor is the one most Assassins take: it turns Dexterity into health, which a light-armor build needs. Airborne and Updraft are travel skills that any build can use.</p>
+<h2 id="stealth">Sneak attacks, crits and Shroud time</h2>
+<p>An Assassin also draws on a few skills outside the group:</p>
+{stealth}
+<p>Sneak Attack doesn't work with wands, staves or bows, so the dagger is your opener. Survival Instinct pays off for both weapons an Assassin carries, and gives back Shroud time now that stacked Shroud time bonuses are weaker in 1.0.</p>
+<h2 id="how-to-skill">How to skill an Assassin in 1.0</h2>
+<ol>
+<li><strong>Daggers first:</strong> Dagger Specialization for the special ability ({ds_pts} points from an empty tree), then Dagger Mastery.</li>
+<li><strong>Openers:</strong> Sneak Attack and Cutthroat, plus Backstab Mastery for fights that start without stealth.</li>
+<li><strong>Crits:</strong> Fatal Precision and Expose Weakness ({ew_pts} points from an empty tree).</li>
+<li><strong>Health:</strong> Veiled Vigor and a few Constitution nodes, because light armor won't save you.</li>
+<li><strong>Bow hybrid:</strong> Slice And Dice if you swap to a bow after a dagger crit.</li>
+</ol>
+<p>Our planner preset has Dagger Specialization, Dagger Mastery and Backstab Mastery by the end of the <strong>{stage.lower()}</strong> stage ({budget} points). Its full core: {", ".join(e(c) for c in core)}. Open the <a href="/skill-planner/#b=assassin&amp;s=1">level 1–15 Assassin preset</a> or the <a href="/skill-planner/#b=assassin">full level 50 build</a> in the planner, and see the <a href="/builds/assassin/">Assassin build guide</a> for gear and playstyle.</p>
+<h2 id="worth-it">Is the Assassin worth playing in 1.0?</h2>
+<p>It's the most demanding build on our <a href="/tier-list/">1.0 tier list</a>, at <strong>{ab["tier"]}-tier</strong>: huge openers, but {e(ab["cons"][0].lower())}. 1.0 made it easier to build (one area, craftable sets), not easier to play. If you like daggers but want more safety, pair them with a bow like the <a href="/builds/ranger/">Ranger</a> does: the two share the Ranger area. For the bigger picture, read <a href="/blog/enshrouded-1-0-changes-by-build/">what 1.0 changed for each build</a> and <a href="/blog/enshrouded-1-0-skill-tree-changes/">the 1.0 skill tree changes</a>.</p>
+'''
+
+
 # slug, publish date, title (<=60), description (<=155), H1, body function
 POSTS = [
     {"slug": "enshrouded-1-0-new-skills", "date": "2026-10-20",
@@ -443,4 +493,10 @@ POSTS = [
      "h1": "Enshrouded 1.0 Patch Notes Explained: What Changed for Each Build",
      "summary": "Only the 1.0 changelog lines that change how a build plays, sorted by build: spells and wands, blocking and stamina, arrows and daggers.",
      "body": build_impact_post},
+    {"slug": "enshrouded-assassin-dagger-skills-1-0", "date": "2026-10-26",
+     "title": "Enshrouded 1.0 Dagger Skills: How to Skill an Assassin Now",
+     "description": "Enshrouded 1.0 moved dagger skills to the Assassin group. Every dagger skill with 1.0 values, the new craftable dagger sets and how to skill an Assassin.",
+     "h1": "Enshrouded Assassin in 1.0: Dagger Skills and How to Skill Them",
+     "summary": "Where the dagger skills went in 1.0, every Assassin skill with its in-game text, the new dagger armor sets and a skill order for the Assassin.",
+     "body": assassin_post},
 ]
