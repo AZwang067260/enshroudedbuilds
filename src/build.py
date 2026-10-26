@@ -1560,6 +1560,9 @@ def seo_files():
         f.write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n')
     with open(os.path.join(OUT, "robots.txt"), "w") as f:
         f.write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
+    # Cloudflare static assets headers: keep the copied GPL text out of search results (it duplicates gnu.org)
+    with open(os.path.join(OUT, "_headers"), "w") as f:
+        f.write("/assets/planner/LICENSE.txt\n  X-Robots-Tag: noindex\n")
     with open(os.path.join(OUT, INDEXNOW_KEY + ".txt"), "w") as f:
         f.write(INDEXNOW_KEY)
     with open(os.path.join(OUT, "ads.txt"), "w") as f:
