@@ -127,7 +127,7 @@ def sources(extra=()):
             f'<h2 id="sources" class="!mt-0 !text-lg">Sources &amp; how we checked this guide</h2>'
             f'<p>Facts on this page were last checked on <strong>{UPDATED_HUMAN}</strong> against Enshrouded <strong>{GAME_VERSION}</strong>. '
             f'Patch facts come from Keen Games\' official posts. Skill ranks, point costs and percentages were checked against the in-game skill text exported from the 1.0 game files '
-            f'(build 1267041) and cross-checked with two independent community sources. Item names were checked against the official Enshrouded Wiki. '
+            f'(build 1267041, the launch build); point budgets come from the 1.0.0.2 export (build 1269579). Both were cross-checked with two independent community sources. Item names were checked against the official Enshrouded Wiki. '
             f'Read our <a href="/about/#methodology">methodology</a>.</p><ul class="dots">{links}</ul></section>')
 
 
@@ -163,6 +163,19 @@ def summoner_section(b):
                    + '<p>The rest of the summoner build is the same as below: Intelligence and Spirit, Quick Charge and Mana Currents for faster casting, and a wand for your own damage. To get the spells themselves, see <a href="/summon-spells/">how to summon skeletons and totems</a>.</p>')
 
 
+def arrow_table(b):
+    """Every Eternal arrow from the wiki item pages: level, rarity and how to get it."""
+    if not b.get("arrow_table"):
+        return ""
+    from arrows_data import ARROWS_PAGE, ETERNAL_ARROWS, wiki_url
+    rows = [[f'<strong>{e(n)}</strong>', el, str(lv), r, e(how)] for n, el, lv, r, how in ETERNAL_ARROWS]
+    return (f'<p class="mt-6">Eternal arrows "cost mana to shoot, but are not consumed when used" (<a href="{ARROWS_PAGE}">Enshrouded Wiki</a>). '
+            f'The 1.0 changelog "added new eternal ember arrows and eternal voltaic arrows at various tiers", and Eternal arrows can now be upgraded like weapons. '
+            f'Mana per shot grows with the tier: the wiki lists 14 for Eternal Frost Arrow I and 24 for tier II. All {len(ETERNAL_ARROWS)} Eternal arrows, sorted by level:</p>'
+            + table(["Eternal arrow", "Element", "Level", "Rarity", "How to get it"], rows)
+            + f'<p>Recipes are from the wiki item pages, for example <a href="{wiki_url(ETERNAL_ARROWS[1][0])}">{e(ETERNAL_ARROWS[1][0])}</a>. Unlock the next tier as you reach its level and switch element by enemy.</p>')
+
+
 def spell_stats(b):
     """Wiki base stats for the build's main spells."""
     if not b.get("spell_stats"):
@@ -191,7 +204,7 @@ def build_page(b):
     if b.get("summoner_h2"):
         toc.insert(1, ("summoner", "Summoner build"))
     if b["spells"]:
-        toc.append(("spells", "Spells & arrows"))
+        toc.append(("spells", "Eternal arrows" if b.get("arrow_table") else "Spells & arrows"))
     toc += [("playstyle", "Playstyle & rotation"), ("pros-cons", "Pros & cons"), ("mistakes", "Common mistakes"),
             ("hybrids", "Hybrid builds"), ("faq", "FAQ")]
     toc_html = "".join(f'<li><a href="#{i}" class="block rounded px-2 py-1 hover:bg-accent hover:text-foreground">{t}</a></li>' for i, t in toc)
@@ -284,7 +297,7 @@ def build_page(b):
   <div class="container grid items-center gap-8 py-10 md:py-14 lg:grid-cols-[1fr_420px]">
     <div>
     {crumbs_html}
-    <div class="flex flex-wrap gap-2">{tier_badge(b["tier"])}{badge("Enshrouded 1.0", "outline")}{badge(b["role"])}{badge("Updated " + UPDATED_HUMAN, "outline")}{badge("Checked against 1.0.0.2 · build " + BUILD_ID, "outline")}</div>
+    <div class="flex flex-wrap gap-2">{tier_badge(b["tier"])}{badge("Enshrouded 1.0", "outline")}{badge(b["role"])}{badge("Updated " + UPDATED_HUMAN, "outline")}{badge("Checked against 1.0.0.2", "outline")}</div>
     <h1 class="mt-4 max-w-4xl text-3xl font-bold tracking-tight md:text-5xl">{e(b.get("h1") or "Enshrouded 1.0 " + b["name"] + " Build")}</h1>
     <p class="mt-4 max-w-3xl text-lg text-muted-foreground">{e(b["tagline"])}</p>
     <p class="mt-3 max-w-3xl leading-relaxed text-foreground/85">{lead}</p>
@@ -304,7 +317,7 @@ def build_page(b):
     {section("skill-order", f"Enshrouded 1.0 {n} Skills &amp; Skill Order (Level 1–50)", f"<p>This is the full {n.lower()} skill order for Enshrouded 1.0, from level 1 to the new level 50 cap. Take the skills from top to bottom and fill in attribute nodes as you path between them. Each row lists the level range where that skill fits.</p>" + order_table + stages + alert("Hotfixes", "Skill names, costs and values were checked against the 1.0 game files (hotfix 1.0.0.2). Keen Games may still adjust values in later hotfixes, so check the in-game tooltip before committing your points."))}
     {section("key-skills", f"Key {n} skills explained", key)}
     {section("gear", f"Best {n} gear: weapons, armor, accessories and food", f"<p>Gear matters as much as skills in Enshrouded. With the 1.0 gear cap raised to 55, always upgrade your main weapon first. Here is the {n.lower()} loadout to aim for:</p>" + table(["Slot", "Recommended", "Why"], [[f"<strong>{e(s)}</strong>", p, e(w)] for s, p, w in b["gear"]]))}
-    {section("spells", "Best spells & arrows for this build", table(["Spell / arrow", "Use"], [[f"<strong>{e(s)}</strong>", e(u)] for s, u in b["spells"]]) + spell_stats(b)) if b["spells"] else ""}
+    {section("spells", b.get("spells_h2") or "Best spells & arrows for this build", table(["Spell / arrow", "Use"], [[f"<strong>{e(s)}</strong>", e(u)] for s, u in b["spells"]]) + spell_stats(b) + arrow_table(b)) if b["spells"] else ""}
     {section("playstyle", f"How to play the {n} build", '<ol class="my-4 list-decimal space-y-2 pl-5">' + "".join(f'<li class="leading-relaxed">{e(s)}</li>' for s in b["playstyle"]) + "</ol>")}
     {section("pros-cons", f"{n} build pros and cons", f'<div class="my-5 grid gap-4 sm:grid-cols-2">{pros}{cons}</div>')}
     {section("mistakes", f"Common {n.lower()} build mistakes", ul([e(m) for m in b["mistakes"]]))}
@@ -510,7 +523,7 @@ def builds_hub():
 {out}
 <div class="prose-eb mt-16 max-w-4xl">
 <h2>Choosing between Enshrouded builds</h2>
-<p>Because Enshrouded has no locked classes, every build here is a starting point, not a cage. Most players settle on one main archetype and borrow a few nodes from a neighboring one. A Warrior might take Tank armor scaling, a Wizard might add Battlemage wand sustain, and a Ranger might take Assassin crits. Each build page ends with a <em>Hybrid builds</em> section that shows which combinations work well. If you want a build that is both S-tier and easy, start with the <a href="/builds/necromancer/">Enshrouded Necromancer build</a>: summoned skeletons and totems take the hits while you attack from behind. For pure spellcasting, the <a href="/builds/wizard/">Enshrouded mage build</a> (Wizard) has the most area damage. New to the game? <a href="/classes/">Enshrouded classes explained</a> covers all twelve archetypes.</p>
+<p>Because Enshrouded has no locked classes, every build here is a starting point, not a cage. Most players settle on one main archetype and borrow a few nodes from a neighboring one. A Warrior might take Tank armor scaling, a Wizard might add Battlemage wand sustain, and a Ranger might take Assassin crits. Each build page ends with a <em>Hybrid builds</em> section that shows which combinations work well. If you want a build that is both S-tier and easy, start with the <a href="/builds/necromancer/">Enshrouded Necromancer build</a>: summoned skeletons and totems take the hits while you attack from behind. For pure spellcasting, the <a href="/builds/wizard/">Enshrouded mage build</a> (Wizard) has the most area damage, and for bows the <a href="/builds/ranger/">Enshrouded archer build</a> (Ranger) keeps you safe at range. New to the game? <a href="/classes/">Enshrouded classes explained</a> covers all twelve archetypes.</p>
 <p>If you are coming back after Update 1.0 (October 15, 2026), remember that your skill points were refunded. It is the best time to try something new, since you have to re-spend everything anyway. Our <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds guide</a> covers every change and the re-spec checklist.</p>
 <h2 id="also-known-as">What players call these builds</h2>
 <p>Players use different names for the same playstyles. If you search for one of these, this is the guide you want:</p>
@@ -822,7 +835,7 @@ def tier_list():
 <h2>S-tier Enshrouded builds</h2>
 <p>The <a href="/builds/battlemage/">Enshrouded battlemage build</a> is the one almost every 1.0 guide ranks first: Unity and Arcane Deflection keep its mana nearly infinite, and a ward or shield covers mistakes. The <a href="/builds/necromancer/">Enshrouded Necromancer build</a>, a summoner, joins it in S-tier because Advanced Necromancy and Totem Mastery let skeletons and totems hold whole fights. The Wizard, our <a href="/builds/wizard/">Enshrouded mage build</a>, has the best area damage in the game thanks to the new 1.0 spells and Blast and Cast. The <a href="/builds/barbarian/">Barbarian</a> brings the highest physical damage, using two-handed stuns as defense.</p>
 <h2>A-tier Enshrouded builds</h2>
-<p>The <a href="/builds/tank/">Tank</a> and <a href="/builds/healer/">Healer</a> rank lower only because they shine in groups. The <a href="/builds/warrior/">Warrior</a> is the best build for beginners. The <a href="/builds/ranger/">Ranger</a> improved a lot with Eternal arrows and Puncture.</p>
+<p>The <a href="/builds/tank/">Tank</a> and <a href="/builds/healer/">Healer</a> rank lower only because they shine in groups. The <a href="/builds/warrior/">Warrior</a> is the best build for beginners. The Ranger, our <a href="/builds/ranger/">Enshrouded archer build</a>, improved a lot with Eternal arrows and Puncture.</p>
 <h2>B-tier Enshrouded builds</h2>
 <p>The <a href="/builds/assassin/">Assassin</a> has the biggest single hit in the game: Sneak Attack deals +900% damage to unaware enemies, and daggers now live in its own tree. But sneak attacks are hard to land on bosses and the build has little armor, so most 1.0 guides rank it near the bottom. It is fun and strong in skilled hands.</p>
 <h2 id="consensus">How other 1.0 guides rank these builds</h2>
@@ -1033,7 +1046,7 @@ def area_page(area):
         new_html = ""
     extra = {"Mage": "Mages also got the most new spells in 1.0: nine new spell types including three totems and a skeleton summon, and an Eternal version of every spell that you can upgrade. See the <a href=\"/blog/enshrouded-1-0-new-skills/\">new 1.0 skills, rank by rank</a>, and for a full caster build start with our <a href=\"/builds/wizard/\">Enshrouded mage build</a>.",
              "Warrior": "No new combat skill landed in the Warrior area, but 1.0 moved all dagger skills to the Ranger area's Assassin group, lowered the cost of many skills and repositioned Veteran and One-Handed Specialization. Heavy melee attacks now hit several enemies, and stamina recovers while blocking.",
-             "Ranger": "The Ranger area also received every dagger skill from the Warrior area, so dagger builds now live entirely here. The <a href=\"/blog/enshrouded-1-0-skill-tree-changes/\">1.0 skill tree changes</a> post lists the moved skills.",
+             "Ranger": "The Ranger area also received every dagger skill from the Warrior area, so dagger builds now live entirely here. The <a href=\"/blog/enshrouded-1-0-skill-tree-changes/\">1.0 skill tree changes</a> post lists the moved skills. For a bow build, start with our <a href=\"/builds/ranger/\">Enshrouded ranger build</a>.",
              "Core": "Inner Fires and Snap were repositioned in 1.0, and Shroud time bonuses such as Inner Fires stack less well than before, according to the 1.0 changelog."}[area]
 
     all_rows = ""
