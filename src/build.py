@@ -116,6 +116,7 @@ OFFICIAL = [
     ("https://enshrouded.com/en-US/news/10-combat-changes-and-additions", "Keen Games: 1.0 combat changes and additions"),
     ("https://steamdb.info/patchnotes/25966634/", "SteamDB: hotfix 1.0.0.1 patch notes"),
     ("https://steamdb.info/patchnotes/25988036/", "SteamDB: hotfix 1.0.0.2 patch notes"),
+    ("https://enshrouded.com/en-US/news/changelog-for-hotfix-1003", "Keen Games: changelog for hotfix 1.0.0.3"),
     ("https://enshrouded.wiki.gg/wiki/1.0_Update", "Enshrouded Wiki: 1.0 Update"),
 ]
 
@@ -729,6 +730,7 @@ def patch_notes():
     hotfixes = table(["Hotfix", "Date", "Build-relevant changes"], [
         ["<strong>1.0.0.1</strong>", "October 15, 2026", "Crash and lighting fixes. The <strong>Fire Wisp</strong> scroll is now fixed at level 27; before, its damage scaled with player level and was far too strong in the endgame."],
         ["<strong>1.0.0.2</strong>", "October 16, 2026", "Fixed locked world settings, grey fog on Nvidia GPUs and crashes. Corrupted characters are skipped during migration. No balance changes."],
+        ["<strong>1.0.0.3</strong>", "October 21, 2026", "Missing Early Access rewards can now be redeemed from the pause menu. Fixed crashes (water simulation, leaving the game, interacting with factories and random crashes), an endless black screen when loading some multiplayer games, light flickering in very large bases and V-Sync stutter on AMD GPUs. Save migration now handles invalid backpack slots (those items are left behind) and a misplaced Flame Altar; in that case the base's water has to be added again. No balance changes."],
     ])
     body = f'''
 <div class="hero-glow border-b"><div class="container py-12">{ch}
@@ -763,8 +765,9 @@ def patch_notes():
 <h2 id="wands">Wand heavy attack and combat changes</h2>
 <p>Keen Games' official combat post confirms that <strong>wands now have a heavy attack</strong> that pierces through enemies and can interrupt weaker foes. Lock-on targeting was improved, wands can now hit explosive barrels, and <strong>melee heavy attacks now hit multiple enemies</strong>. Mana costs and cast times of spells were rebalanced as well.</p>
 
-<h2 id="hotfixes">Enshrouded 1.0 hotfixes (1.0.0.1 and 1.0.0.2)</h2>
+<h2 id="hotfixes">Enshrouded 1.0 hotfixes (1.0.0.1 to 1.0.0.3)</h2>
 {hotfixes}
+<p>Hotfix 1.0.0.3 (build 1273043) lists no skill or balance changes, so the skill values in our guides, checked against 1.0.0.2, still apply. On October 23 Keen Games also announced that Enshrouded 1.0 is Steam Deck Verified.</p>
 <h2 id="daggers">Dagger skills moved to the Assassin tree</h2>
 <p>Dagger skills moved from the Warrior tree to the <strong>Assassin tree</strong>. Dagger players can now focus their points in one area, and Warriors no longer path around dagger nodes. Read the updated <a href="/builds/assassin/">Assassin build</a> and <a href="/builds/warrior/">Warrior build</a>.</p>
 
