@@ -455,6 +455,66 @@ def assassin_post():
 '''
 
 
+MOVE_JUMP = ["Double Jump", "Crash Down Attack", "Crash Down: Force", "Upwards Slash Attack", "Bee Sting"]
+MOVE_GLIDE = ["Airborne", "Updraft"]
+MOVE_GROUND = ["Runner", "Wanderlust", "Arachnoid", "Silent Stride", "Splash Dash"]
+
+
+def movement_post():
+    every = MOVE_JUMP[:1] + MOVE_GLIDE + MOVE_GROUND
+    def rows(names):
+        return table(["Skill", "Area / archetype", "Cost", "Points from an empty tree", "In-game effect at max rank"], [
+            [f"<strong>{n}</strong>", f"{OUR[n][0]} / {OUR[n][1]}", _ranks(n), str(_max_from_scratch(n)[0]), e(_full_text(n))] for n in names])
+    def got(b):
+        sel = build_preset(b, 212)[0]
+        have = {}
+        for nid, r in sel.items():
+            n = our_name(NODES[nid]["type"])
+            have[n] = max(have.get(n, 0), r)
+        return have
+    names = MOVE_JUMP + MOVE_GLIDE + MOVE_GROUND
+    presets = table(["Build", "Movement skills in the level 50 preset", "Updraft from"], [
+        [f'<a href="/builds/{b}/">{BUILD_NAMES[b]}</a>',
+         ", ".join(f"{n} {r}/{skill_cost(n)[1]}" if skill_cost(n)[1] > 1 else n for n in names for h in [got(b)] if (r := h.get(n))),
+         _stage_has(b, ["Updraft"])[0] or "Not taken"] for b in BUILD_NAMES])
+    dj, _ = _max_from_scratch("Double Jump")
+    trio = dj + _max_from_scratch("Airborne")[0] + _max_from_scratch("Updraft")[0]
+    return f"""
+<p>Enshrouded is an exploration game first, and the skills that get you around are the ones you use on every trip: jumping, gliding, sprinting and climbing. This post lists every movement skill in the 1.0 skill tree with its cost and in-game text from the game files (build {BUILD_ID}), what each one actually does, and which of our build presets take it.</p>
+<p><strong>Short version:</strong> buy <strong>Double Jump</strong> first ({dj} points, and it sits right next to the starting Sparks). Add <strong>Airborne</strong> and <strong>Updraft</strong> for gliding once your build's core skills are done. Bow and dagger builds get the most from the ground skills, because Runner, Arachnoid and Silent Stride all sit in the Ranger area.</p>
+<h2 id="all-movement-skills">Every movement skill in Enshrouded 1.0</h2>
+<p>"Points from an empty tree" is the cheapest path from the start, with every rank bought. Your real cost is lower if your build already passes nearby.</p>
+{rows(every)}
+<h2 id="double-jump">Double Jump and jump attacks</h2>
+<p><strong>Double Jump</strong> is the one skill almost every build takes. It costs 2 points, sits in the Core area at the center of the tree, and each second jump costs 10 Stamina. It makes ledges, rooftops and dodging easier, and several attack skills build on it:</p>
+{rows(MOVE_JUMP[1:])}
+<p>For melee builds, <strong>Crash Down: Force</strong> only works from a double jump, so it is a reason to keep Double Jump even on a heavy two-hander. Bow users get <strong>Bee Sting</strong> instead: aiming in mid-air slows your fall, which pairs well with a double jump over a crowd.</p>
+<h2 id="gliding">Gliding: Airborne and Updraft</h2>
+<p>Both gliding skills sit in the Assassin group of the Ranger area, so a mage or warrior has to path a little to reach them.</p>
+<ul class="dots">
+<li><strong>Airborne</strong> ({_ranks("Airborne")}): {e(_full_text("Airborne"))} One rank is a cheap start; three ranks matter for long flights.</li>
+<li><strong>Updraft</strong> ({_ranks("Updraft")}): {e(_full_text("Updraft"))}</li>
+</ul>
+<p>Two details are easy to miss. Updraft costs <strong>Mana, not Stamina</strong>, so a glide never competes with your stamina bar. And it works once per flight: charge it fully for the extra boost instead of tapping it early.</p>
+<p>Taking all three (Double Jump, Airborne and Updraft) from an empty tree costs at most {trio} points, and less when the paths overlap. That's why every one of our level 50 presets includes Updraft.</p>
+<h2 id="running-climbing">Running, climbing and swimming</h2>
+{rows(MOVE_GROUND)}
+<p><strong>Runner</strong> is the best of these for long trips: faster sprints that also cost less stamina. <strong>Arachnoid</strong> pays off if you climb cliffs instead of walking around them. <strong>Wanderlust</strong> and <strong>Splash Dash</strong> are niche, so take them only when your path passes them. Silent Stride is for stealth builds that open with a sneak attack.</p>
+<h2 id="by-build">Which builds take which movement skills</h2>
+<p>These are the movement skills in each of our <a href="/skill-planner/">skill planner</a> presets at level 50 (212 points). "Updraft from" is the first game stage where the preset has it.</p>
+{presets}
+<p>Mage builds keep it light (Double Jump, one rank of Airborne and Updraft) because their points go into spells. Ranger and Assassin take nearly everything, since the movement skills share their area. Our <a href="/skill-points/">skill points guide</a> shows how many points you have at each stage if you want to fit more in.</p>
+<h2 id="order">What to buy first</h2>
+<ol>
+<li><strong>Double Jump</strong> as one of your first buys, for any build.</li>
+<li><strong>Runner</strong> early if you play a bow or dagger build; it sits in your own area.</li>
+<li><strong>Airborne</strong> (1 rank) and <strong>Updraft</strong> once your main damage skills are maxed, usually in the late game.</li>
+<li>Extra Airborne ranks, Arachnoid and the niche picks with leftover points.</li>
+</ol>
+<p>Try it before you spend: load your build in the <a href="/skill-planner/">Enshrouded skill planner</a> and add the movement skills to see what they cost from your path. For the class guides, see the <a href="/builds/wizard/">Enshrouded mage build</a>, the <a href="/builds/ranger/">Enshrouded ranger build</a> and the <a href="/builds/assassin/">Assassin build</a>. For more 1.0 changes, read <a href="/blog/enshrouded-1-0-skill-tree-changes/">the 1.0 skill tree changes</a> and <a href="/blog/enshrouded-1-0-new-skills/">the new 1.0 skills</a>.</p>
+"""
+
+
 # slug, publish date, title (<=60), description (<=155), H1, body function
 POSTS = [
     {"slug": "enshrouded-1-0-new-skills", "date": "2026-10-20",
@@ -499,4 +559,10 @@ POSTS = [
      "h1": "Enshrouded Assassin in 1.0: Dagger Skills and How to Skill Them",
      "summary": "Where the dagger skills went in 1.0, every Assassin skill with its in-game text, the new dagger armor sets and a skill order for the Assassin.",
      "body": assassin_post},
+    {"slug": "enshrouded-movement-skills-1-0", "date": "2026-11-02",
+     "title": "Enshrouded Movement Skills: Double Jump, Updraft & Airborne",
+     "description": "Every Enshrouded 1.0 movement skill with costs and in-game text: Double Jump, Updraft, Airborne, Runner and Arachnoid, plus which builds take them.",
+     "h1": "Enshrouded 1.0 Movement Skills: Double Jump, Updraft, Gliding and More",
+     "summary": "Every jumping, gliding, running and climbing skill in the 1.0 tree with costs from the game files, what to buy first and which builds take each one.",
+     "body": movement_post},
 ]
