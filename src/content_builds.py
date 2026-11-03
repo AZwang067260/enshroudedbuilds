@@ -611,7 +611,7 @@ BUILDS = [
 "tier": "A", "role": "Ranged physical DPS", "difficulty": "Medium", "best_for": "Solo & co-op",
 "weapon": "Bow + Eternal arrows", "armor": "Light / medium",
 "primary": "Dexterity, Constitution",
-"title": "Enshrouded 1.0 Ranger Build: Bow Skill Order & Gear",
+"title": "Enshrouded 1.0 Ranger (Archer) Build: Skill Order & Gear",
 "desc": "Enshrouded 1.0 Ranger build: bow skill order to level 50 with Marksman, Puncture, Barrage and Survival Instinct, plus the new Eternal arrows.",
 "keywords": "enshrouded ranger build, enshrouded archer build, enshrouded bow build, enshrouded 1.0 ranger, eternal arrows",
 "tagline": "Weak-point headshots from a long way off, now with Eternal arrows that cost mana instead of ammo and three new archer skills in 1.0.",
