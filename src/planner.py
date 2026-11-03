@@ -171,7 +171,7 @@ def planner_page(builds_lookup):
 <div class="container"><article class="prose-eb mx-auto max-w-4xl">
 <h2 id="about-planner">Enshrouded skill tree planner for the 1.0 release</h2>
 <p>Enshrouded 1.0 reset every character's skill tree, so most players are re-planning their build right now. This <strong>Enshrouded skill tree planner</strong> lets you do that before you spend a single point in the game. It draws the full 1.0 tree, with 231 nodes covering 178 different skills, at the positions and with the links the game uses. Like in Enshrouded itself, you can only learn a skill that connects to one you already have.</p>
-<p>Use the skill planner to test a new build, compare two paths to the same capstone, or check how many points a hybrid really costs. When you like the result, copy the build link and share it with your group.</p>
+<p>Use the skill planner to test a new build, compare two paths to the same capstone, or check how many points a hybrid really costs. When you like the result, copy the build link and share it with your group. For ideas, open one of the player-made <a href="/community-builds/">Enshrouded community builds</a> and change it.</p>
 <h2 id="how-to-use">How to use the Enshrouded skill planner</h2>
 <ol class="my-4 list-decimal space-y-2 pl-5">
 <li><strong>Load a build or start empty.</strong> Each preset is the level 50 version of one of our guides, following real paths through the tree: {guide_links}.</li>

@@ -74,6 +74,7 @@ HUBS = [
     ("/respec/", "How to Respec (1.0)", "Reset your skill tree at a Flame Altar: cost per stage and how to plan it."),
     ("/skill-points/", "Skill Points (1.0)", "How many skill points you get: 212 at level 50, by level and by biome."),
     ("/summon-spells/", "Summon Spells (1.0)", "How to summon skeletons and totems: every spell, recipe and summon cap."),
+    ("/community-builds/", "Community Builds (1.0)", "Player-made 1.0 builds from r/Enshrouded, ranked by upvotes and checked in the planner."),
     ("/builds/", "All Enshrouded Builds", "Compare every class build by role, stats and difficulty."),
 ]
 
@@ -1669,6 +1670,87 @@ def write_art():
     return jobs
 
 
+# ============================================================ COMMUNITY BUILDS
+
+def community_builds():
+    import community_data as cd
+    path = "/community-builds/"
+    ch, cs = breadcrumb([("/", "Home"), ("/builds/", "Builds"), (path, "Community Builds")])
+    guide = {f"/builds/{b['slug']}/": b["short"] for b in BUILDS}
+    colors = {"Core": "#a1a1aa", "Mage": "#60a5fa", "Warrior": "#f87171", "Ranger": "#4ade80"}
+    def split(areas):
+        total = sum(areas.values())
+        bar = "".join(f'<span style="width:{v / total * 100:.1f}%;background:{colors[a]}" title="{a} {v}"></span>' for a, v in areas.items() if v)
+        legend = " · ".join(f"{a} {v}" for a, v in areas.items() if v)
+        return f'<div class="mt-3 flex h-2 overflow-hidden rounded-full bg-muted">{bar}</div><p class="mt-1 text-xs text-muted-foreground">Points by area: {legend}</p>'
+    def card(b):
+        slug, name, group, author, votes, cid, code, level, spent, summary, related = b
+        lv, areas = cd.decode(code)
+        assert (lv, sum(areas.values())) == (level, spent), slug
+        meta = f"u/{e(author)} · {votes} upvote{'s' if votes != 1 else ''} · level {level}, {spent} points"
+        return f"""<section id="{slug}" class="not-prose my-6 rounded-lg border bg-card p-5">
+<h3 class="text-lg font-semibold">{e(name)}</h3><p class="mt-1 text-sm text-muted-foreground">{meta}</p>
+<p class="mt-3 text-sm leading-relaxed">{e(summary)}</p>{split(areas)}
+<div class="mt-4 flex flex-wrap gap-2">{button(cd.planner_url(code), "Open in planner")}{button(f"/assets/community/{slug}.jpg", "Share image", "outline")}
+{button(cd.comment_url(cid), "Original comment", "outline").replace("<a ", '<a rel="nofollow ugc noopener" target="_blank" ', 1)}</div>
+<p class="mt-3 text-xs text-muted-foreground">Compare with our <a class="text-primary hover:underline" href="{related}">{e(guide[related])} build guide</a>.</p></section>"""
+    ranked = sorted(cd.BUILDS, key=lambda b: -b[4])
+    overview = table(["Build", "Author", "Upvotes", "Level / points", "Style"], [
+        [f'<a href="#{b[0]}"><strong>{e(b[1])}</strong></a>', f"u/{e(b[3])}", str(b[4]), f"{b[7]} / {b[8]}", dict(cd.GROUPS)[b[2]].split(" builds")[0].split(" (")[0]] for b in ranked])
+    groups = "".join(f'<h2 id="{g}">{e(label)}</h2>' + "".join(card(b) for b in ranked if b[2] == g) for g, label in cd.GROUPS)
+    n = len(cd.BUILDS)
+    faq = [
+        ("Where do these Enshrouded builds come from?", f'From players in the r/Enshrouded thread <a href="{cd.THREAD}" rel="nofollow ugc noopener" target="_blank">Share your best 1.0 build</a>. Each build is credited to its author and links to the original comment.'),
+        ("Are these builds checked?", "Every link was opened in our skill planner: no build spends more points than its level allows on the 1.0 tree. The descriptions are the authors' own reasoning, not our tests."),
+        ("How do I add my build?", 'Make it in the <a href="/skill-planner/">skill planner</a>, copy the link and post it in the Reddit thread with a few lines on how you play it. We update this page from the thread.'),
+    ]
+    body = f"""
+<div class="hero-glow border-b"><div class="container py-12">{ch}
+<div class="flex flex-wrap gap-2">{badge("Enshrouded 1.0", "primary")}{badge("Upvotes as of " + cd.SNAPSHOT, "outline")}</div>
+<h1 class="mt-4 text-3xl font-bold tracking-tight md:text-5xl">Enshrouded Community Builds: Player-Made 1.0 Builds</h1>
+<p class="mt-4 max-w-3xl text-lg text-muted-foreground">{n} builds shared by players on r/Enshrouded, ranked by upvotes. Every one opens in the skill planner, so you can load it, change it and share your own version.</p>
+<div class="mt-6 flex flex-wrap gap-3">{button("#all", "See all builds")}{button("/skill-planner/", "Make your own", "outline")}</div></div></div>
+<div class="container py-10"><article class="prose-eb mx-auto max-w-4xl">
+<h2 class="!mt-0" id="all">All community builds at a glance</h2>
+<p>On October 24 we asked r/Enshrouded to <a href="{cd.THREAD}" rel="nofollow ugc noopener" target="_blank">share their best 1.0 build</a>. These are the builds from that thread with a planner link and a description, sorted by upvotes as of {cd.SNAPSHOT}. Each card summarizes the author's own reasoning; click through to the comment for their full write-up and gear.</p>
+{overview}
+{groups}
+<h2 id="how-picked">How these builds were picked</h2>
+<ul class="dots">
+<li><strong>A planner link and a description.</strong> Comments with only a link, or only a screenshot, aren't listed because we can't check them or explain them.</li>
+<li><strong>Checked in the planner.</strong> Every link was loaded on the 1.0 tree: none spends more points than its level allows. The three tank starter routes are deliberately short (about 20 points) and show only the opening.</li>
+<li><strong>Credit stays with the author.</strong> The summaries paraphrase each comment. Nothing here is our own recommendation; for that, see our <a href="/builds/">build guides</a> and <a href="/tier-list/">tier list</a>.</li>
+<li><strong>Want yours removed or updated?</strong> Reply in the thread or <a href="/contact/">contact us</a>.</li>
+</ul>
+<h2 id="faq">Community builds FAQ</h2>
+{accordion(faq)}
+</article></div>"""
+    title = f"Enshrouded Community Builds: {n} Player-Made 1.0 Builds"
+    desc = f"{n} Enshrouded 1.0 builds shared by players on r/Enshrouded, ranked by upvotes: mage, tank, bow and summoner builds you can open in the skill planner."
+    write(path, page(path=path, title=title, description=desc, body=body, builds=BUILDS, active="/builds/",
+                     keywords="enshrouded community builds, enshrouded player builds, enshrouded reddit builds, enshrouded 1.0 builds",
+                     schemas=[article_schema(path, title, desc), cs, faq_schema(faq)]), "0.8")
+
+
+def community_images():
+    """Share images for the community builds, drawn by the planner itself (needs the built site and Playwright)."""
+    import community_data as cd
+    jobs = os.path.join(OUT, "..", "community-jobs.json")
+    with open(jobs, "w") as f:
+        json.dump([[b[0], b[1], b[6]] for b in cd.BUILDS], f)
+    out = os.path.join(OUT, "assets", "community")
+    r = subprocess.run(["node", "src/og/community.js", OUT, jobs, out], cwd=ROOT)
+    os.remove(jobs)
+    if r.returncode:
+        return r.returncode
+    from PIL import Image  # the planner draws at 2x; 1600 px wide JPEGs keep each image small enough to share
+    for b in cd.BUILDS:
+        png = os.path.join(out, b[0] + ".png")
+        Image.open(png).convert("RGB").resize((1600, 900), Image.LANCZOS).save(png[:-4] + ".jpg", quality=86, optimize=True)
+        os.remove(png)
+    return 0
+
+
 if __name__ == "__main__":
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
@@ -1687,6 +1769,7 @@ if __name__ == "__main__":
     respec()
     skill_points()
     summon_spells()
+    community_builds()
     classes_page()
     about()
     privacy()
@@ -1700,6 +1783,6 @@ if __name__ == "__main__":
     # Share image: rendered from src/og/og.html with Playwright (skipped if Playwright is unavailable)
     og = subprocess.run(["node", "src/og/og.js", os.path.join(OUT, "og-image.png")], cwd=ROOT)
     og_builds = subprocess.run(["node", "src/og/og.js", *write_art()], cwd=ROOT)
-    if og.returncode or og_builds.returncode:
+    if og.returncode or og_builds.returncode or community_images():
         print("warning: og-image.png not rendered (install playwright to enable)")
     print(f"Built {len(PAGES)} pages into {OUT}")
