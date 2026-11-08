@@ -148,7 +148,15 @@ def router_section(b):
              by[s]["tier"], e(by[s]["weapon"]), e(by[s]["role"]), e(by[s]["best_for"])] for s in b["router"]]
     return section("best-mage", "Which Enshrouded mage build is best in 1.0?",
                    "<p>Pick the Wizard for area burst, the Battlemage for the safest solo play, the Necromancer for summons and the Healer for co-op support.</p>"
-                   + table(["Mage build", "Tier", "Weapons", "Role", "Best for"], rows))
+                   + table(["Mage build", "Tier", "Weapons", "Role", "Best for"], rows) + (WIZ_VS_BM if b["slug"] == "wizard" else ""))
+
+
+# Wizard page: players search this comparison in several word orders, so the answer names them all
+WIZ_VS_BM = ("<p><strong>Battlemage or Wizard: which should you pick?</strong> Whether you call it battlemage vs wizard, wizard vs battlemage or battle mage vs wizard, "
+             "the difference between Battlemage and Wizard comes down to range and safety. The Wizard swaps between a staff and a wand for ranged area burst, while the "
+             "Battlemage fights at mid range with a wand and a ward or shield for steady damage. Both are S-tier on our <a href=\"/tier-list/\">tier list</a> and spend most "
+             "of their points in the Mage area. If you're stuck on wizard or battlemage, take the Wizard for the biggest area damage solo or in co-op, and the "
+             "<a href=\"/builds/battlemage/\">Enshrouded Battlemage build</a> for the safest solo play.</p>")
 
 
 def summoner_section(b):
@@ -362,8 +370,8 @@ def home():
         card(f'<div class="p-5"><p class="text-3xl font-bold text-primary">{v}</p><p class="mt-1 text-sm text-muted-foreground">{l}</p></div>')
         for v, l in [("50", "New level cap in 1.0"), ("55", "Max gear level"), ("9", "New spells incl. summons"), ("12", "Skill tree archetypes")])
     picks = table(["Goal", "Best Enshrouded build", "Why"], [
-        ["Best overall", '<a href="/builds/wizard/">Wizard</a>', "Highest area damage and strong new 1.0 spells"],
-        ["Best solo", '<a href="/builds/battlemage/">Battlemage</a>', "Near-infinite mana with a shield for safety"],
+        ["Best overall", '<a href="/builds/wizard/">Enshrouded Wizard build</a>', "Highest area damage and strong new 1.0 spells"],
+        ["Best solo", '<a href="/builds/battlemage/">Enshrouded Battlemage build</a>', "Near-infinite mana with a shield for safety"],
         ["Best for beginners", '<a href="/builds/warrior/">Warrior</a>', "Self-healing, no mana, forgiving"],
         ["Best melee DPS", '<a href="/builds/barbarian/">Barbarian</a>', "Two-handed stuns and huge hits"],
         ["Best co-op tank", '<a href="/builds/tank/">Tank</a>', "Heavy armor scaling and aggro skills"],
