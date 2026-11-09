@@ -515,6 +515,50 @@ def movement_post():
 """
 
 
+def patch_101_post():
+    import re
+    def cost_of(name):
+        return re.search(r"Cost: ([^.]+?)(?:\s+Block Breaker|$)", _full_text(name)).group(1).strip()
+    aerial, evasion, whirl = cost_of("Aerial Wand Attack"), cost_of("Wand Evasion Attack"), cost_of("Whirlwind Crescendo")
+    wand = table(["Skill", "Before (1.0 launch data)", "After Patch 1.0.1.0"], [
+        ["<strong>Aerial Wand Attack</strong>", e(aerial), "<strong>40 Mana</strong>"],
+        ["<strong>Wand Evasion Attack</strong>", e(evasion), "Less mana (the changelog gives no number)"],
+        ["<strong>Whirlwind Crescendo</strong>", e(whirl), "Less stamina (the changelog gives no number)"],
+    ])
+    return f"""
+<p>Keen Games released <strong>Patch #1 (1.0.1.0)</strong> on November 2, 2026, the first update with balance changes since Enshrouded left Early Access. Two hotfixes followed on November 3 and 4. This post goes through the changelog and keeps only what matters for your build, with quotes from Keen's notes.</p>
+<p><strong>Short version:</strong> wand builds got a nerf and two buffs, two-handed builds got a cheaper Whirlwind Crescendo, and ranged builds can finally fight bosses from a distance without the boss healing. The patch doesn't change any skill's point cost or place in the tree, so <strong>you don't need to respec</strong>.</p>
+<h2 id="skill-changes">The three skill changes</h2>
+<p>These are the only skill changes in the notes. "Before" is the cost from the 1.0 launch game data; "after" is what the changelog says:</p>
+{wand}
+<h2 id="wands">Wand builds: one nerf, two buffs</h2>
+<ul class="dots">
+<li><strong>No more animation cancelling.</strong> "Wand attack frequency can't be unnaturally boosted anymore by animation-cancelling each shot via blocking." If you blocked between shots to fire faster, your wand damage per second goes down. Normal play is unchanged.</li>
+<li><strong>Aerial Wand Attack now costs mana.</strong> It "now costs 40 mana instead of stamina". Your stamina is free for dodging and jumping, but the jump shot now competes with your spells for mana.</li>
+<li><strong>Wand Evasion Attack is cheaper.</strong> Keen "reduced the mana costs for the Wand Evasion Attack". It was already the best of the new wand skills, and now you can fire it more often.</li>
+</ul>
+<p>For the <a href="/builds/battlemage/">Enshrouded Battlemage build</a>, the net effect is positive: the two skills it relies on for mobile damage got cheaper or moved off stamina. The <a href="/builds/wizard/">Wizard</a> uses the wand mostly to refill mana, so only the animation-cancel fix touches it.</p>
+<h2 id="bosses">Ranged builds: bosses stop healing at range</h2>
+<p>"Bosses now stay engaged in combat longer after having been attacked and even when players are far away." Keen's own example: ranged fights against the Fell Monstrosity were frustrating "when the boss suddenly started to recover health even while being shot at." That was a problem for every build that fights at range, so <a href="/builds/ranger/">Ranger</a>, Wizard and summoner players benefit most. The patch also shrank the hitbox of Fell mini critters, which "could block arrows when trying to shoot enemies behind them."</p>
+<h2 id="melee">Melee builds: cheaper Whirlwind Crescendo</h2>
+<p>Keen "lowered the stamina costs for Whirlwind Crescendo", the two-handed whirl at the end of an attack chain ({e(whirl)} in the launch data). Two-handed builds such as the <a href="/builds/barbarian/">Barbarian</a> can use it more often without running dry. Lupa's scalper daggers also enable the riposte kick again, which matters for <a href="/builds/assassin/">dagger builds</a> that use them.</p>
+<h2 id="summoners">Summoners and healers</h2>
+<ul class="dots">
+<li>The Wispwyvern and its undead version "couldn't get targeted correctly by totem spells and other summons". That's fixed, so a <a href="/builds/necromancer/">summoner build</a> works against them now. See <a href="/summon-spells/">how to summon skeletons and totems</a>.</li>
+<li>"Fixed that the Chain Heal spell can also heal enemy Hollow skeletons." <a href="/builds/healer/">Healers</a> no longer patch up the enemy by accident.</li>
+</ul>
+<h2 id="everyone">Fixes for every build</h2>
+<ul class="dots">
+<li>"Fixed that skills and attacks could stop working correctly after playing for several hours." If a skill seemed to stop working in long sessions, this was probably why.</li>
+<li>Fewer Fell enemies drop no loot ("another fix for this is planned for the next update"), and elite flying critters give more XP.</li>
+<li>Sprint can now be set to toggle in the keyboard and mouse settings.</li>
+<li>Hotfixes 1.0.1.1 and 1.0.1.2 only fix crashes, sound, textures and pinned recipes. They list no balance changes.</li>
+</ul>
+<h2 id="respec">Do you need to respec after 1.0.1?</h2>
+<p>No. No skill moved and no point cost changed, so your tree is still valid. The only reason to change it is if the new costs change your mind: a Battlemage who skipped Wand Evasion Attack may want it now. Check the change in the <a href="/skill-planner/">Enshrouded skill planner</a> before you pay Runes at the Flame Altar. For the full list of 1.0 changes and every hotfix, see the <a href="/enshrouded-1-0-patch-notes/">Enshrouded 1.0 patch notes</a> and <a href="/blog/enshrouded-1-0-changes-by-build/">what 1.0 changed for each build</a>.</p>
+"""
+
+
 # slug, publish date, title (<=60), description (<=155), H1, body function
 POSTS = [
     {"slug": "enshrouded-1-0-new-skills", "date": "2026-10-20",
@@ -565,4 +609,10 @@ POSTS = [
      "h1": "Enshrouded 1.0 Movement Skills: Double Jump, Updraft, Gliding and More",
      "summary": "Every jumping, gliding, running and climbing skill in the 1.0 tree with costs from the game files, what to buy first and which builds take each one.",
      "body": movement_post},
+    {"slug": "enshrouded-patch-1-0-1-builds", "date": "2026-11-09",
+     "title": "Enshrouded Patch 1.0.1: Wand Changes and What They Mean",
+     "description": "Enshrouded Patch 1.0.1 for builds: Aerial Wand Attack now costs mana, cheaper Wand Evasion Attack and Whirlwind Crescendo, bosses no longer heal at range.",
+     "h1": "Enshrouded Patch 1.0.1: What Changed for Your Build",
+     "summary": "Patch 1.0.1.0 and hotfixes 1.0.1.1 and 1.0.1.2, filtered for builds: the wand changes, cheaper Whirlwind Crescendo, bosses that stop healing at range, and whether to respec.",
+     "body": patch_101_post},
 ]
