@@ -142,6 +142,17 @@ def citations():
 
 # ============================================================ BUILD PAGES
 
+def community_box(b):
+    """Class guide: player-made builds for this class from /community-builds/, linked to their cards by anchor."""
+    import community_data as cd
+    picks = [x for x in sorted(cd.BUILDS, key=lambda x: -x[4]) if x[10] == f"/builds/{b['slug']}/"]
+    if not picks:
+        return ""
+    links = ", ".join(f'<a href="/community-builds/#{x[0]}" class="font-medium text-primary hover:underline">{e(x[1])}</a> (u/{e(x[3])})' for x in picks)
+    return (f'<aside class="not-prose my-6 rounded-lg border border-primary/40 bg-primary/5 p-4 text-sm leading-relaxed">'
+            f'<strong>Player-made {e(b["short"])} builds:</strong> {links}. Shared on r/Enshrouded and checked in our planner; each one opens in the skill planner from its card.</aside>')
+
+
 def router_section(b):
     """Short 'which build in this family' routing table; each row links out, the answer stays one sentence."""
     if not b.get("router"):
@@ -327,6 +338,7 @@ def build_page(b):
     {summoner_section(b)}
     {section("why-1-0", f"What changed for the {n} in Enshrouded 1.0", paras(b["why"]) + alert("Update 1.0 skill tree reset", 'Every character\'s skill tree was reset when Enshrouded Update 1.0 launched on October 15, 2026, and all points were refunded. Re-spend your points before leaving your base. Your character level is kept. See all <a href="/enshrouded-1-0-builds/">Enshrouded 1.0 builds</a>.') + respec)}
     {section("attributes", f"{n} attribute priority", f"<p>Attribute points decide how your {n.lower()} build scales. Use this priority when you spend points on the skill tree. What each of the six attributes does is explained in our <a href=\"/skill-tree/\">Enshrouded skill tree guide</a>.</p>" + table(["Attribute", "Priority", "Why"], [[f"<strong>{e(a)}</strong>", e(p), e(w)] for a, p, w in b["attributes"]]))}
+    {community_box(b)}
     {section("skill-order", f"Enshrouded 1.0 {n} Skills &amp; Skill Order (Level 1–50)", f"<p>This is the full {n.lower()} skill order for Enshrouded 1.0, from level 1 to the new level 50 cap. Take the skills from top to bottom and fill in attribute nodes as you path between them. Each row lists the level range where that skill fits.</p>" + order_table + stages + alert("Hotfixes", "Skill names, costs and values were checked against the 1.0 game files (hotfix 1.0.0.2). Keen Games may still adjust values in later hotfixes, so check the in-game tooltip before committing your points."))}
     {section("key-skills", f"Key {n} skills explained", key)}
     {section("gear", f"Best {n} gear: weapons, armor, accessories and food", f"<p>Gear matters as much as skills in Enshrouded. With the 1.0 gear cap raised to 55, always upgrade your main weapon first. Here is the {n.lower()} loadout to aim for:</p>" + table(["Slot", "Recommended", "Why"], [[f"<strong>{e(s)}</strong>", p, e(w)] for s, p, w in b["gear"]]))}
@@ -405,6 +417,7 @@ def home():
   <h2 id="quick-picks">Quick picks: which Enshrouded build should you play?</h2>
   <p>Not sure where to start? This table matches each common goal with the strongest <strong>Enshrouded 1.0 build</strong> for it. Every link goes to a full guide.</p>
   {picks}
+  <p>Want to see what other players run? Browse the <a href="/community-builds/">player-made Enshrouded builds from r/Enshrouded</a>, ranked by upvotes, and open any of them in the planner.</p>
 
   <h2 id="about-enshrouded-builds">How builds work in Enshrouded</h2>
   <p>Enshrouded is a survival action RPG by Keen Games set in the Shroud-covered world of Embervale. It has no character classes in the traditional sense. Every Flameborn character uses the same large skill tree, and your build depends on where you spend your skill points, which attributes you raise, and which weapons, armor and spells you equip. When players search for <strong>Enshrouded builds</strong>, they usually want a proven path through that tree for a specific playstyle: a mage, a tank, an archer or a melee fighter.</p>

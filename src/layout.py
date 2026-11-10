@@ -21,6 +21,7 @@ NAV = [
     ("/tier-list/", "Tier List"),
     ("/skill-tree/", "Skill Tree"),
     ("/skill-planner/", "Skill Planner"),
+    ("/community-builds/", "Community"),
 ]
 
 JS = """
@@ -166,13 +167,13 @@ def header(active):
     <a href="/" class="flex items-center gap-2 font-display text-lg font-bold tracking-wide" aria-label="Enshrouded Builds home">
       <span class="text-primary">{ICON_FLAME}</span><span>Enshrouded<span class="text-primary"> Builds</span></span>
     </a>
-    <nav class="hidden items-center gap-6 md:flex" aria-label="Main">{links}</nav>
+    <nav class="hidden items-center gap-6 lg:flex" aria-label="Main">{links}</nav>
     <div class="flex items-center gap-1">
       <button type="button" data-theme-toggle class="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent" aria-label="Toggle dark mode">{ICON_SUN}</button>
-      <button type="button" id="menu-btn" class="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent md:hidden" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">{ICON_MENU}</button>
+      <button type="button" id="menu-btn" class="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent lg:hidden" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">{ICON_MENU}</button>
     </div>
   </div>
-  <nav id="mobile-nav" class="hidden border-t md:hidden" aria-label="Mobile"><div class="container py-2">{mlinks}</div></nav>
+  <nav id="mobile-nav" class="hidden border-t lg:hidden" aria-label="Mobile"><div class="container py-2">{mlinks}</div></nav>
 </header>'''
 
 

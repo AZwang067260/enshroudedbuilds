@@ -235,7 +235,9 @@
     lv.value = st ? st[0] : D.levelCap;
     document.querySelectorAll('[data-biome]').forEach(function (c, i) { c.checked = !st || i < st[1]; });
   }
-  pre.addEventListener('change', function () { var v = pre.value; if (v) { loadPreset(v); track('planner_preset_load', { build: v, stage: 'full', source: 'menu' }); } pre.value = v; render(); });
+  pre.addEventListener('change', function () { var v = pre.value;
+    if (v.indexOf('c:') === 0) { if (unpackCode(v.slice(2))) { pts.value = ''; var ok = reachable(null); Object.keys(sel).forEach(function (id) { if (!ok[id]) delete sel[id]; }); track('planner_community_load', { source: 'menu' }); } pre.value = v; render(); return; }
+    if (v) { loadPreset(v); track('planner_preset_load', { build: v, stage: 'full', source: 'menu' }); } pre.value = v; render(); });
   document.querySelectorAll('[data-load]').forEach(function (a) {
     a.addEventListener('click', function (ev) {
       ev.preventDefault();

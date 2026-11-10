@@ -109,6 +109,18 @@ def build_ranking(builds_lookup):
 </section>'''
 
 
+def community_options(n=5):
+    """Top player builds by upvotes as a second group in the build menu; the value is the share code."""
+    import community_data as cd
+    top = sorted(cd.BUILDS, key=lambda x: -x[4])[:n]
+    return '<optgroup label="Community builds (Reddit)">' + "".join(f'<option value="c:{x[6]}">{e(x[1])} (u/{e(x[3])})</option>' for x in top) + "</optgroup>"
+
+
+def community_count():
+    import community_data as cd
+    return len(cd.BUILDS)
+
+
 def planner_page(builds_lookup):
     keys = type_key_by_name()
     field = "h-9 w-full rounded-md border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -119,7 +131,8 @@ def planner_page(builds_lookup):
     legend = "".join(f'<span class="inline-flex items-center gap-1.5"><i class="inline-block h-2.5 w-2.5 rounded-full" style="background:{c}"></i>{a}</span>' for a, c in AREA_COLORS.items())
     controls = f'''
 <div class="space-y-4 rounded-lg border bg-card p-4 shadow-sm">
-  <label class="block text-xs font-medium">Load a build<select id="pl-preset" class="mt-1 {field}"><option value="">Empty tree</option>{options}</select></label>
+  <label class="block text-xs font-medium">Load a build<select id="pl-preset" class="mt-1 {field}"><option value="">Empty tree</option>{options}{community_options()}</select></label>
+  <p class="-mt-2 text-xs"><a href="/community-builds/" class="font-medium text-primary hover:underline">See all {community_count()} community builds →</a></p>
   <div>
     <div class="flex items-baseline justify-between text-sm"><span>Points spent</span><span><strong id="pl-spent">0</strong> / <span id="pl-budget">212</span></span></div>
     <div class="mt-2 h-2 overflow-hidden rounded-full bg-secondary"><div id="pl-bar" class="h-full bg-primary transition-all" style="width:0"></div></div>
